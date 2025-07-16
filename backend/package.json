@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "0.0.1",
+  "description": "Backend for the game NodeRace",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ming Bao, Jacob Lum",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
