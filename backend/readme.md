@@ -5,5 +5,7 @@ First you have to install node.js
 ##Run
 
 >npm start  
+
 or  
+
 >node app.js
