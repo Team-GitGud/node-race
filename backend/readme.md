@@ -1,11 +1,7 @@
-##Setup  
+## Setup  
 First you have to install node.js
 >npm install  
 
-##Run
+## Run
 
->npm start  
-
-or  
-
->node app.js
+>npm run dev
