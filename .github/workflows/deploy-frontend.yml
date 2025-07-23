@@ -3,8 +3,10 @@ on:
   push:
     branches:
       - main
+      - alexanderheffernan/github-pages-hosting
     paths:
       - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
 
 jobs:
   build-and-deploy:
