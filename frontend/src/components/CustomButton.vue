@@ -62,22 +62,7 @@ withDefaults(
 .button-background-shadow {
 	display: inline-block;
 	padding: 0 4px 4px 0;
-}
-
-.button-background-shadow.type-neutral {
-	background-color: #fff;
-}
-
-.button-background-shadow.type-positive {
-	background-color: #069701;
-}
-
-.button-background-shadow.type-negative {
-	background-color: #8f0000;
-}
-
-.button-background-shadow.disabled {
-	background-color: #5a5a5a;
+	transition: all 0.3s ease;
 }
 
 .custom-button:hover:not(.disabled) {
@@ -89,9 +74,39 @@ withDefaults(
 	color: #ffffff;
 }
 
+.type-neutral:active:not(.disabled) {
+	border-color: color-mix(in srgb, #ffffff 40%, black);
+	color: color-mix(in srgb, #ffffff 40%, black);
+	transition: all 0.1s linear;
+}
+
+.button-background-shadow.type-neutral {
+	background-color: #fff;
+}
+
+.button-background-shadow.type-neutral:active:not(.disabled) {
+	background-color: color-mix(in srgb, #ffffff 40%, black);
+	transition: all 0.1s linear;
+}
+
 .type-positive {
 	border-color: #069701;
 	color: white;
+}
+
+.type-positive:active:not(.disabled) {
+	border-color: color-mix(in srgb, #069701 40%, black);
+	color: color-mix(in srgb, #ffffff 40%, black);
+	transition: all 0.1s linear;
+}
+
+.button-background-shadow.type-positive {
+	background-color: #069701;
+}
+
+.button-background-shadow.type-positive:active:not(.disabled) {
+	background-color: color-mix(in srgb, #069701 40%, black);
+	transition: all 0.1s linear;
 }
 
 .type-negative {
@@ -99,9 +114,28 @@ withDefaults(
 	color: white;
 }
 
+.type-negative:active:not(.disabled) {
+	border-color: color-mix(in srgb, #8f0000 40%, black);
+	color: color-mix(in srgb, #ffffff 40%, black);
+	transition: all 0.1s linear;
+}
+
+.button-background-shadow.type-negative {
+	background-color: #8f0000;
+}
+
+.button-background-shadow.type-negative:active:not(.disabled) {
+	background-color: color-mix(in srgb, #8f0000 40%, black);
+	transition: all 0.1s linear;
+}
+
 .custom-button.disabled {
 	opacity: 0.4;
 	border-color: #5a5a5a;
 	cursor: not-allowed;
+}
+
+.button-background-shadow.disabled {
+	background-color: #5a5a5a;
 }
 </style>
