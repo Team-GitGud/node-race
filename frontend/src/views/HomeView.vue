@@ -5,7 +5,7 @@
     />
     <ModalPopup title="Modal Popup" v-if="isModalOpen" @close="isModalOpen = false">
       <template #body>
-        <p>This is a modal popup example.</p>
+        <p style="font-size: 24px;">This is a modal popup example.</p>
       </template>
       <template #footer>
         <CustomButton text="Action 1" :action="() => console.log('Action 1 clicked')" type="positive" />

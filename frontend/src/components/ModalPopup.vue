@@ -80,6 +80,7 @@ defineProps<{ title?: string }>();
 
 .modal-header h3 {
     margin: 0;
+    font-size: 28px;
 }
 
 .close-button {
