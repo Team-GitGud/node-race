@@ -22,9 +22,9 @@ Props:
         <div class="modal">
             <div v-if="title" class="modal-header">
                 <h3>{{ title }}</h3>
-                <button class="close-button" @click="$emit('close')">X</button>
+                <CustomButton text="X" :action="() => $emit('close')" />
             </div>
-            <button v-else class="close-button no-title" @click="$emit('close')">X</button>
+            <CustomButton v-else text="X" :action="() => $emit('close')" />
             <div class="modal-body">
                 <slot name="body" />
             </div>
@@ -37,6 +37,7 @@ Props:
 
 <script setup lang="ts">
 import { defineProps } from 'vue';
+import CustomButton from '@/components/CustomButton.vue';
 defineProps<{ title?: string }>();
 </script>
 
@@ -60,12 +61,12 @@ defineProps<{ title?: string }>();
 
 .modal {
     position: relative;
-    background: #fff;
-    border-radius: 8px;
+    background: #00040D;
     padding: 1.5rem;
     min-width: 300px;
     z-index: 1002;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+    border: 1px solid white;
 }
 
 .modal-header {

@@ -1,18 +1,15 @@
 <template>
   <div class="home">
     <h1>NodeRace</h1>
-    <CustomButton
-      text="Click Me"
-      :action="() => console.log('hello')"
+    <CustomButton text="Open Modal" :action="() => isModalOpen = true"
     />
-    <button @click="isModalOpen = true">Open Modal</button>
-    <ModalPopup v-if="isModalOpen" @close="isModalOpen = false">
+    <ModalPopup title="Modal Popup" v-if="isModalOpen" @close="isModalOpen = false">
       <template #body>
         <p>This is a modal popup example.</p>
       </template>
       <template #footer>
-        <button>Action 1</button>
-        <button @click="isModalOpen = false">Close</button>
+        <CustomButton text="Action 1" :action="() => console.log('Action 1 clicked')" type="positive" />
+        <CustomButton text="Close" :action="() => isModalOpen = false" type="negative" />
       </template>
     </ModalPopup>
   </div>
