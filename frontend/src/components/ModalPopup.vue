@@ -1,11 +1,30 @@
+<!--
+Usage:
+<ModalPopup title="My Modal" v-if="isOpen" @close="isOpen = false">
+    <template #body>
+        <p>Modal content here.</p>
+    </template>
+    <template #footer>
+        <button @click="isOpen = false">Close</button>
+    </template>
+</ModalPopup>
+
+Import this component in your Vue file:
+import ModalPopup from '@/components/ModalPopup.vue';
+
+Props:
+- title (optional, string): If provided, displays a header with the title and a close button. If omitted, only a close button appears in the top-right.
+-->
+
 <template>
     <div class="modal-popup">
         <div class="overlay" @click="$emit('close')"></div>
         <div class="modal">
-            <div class="modal-header">
+            <div v-if="title" class="modal-header">
                 <h3>{{ title }}</h3>
                 <button class="close-button" @click="$emit('close')">X</button>
             </div>
+            <button v-else class="close-button no-title" @click="$emit('close')">X</button>
             <div class="modal-body">
                 <slot name="body" />
             </div>
@@ -18,7 +37,7 @@
 
 <script setup lang="ts">
 import { defineProps } from 'vue';
-defineProps<{ title: string }>();
+defineProps<{ title?: string }>();
 </script>
 
 <style scoped>
@@ -40,6 +59,7 @@ defineProps<{ title: string }>();
 }
 
 .modal {
+    position: relative;
     background: #fff;
     border-radius: 8px;
     padding: 1.5rem;
@@ -66,6 +86,12 @@ defineProps<{ title: string }>();
     border: none;
     font-size: 1.2rem;
     cursor: pointer;
+}
+
+.close-button.no-title {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
 }
 
 .modal-body {

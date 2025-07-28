@@ -2,7 +2,7 @@
   <div class="home">
     <h1>NodeRace</h1>
     <button @click="isModalOpen = true">Open Modal</button>
-    <ModalPopup v-if="isModalOpen" title="Modal Title" @close="isModalOpen = false">
+    <ModalPopup v-if="isModalOpen" @close="isModalOpen = false">
       <template #body>
         <p>This is a modal popup example.</p>
       </template>
