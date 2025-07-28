@@ -1,13 +1,15 @@
-<template>  
-    <button
-        :class="['custom-button', `type-${type}`, { disabled }]"
-        :disabled="disabled"
-        :style="{ width: width ? `${width}px` : undefined }"
-        @click="action"
-    >
-        <!-- {{ icon }}  Temperary until actual icons are implemented -->
-        {{ text }}
-    </button>
+<template>
+	<div class="button-background-shadow" :class="[`type-${type}`, { disabled }]">
+		<button
+			:class="['custom-button', `type-${type}`, { disabled }]"
+			:disabled="disabled"
+			:style="{ width: width ? `${width}px` : undefined }"
+			@click="action"
+		>
+			<!-- {{ icon }}  Temperary until actual icons are implemented -->
+			{{ text }}
+		</button>
+	</div>
 </template>
 
 <script lang="ts" setup>
@@ -21,52 +23,85 @@ import { defineProps, withDefaults } from 'vue';
 //     - icon: string (a fontawesome icon string, undefined default)
 //     - width: number (undefined default)
 withDefaults(
-  defineProps<{
-    text: string;
-    action: () => void;
-    type?: 'neutral' | 'positive' | 'negative';
-    disabled?: boolean;
-    icon?: string;
-    width?: number;
-  }>(),
-  {
-    text: 'this is a button',
-    type: 'neutral',
-    disabled: false,
-  }
+	defineProps<{
+		text: string;
+		action: () => void;
+		type?: 'neutral' | 'positive' | 'negative';
+		disabled?: boolean;
+		icon?: string;
+		width?: number;
+	}>(),
+	{
+		text: 'this is a button',
+		type: 'neutral',
+		disabled: false,
+	}
 );
 
 </script>
 
 <style>
 .custom-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2px 30px;
+	background-color: #00081A;
+	border: 2px solid #fff;
+	cursor: pointer;
+	transition: all 0.3s ease;
+	transform: translate(4px, 4px);
+
+	/* font */
+	font-size: 25px;
+	font-family: "Jersey 10", sans-serif;
+	font-weight: 400;
+	font-style: normal;
+}
+
+.button-background-shadow {
+	display: inline-block;
+	padding: 0 4px 4px 0;
+}
+
+.button-background-shadow.type-neutral {
+	background-color: #fff;
+}
+
+.button-background-shadow.type-positive {
+	background-color: #069701;
+}
+
+.button-background-shadow.type-negative {
+	background-color: #8f0000;
+}
+
+.button-background-shadow.disabled {
+	background-color: #5a5a5a;
+}
+
+.custom-button:hover:not(.disabled) {
+	transform: translate(8px, 8px);
 }
 
 .type-neutral {
-  background-color: #e0e0e0;
-  color: #333;
+	border-color: #ffffff;
+	color: #ffffff;
 }
 
 .type-positive {
-  background-color: #4caf50;
-  color: white;
+	border-color: #069701;
+	color: white;
 }
 
 .type-negative {
-  background-color: #f44336;
-  color: white;
+	border-color: #8f0000;
+	color: white;
 }
 
 .custom-button.disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+	opacity: 0.4;
+	border-color: #5a5a5a;
+	cursor: not-allowed;
 }
 </style>
