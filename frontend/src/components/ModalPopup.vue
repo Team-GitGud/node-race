@@ -5,12 +5,13 @@ Usage:
         <p>Modal content here.</p>
     </template>
     <template #footer>
-        <button @click="isOpen = false">Close</button>
+        <CustomButton text="Close" :action="() => isOpen = false" type="negative" />
     </template>
 </ModalPopup>
 
 Import this component in your Vue file:
 import ModalPopup from '@/components/ModalPopup.vue';
+import CustomButton from '@/components/CustomButton.vue';
 
 Props:
 - title (optional, string): If provided, displays a header with the title and a close button. If omitted, only a close button appears in the top-right.
