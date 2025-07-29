@@ -11,10 +11,12 @@
         <CustomButton text="Close" :action="() => isModalOpen = false" type="negative" />
       </template>
     </ModalPopup>
+    <ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
   </div>
 </template>
 
 <script lang="ts" setup>
+import ConnectionStatus from '@/components/ConnectionStatus.vue';
 import CustomButton from '@/components/CustomButton.vue'
 import { ref } from 'vue';
 import ModalPopup from '@/components/ModalPopup.vue';
