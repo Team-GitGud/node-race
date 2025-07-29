@@ -1,5 +1,5 @@
-export type Node = { 
-    leftChild: Node; 
-    rightChild: Node;
-    id: number;
+export class Node  { 
+    leftChild: Node | null = null; 
+    rightChild: Node | null = null;
+    id: number = -1;
 }
