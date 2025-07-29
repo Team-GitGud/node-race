@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dist/app.js",
     "dev": "ts-node src/app.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest"
   },
   "author": "Ming Bao, Jacob Lum",
   "license": "ISC",
@@ -15,7 +16,8 @@
     "@types/express": "^5.0.3",
     "@types/node": "^24.0.15",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "cors": "^2.8.5",
