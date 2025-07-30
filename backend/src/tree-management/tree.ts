@@ -14,8 +14,8 @@ export class Tree{
     constructor(){
         this.maxDepth = 2; // For now this is not based on constructor args.
         this.maxWidth = 2; 
+        this.random =  () => Math.random();
         this.root = this.generateTree();
-        this.random =  () =>{return Math.random();}
     }
 
     /**

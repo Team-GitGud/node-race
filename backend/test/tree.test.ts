@@ -4,16 +4,16 @@ import {Node} from "../src/tree-management/node";
 describe("Tree generation", () => {
     it("Tree should generate on instantiation of type", () => {
         let generator = new Tree;
-        expect(typeof generator.root).toBe(Node);
+        expect(generator.root).toBeInstanceOf(Node);
     });
     it("Tree should generate with minimum of two nodes and two layers", () => {
         let generator = new Tree;
         generator.random = () => {return 1;};
         generator.root = generator.generateTree();
 
-        expect(typeof generator.root).toBe(Node);
-        expect(typeof generator.root.leftChild).toBe(Node);
-        expect(typeof generator.root.rightChild).toBe(Node);
+        expect(generator.root).toBeInstanceOf(Node);
+        expect(generator.root.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild).toBeInstanceOf(Node);
         // Rest of these should not exist.
         expect(generator.root.leftChild?.leftChild).toBeNull();
         expect(generator.root.leftChild?.rightChild).toBeNull();
@@ -30,23 +30,23 @@ describe("Tree generation", () => {
         let generator = new Tree;
         generator.random = () => {return 0;};
         generator.root = generator.generateTree();
-        expect(typeof generator.root).toBe(Node);
-        expect(typeof generator.root.leftChild).toBe(Node);
-        expect(typeof generator.root.rightChild).toBe(Node);
+        expect(generator.root).toBeInstanceOf(Node);
+        expect(generator.root.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild).toBeInstanceOf(Node);
         // there is almost certainly a more effcient way to do this however copy and paste is faster
-        expect(typeof generator.root.leftChild?.leftChild).toBe(Node);
-        expect(typeof generator.root.leftChild?.rightChild).toBe(Node);
-        expect(typeof generator.root.rightChild?.leftChild).toBe(Node);
-        expect(typeof generator.root.rightChild?.rightChild).toBe(Node);
+        expect(generator.root.leftChild?.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.leftChild?.rightChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild?.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild?.rightChild).toBeInstanceOf(Node);
 
-        expect(typeof generator.root.leftChild?.leftChild?.leftChild).toBe(Node);
-        expect(typeof generator.root.leftChild?.leftChild?.rightChild).toBe(Node);
-        expect(typeof generator.root.leftChild?.rightChild?.leftChild).toBe(Node);
-        expect(typeof generator.root.leftChild?.rightChild?.rightChild).toBe(Node);
-        expect(typeof generator.root.rightChild?.leftChild?.leftChild).toBe(Node);
-        expect(typeof generator.root.rightChild?.leftChild?.rightChild).toBe(Node);
-        expect(typeof generator.root.rightChild?.rightChild?.leftChild).toBe(Node);
-        expect(typeof generator.root.rightChild?.rightChild?.rightChild).toBe(Node);
+        expect(generator.root.leftChild?.leftChild?.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.leftChild?.leftChild?.rightChild).toBeInstanceOf(Node);
+        expect(generator.root.leftChild?.rightChild?.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.leftChild?.rightChild?.rightChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild?.leftChild?.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild?.leftChild?.rightChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild?.rightChild?.leftChild).toBeInstanceOf(Node);
+        expect(generator.root.rightChild?.rightChild?.rightChild).toBe(Node);
     });
 
 });
