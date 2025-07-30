@@ -8,7 +8,7 @@ describe("Tree generation", () => {
     });
     it("Tree should generate with minimum of two nodes and two layers", () => {
         let generator = new Tree;
-        generator.random = () => {return 1;};
+        generator.random = () => {return 0.9;};
         generator.root = generator.generateTree();
 
         expect(generator.root).toBeInstanceOf(Node);
@@ -23,8 +23,8 @@ describe("Tree generation", () => {
     it("Each node in the tree should have an id number", () => {
         let generator = new Tree;
         expect(generator.root.id).toBe(0);
-        expect(generator.root.leftChild).toBe(1);
-        expect(generator.root.rightChild).toBe(2);
+        expect(generator.root.leftChild?.id).toBe(1);
+        expect(generator.root.rightChild?.id).toBe(2);
     });
     it("Tree should fully generate when random returns 0", () => {
         let generator = new Tree;
