@@ -6,7 +6,6 @@ export function api() {
     const port = 3000;
 
     app.use(cors({
-        origin: 'http://localhost:8080',
         credentials: true
     }));
 
@@ -24,7 +23,7 @@ export function api() {
         res.status(200).json({ status: 'ok' });
     });
 
-    app.listen(port, () => {
-        console.log(`Server running on http://localhost:${port}`);
+    app.listen(port, "0.0.0.0", () => {
+        console.log(`Server running on http://0.0.0.0:${port}`);
     });
 }
