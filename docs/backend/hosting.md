@@ -13,13 +13,18 @@ This will:
 - Stop any existing backend processes.
 - Install required dependencies.
 - Clone or update the repository.
-- Start the backend as a background process.
+- Start the backend and ngrok as a background processes.
 
 ## Useful Commands
 
 - **Stop the backend:**  
   ```bash
   pkill -f "src/app.ts"
+  ```
+
+- **Stop ngrok:**  
+  ```bash
+  pkill -f "ngrok http"
   ```
 
 - **Check running backend processes:**  
@@ -32,4 +37,11 @@ This will:
   cat /node-race/backend/backend.log
   ```
 
-> The backend will be accessible at `http://0.0.0.0:3000/health`.
+- **View ngrok logs:**  
+  ```bash
+  cat ~/node-race/backend/ngrok.log
+  ```
+
+> The backend will be accessible at:
+> - `http://0.0.0.0:3000/health`.
+> - `https://frank-overly-dane.ngrok-free.app/health`
