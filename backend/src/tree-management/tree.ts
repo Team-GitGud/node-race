@@ -39,6 +39,8 @@ export class Tree{
                 
             } while (popped != undefined);
 
+            activeNodes.reverse();
+
             // Generating children nodes for the current nodes in the active layer
             activeNodes.forEach((node: Node) =>{
                 node.id = id;
