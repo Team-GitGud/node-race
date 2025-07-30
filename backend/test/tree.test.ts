@@ -39,14 +39,14 @@ describe("Tree generation", () => {
         expect(generator.root.rightChild?.leftChild).toBeInstanceOf(Node);
         expect(generator.root.rightChild?.rightChild).toBeInstanceOf(Node);
 
-        expect(generator.root.leftChild?.leftChild?.leftChild).toBeInstanceOf(Node);
-        expect(generator.root.leftChild?.leftChild?.rightChild).toBeInstanceOf(Node);
-        expect(generator.root.leftChild?.rightChild?.leftChild).toBeInstanceOf(Node);
-        expect(generator.root.leftChild?.rightChild?.rightChild).toBeInstanceOf(Node);
-        expect(generator.root.rightChild?.leftChild?.leftChild).toBeInstanceOf(Node);
-        expect(generator.root.rightChild?.leftChild?.rightChild).toBeInstanceOf(Node);
-        expect(generator.root.rightChild?.rightChild?.leftChild).toBeInstanceOf(Node);
-        expect(generator.root.rightChild?.rightChild?.rightChild).toBe(Node);
+        expect(generator.root.leftChild?.leftChild?.leftChild).toBeNull();
+        expect(generator.root.leftChild?.leftChild?.rightChild).toBeNull();
+        expect(generator.root.leftChild?.rightChild?.leftChild).toBeNull();
+        expect(generator.root.leftChild?.rightChild?.rightChild).toBeNull();
+        expect(generator.root.rightChild?.leftChild?.leftChild).toBeNull();
+        expect(generator.root.rightChild?.leftChild?.rightChild).toBeNull();
+        expect(generator.root.rightChild?.rightChild?.leftChild).toBeNull();
+        expect(generator.root.rightChild?.rightChild?.rightChild).toBeNull();
     });
 
 });
