@@ -17,9 +17,6 @@ export class postorderBFS implements SolveTree{
         while(layers[layer].length != 0){
             let current = layers[layer][cursor];
             if (layer + 1 > layers.length) layers.push([]); // Make a new layer if on final layer
-            console.log(layers);
-            console.log(layer + " " + cursor);
-            console.log(current);
             if(current.leftChild != null){
                 layers[layer + 1].push(current.leftChild);
             }
