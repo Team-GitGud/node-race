@@ -29,7 +29,7 @@ export class Tree{
         let queuedNodes: Node[] = [new Node];
         let root = queuedNodes[0];
         let id: number = 0;
-        for (let i = 0; i< this.maxDepth; i++){
+        for (let i = 0; i <= this.maxDepth; i++){
             let popped: Node | undefined; // I miss java this could of been 3 lines
             do {
                 popped = queuedNodes.pop();
@@ -45,11 +45,11 @@ export class Tree{
             activeNodes.forEach((node: Node) =>{
                 node.id = id;
                 id++;
-                if (this.random() < (1.0/(i+1))) {
+                if (i != this.maxDepth && this.random() < (1.0/(i+1))) {
                     node.leftChild = new Node;
                     queuedNodes.push(node.leftChild);
                 }
-                if (this.random() < (1.0/(i+1))) {
+                if (i != this.maxDepth && this.random() < (1.0/(i+1))) {
                     node.rightChild = new Node;
                     queuedNodes.push(node.rightChild);
                 }
