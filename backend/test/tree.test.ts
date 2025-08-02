@@ -5,6 +5,7 @@ import {preorderDFS} from "../src/tree-management/preorderDFS";
 import {postorderDFS} from "../src/tree-management/postorderDFS";
 import {inorderDFS} from "../src/tree-management/inorderDFS";
 import {preorderBFS} from "../src/tree-management/preorderBFS";
+import {postorderBFS} from "../src/tree-management/postorderBFS";
 describe("Tree generation", () => {
     it("Tree should generate on instantiation of type", () => {
         let generator = new Tree;
@@ -163,6 +164,33 @@ describe("preorderBFS tests", ()=>{
         expect(generatedOrder.get(4)).toBe(4);
         expect(generatedOrder.get(5)).toBe(5);
         expect(generatedOrder.get(6)).toBe(6);
+
+    })
+
+});
+
+describe("postorderBFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new postorderBFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(6);
+        expect(generatedOrder.get(1)).toBe(4);
+        expect(generatedOrder.get(2)).toBe(5);
+        expect(generatedOrder.get(3)).toBe(0);
+        expect(generatedOrder.get(4)).toBe(1);
+        expect(generatedOrder.get(5)).toBe(2);
+        expect(generatedOrder.get(6)).toBe(3);
 
     })
 
