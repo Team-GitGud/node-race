@@ -23,9 +23,15 @@ describe("Tree generation", () => {
     });
     it("Each node in the tree should have an id number", () => {
         let generator = new Tree;
+        generator.random = () => {return 0;};
+        generator.root = generator.generateTree();
         expect(generator.root.id).toBe(0);
         expect(generator.root.leftChild?.id).toBe(1);
         expect(generator.root.rightChild?.id).toBe(2);
+        expect(generator.root.leftChild?.leftChild?.id).toBe(3);
+        expect(generator.root.leftChild?.rightChild?.id).toBe(4);
+        expect(generator.root.rightChild?.leftChild?.id).toBe(5);
+        expect(generator.root.rightChild?.rightChild?.id).toBe(6);
     });
     it("Tree should fully generate when random returns 0", () => {
         let generator = new Tree;
@@ -59,19 +65,20 @@ describe("preorderDFS tests", ()=>{
 
 
         let generatedOrder = new preorderDFS().solveTree(tree.root)
-        expect(generatedOrder.values.length).toBe(7); // Make sure the tree is explored fully
-        let expectedOrder = new Map<number, number>();
-        expectedOrder.set(0, 0);
-        expectedOrder.set(1, 1);
-        expectedOrder.set(3, 2);
-        expectedOrder.set(4, 3);
-        expectedOrder.set(2, 4);
-        expectedOrder.set(5, 5);
-        expectedOrder.set(6, 6);
-
-        expectedOrder.forEach((id, order)=>{
-            expect(generatedOrder.get(id)).toBe(order);
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
         })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(0);
+        expect(generatedOrder.get(1)).toBe(1);
+        expect(generatedOrder.get(2)).toBe(4);
+        expect(generatedOrder.get(3)).toBe(2);
+        expect(generatedOrder.get(4)).toBe(3);
+        expect(generatedOrder.get(5)).toBe(5);
+        expect(generatedOrder.get(6)).toBe(6);
 
     })
 }
