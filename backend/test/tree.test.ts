@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {Tree} from "../src/tree-management/tree";
 import {Node} from "../src/tree-management/node";
+import {preorderDFS} from "../src/tree-management/preorderDFS";
 describe("Tree generation", () => {
     it("Tree should generate on instantiation of type", () => {
         let generator = new Tree;
@@ -48,5 +49,31 @@ describe("Tree generation", () => {
         expect(generator.root.rightChild?.rightChild?.leftChild).toBeNull();
         expect(generator.root.rightChild?.rightChild?.rightChild).toBeNull();
     });
-
 });
+
+describe("preorderDFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new preorderDFS().solveTree(tree.root)
+        expect(generatedOrder.values.length).toBe(7); // Make sure the tree is explored fully
+        let expectedOrder = new Map<number, number>();
+        expectedOrder.set(0, 0);
+        expectedOrder.set(1, 1);
+        expectedOrder.set(3, 2);
+        expectedOrder.set(4, 3);
+        expectedOrder.set(2, 4);
+        expectedOrder.set(5, 5);
+        expectedOrder.set(6, 6);
+
+        expectedOrder.forEach((id, order)=>{
+            expect(generatedOrder.get(id)).toBe(order);
+        })
+
+    })
+}
+
+)

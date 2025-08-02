@@ -2,7 +2,7 @@ import { SolveTree } from "./solvetree.ts";
 import {Node} from "./node.ts";
 
 
-export class DFS implements SolveTree{
+export class preorderDFS implements SolveTree{
     
     /**
      * This generates the order of explored nodes stored in a map with the node id being the key
