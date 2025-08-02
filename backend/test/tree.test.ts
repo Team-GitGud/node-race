@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import {Tree} from "../src/tree-management/tree";
 import {Node} from "../src/tree-management/node";
 import {preorderDFS} from "../src/tree-management/preorderDFS";
+import {postorderDFS} from "../src/tree-management/postorderDFS";
 describe("Tree generation", () => {
     it("Tree should generate on instantiation of type", () => {
         let generator = new Tree;
@@ -81,6 +82,33 @@ describe("preorderDFS tests", ()=>{
         expect(generatedOrder.get(6)).toBe(6);
 
     })
-}
+});
 
+
+describe("postorderDFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new postorderDFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(6);
+        expect(generatedOrder.get(1)).toBe(2);
+        expect(generatedOrder.get(2)).toBe(5);
+        expect(generatedOrder.get(3)).toBe(0);
+        expect(generatedOrder.get(4)).toBe(1);
+        expect(generatedOrder.get(5)).toBe(3);
+        expect(generatedOrder.get(6)).toBe(4);
+
+    })
+
+}
 )
