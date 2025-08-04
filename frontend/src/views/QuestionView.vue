@@ -8,7 +8,7 @@
                 @select="handleSelect"
             />
         </div>
-        <button @click="checkAnswer">Submit</button>
+        <CustomButton :action="() => checkAnswer()" type="positive" text="Submit" :disabled="answerReady()" />
         <div v-if="result !== null">
             <span v-if="result">Correct!</span>
             <span v-else>Incorrect. Try again.</span>
@@ -21,6 +21,7 @@ import { ref } from 'vue';
 import { Question } from '@/types/Question';
 import { Node } from '@/types/Node';
 import TreeNode from '@/components/TreeNode.vue';
+import CustomButton from '@/components/CustomButton.vue';
 
 // Demo tree setup
 const demoRoot = new Node(
@@ -48,6 +49,13 @@ function handleSelect(newOrder: Record<string, number>) {
 
 function checkAnswer() {
     result.value = question.value.isCorrect(selectedOrder.value);
+}
+
+function answerReady() {
+    // Ensure no duplicate selections and all nodes are selected
+    const values = Object.values(selectedOrder.value);
+    const uniqueValues = new Set(values);
+    return values.includes(-1) || uniqueValues.size !== values.length;
 }
 </script>
 
