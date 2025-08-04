@@ -1,7 +1,7 @@
 <template>
     <div class="tree-node">
         <button class="node-btn" @click="handleClick">
-            <span v-if="selectedOrder[node.id] !== undefined">
+            <span v-if="selectedOrder[node.id] !== -1">
                 {{ selectedOrder[node.id] }}
             </span>
         </button>
