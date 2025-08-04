@@ -18,7 +18,17 @@
                 stroke-width="4"
             />
         </svg>
-        <button class="node-btn" ref="nodeBtn" @click="handleClick">
+        <button 
+            class="node-btn"
+            ref="nodeBtn"
+            @click="handleClick"
+            :class="{ 
+                'selected': selectedOrder[node.id] !== -1, 
+                'duplicate': Object.values(selectedOrder).filter(v => v === selectedOrder[node.id]).length > 1,
+                'incorrect': result === false,
+                'correct': result === true
+            }"
+        >
             <span v-if="selectedOrder[node.id] !== -1">
                 {{ selectedOrder[node.id] }}
             </span>
@@ -28,12 +38,14 @@
                 v-if="node.leftChild"
                 :node="node.leftChild"
                 :selectedOrder="selectedOrder"
+                :result="result"
                 @select="emitSelect"
             />
             <TreeNode
                 v-if="node.rightChild"
                 :node="node.rightChild"
                 :selectedOrder="selectedOrder"
+                :result="result"
                 @select="emitSelect"
             />
         </div>
@@ -47,6 +59,7 @@ import { Node } from '@/types/Node';
 const props = defineProps<{
     node: Node;
     selectedOrder: Record<string, number>;
+    result: boolean | null;
 }>();
 
 const emit = defineEmits<{
@@ -59,7 +72,7 @@ function handleClick() {
     if (current === -1) {
         const max = Math.max(...Object.values(newOrder), 0);
         newOrder[props.node.id] = max + 1;
-    } else if (current === Object.keys(newOrder).length) {
+    } else if (current >= Object.keys(newOrder).length) {
         newOrder[props.node.id] = 1;
     } else {
         newOrder[props.node.id] = current + 1;
@@ -147,11 +160,27 @@ watch(() => [props.node.leftChild, props.node.rightChild], updateLines);
     border-radius: 50%;
     margin-bottom: 0.5rem;
     position: relative;
-    background-color: #4F95D8;
     border: none;
     outline: none;
-    box-shadow: 2px 2px 0 2px #235F9C;
     z-index: 1;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+.node-btn.duplicate:not(.incorrect):not(.correct), .node-btn:not(.selected):not(.incorrect):not(.correct) {
+    background-color: #235F9C;
+    box-shadow: 2px 2px 0 2px #1D4A77;
+}
+.node-btn.selected:not(.duplicate):not(.incorrect):not(.correct), .node-btn:not(.selected):not(.incorrect):not(.correct):hover {
+    background-color: #4F95D8;
+    box-shadow: 2px 2px 0 2px #235F9C;
+}
+.node-btn.incorrect {
+    background-color: #8F0000;
+    box-shadow: 2px 2px 0 2px color-mix(in srgb, #8f0000 40%, black);
+}
+.node-btn.correct {
+    background-color: #049702;
+    box-shadow: 2px 2px 0 2px color-mix(in srgb, #049702 40%, black);
 }
 .node-btn span {
     color: white;

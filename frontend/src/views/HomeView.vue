@@ -2,6 +2,7 @@
   <div class="home">
     <h1>NodeRace</h1>
     <CustomButton text="Open Modal" :action="() => isModalOpen = true" />
+    <CustomButton style="margin-left: 10px;" text="Demo Question" :action="() => $router.push('/question/')" />
     <ModalPopup title="Modal Popup" v-if="isModalOpen" @close="isModalOpen = false">
       <template #body>
         <p style="font-size: 24px; margin: 0;">This is a modal popup example.</p>

@@ -1,17 +1,24 @@
 <template>
     <div class="question-view">
+        <CustomButton 
+            :action="() => $router.push('/')" 
+            text="Back to Home" 
+            type="neutral"
+            style="position: absolute; top: 20px; left: 20px;" 
+        />
         <h2>{{ question.title }}</h2>
         <div class="tree-container">
             <TreeNode
                 :node="question.root"
                 :selectedOrder="selectedOrder"
+                :result="result"
                 @select="handleSelect"
+                style="margin-top: 0px;"
             />
         </div>
-        <CustomButton :action="() => checkAnswer()" type="positive" text="Submit" :disabled="answerReady()" />
-        <div v-if="result !== null">
-            <span v-if="result">Correct!</span>
-            <span v-else>Incorrect. Try again.</span>
+        <div style="display: flex; justify-content: center; gap: 20px;">
+            <CustomButton :action="() => checkAnswer()" type="positive" text="Submit" :disabled="answerReady() || result !== null" />
+            <CustomButton :action="() => resetOrder()" type="negative" text="Reset" :disabled="isOriginal() || result !== null" />
         </div>
     </div>
 </template>
@@ -31,7 +38,7 @@ const demoRoot = new Node(
 );
 const demoQuestion = new Question(
     '1',
-    'Select the nodes in depth-first search (in order)',
+    'Click the nodes in depth-first order',
     demoRoot,
     { 'A': 1, 'B': 2, 'D': 3, 'E': 4, 'C': 5, 'F': 6, 'G': 7 }
 );
@@ -41,9 +48,18 @@ const selectedOrder = ref<Record<string, number>>(
     Object.fromEntries(question.value.root.getAllNodes().map(node => [node.id, -1]))
 );
 
+function resetOrder() {
+    selectedOrder.value = Object.fromEntries(question.value.root.getAllNodes().map(node => [node.id, -1]));
+}
+
+function isOriginal(): boolean {
+    return Object.keys(selectedOrder.value).every(key => selectedOrder.value[key] === -1);
+}
+
 const result = ref<boolean | null>(null);
 
 function handleSelect(newOrder: Record<string, number>) {
+    if (result.value !== null) { return; }
     selectedOrder.value = newOrder;
 }
 
@@ -60,12 +76,18 @@ function answerReady() {
 </script>
 
 <style scoped>
+h2 {
+    font-size: 2.5rem;
+    margin-top: 40px;
+    padding: 0 20px 10px 20px;
+    border-bottom: 2px solid white;
+}
 .question-view {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 .tree-container {
-    margin: 2rem 0;
+    margin: 2rem 0 3rem 0;
 }
 </style>
