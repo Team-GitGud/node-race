@@ -1,4 +1,51 @@
 :root {
-    --positive-color: #069701;
-    --negative-color: #8f0000;
+    /* Colours */
+    --primary-color: #4F95D8;
+    --secondary-color: #235F9B;
+    --tertiary-color: #1C4A78;
+    --accent-color: #ffff;
+    --positive-color: #139705;
+    --negative-color: #AA0707;
+    --background-color: #00081A;
+    --text-color: #ffff;
+    --text-color-active: #666666;
+}
+
+* {
+    /* Font */
+    font-family: "Jersey 10", sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+/* General text styling */
+html, body {
+  color: #ffff;
+  background-color: #00081A;
+}
+
+h1, h2, h3, h4 {
+    font-weight: normal;
+}
+
+h1 {
+    font-size: 100px;
+}
+
+h2 {
+    font-size: 60px;
+}
+
+h3 {
+    font-size: 40px;
+}
+
+h4 {
+    font-size: 30px;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+
+p {
+    font-size: 25px;
 }
