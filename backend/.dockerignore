@@ -1,0 +1,9 @@
+node_modules
+npm-debug.log
+.git
+.gitignore
+backend.log
+ngrok.log
+dist
+*.log
+.DS_Store
