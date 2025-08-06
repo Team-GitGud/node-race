@@ -44,4 +44,12 @@ img {
 	z-index: -1;
 	overflow-y: hidden;
 }
+
+.button_container {
+	display: flex;
+	justify-content: center;
+	position: fixed;
+	top: calc(100vh - 45vh);
+	width: 100%;
+}
 </style>
