@@ -5,3 +5,6 @@ First you have to install node.js
 ## Run
 
 >npm run dev
+
+## Run tests
+> npm test
