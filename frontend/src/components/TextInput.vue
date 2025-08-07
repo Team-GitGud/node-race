@@ -1,19 +1,21 @@
 <template>
-  <div class="input-background-shadow" :class="[`type-${variant}`, { 'hasError': hasError }]">
+  <div class="text-input-container" :class="{ 'has-error': hasError }" :style="{ width: getWidth() }">
     <input
-        class="custom-input"
+        class="text-input"
         :value="internalValue"
         :placeholder="placeholder"
-        :style="{width: width ? `${width}px` : undefined }"
-        :class="[`type-${variant}`, { 'hasError': hasError}]"
+        :class="{ 'has-error': hasError }"
         @input="handleInput"
-        @keydown.enter="handleEnter"
     />
+    
+    <span v-if="hasError && errorMessage" class="error-message">
+      {{ errorMessage }}
+    </span>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, withDefaults, ref, watch } from 'vue'
+import { defineProps, defineEmits, defineExpose, withDefaults, ref, watch } from 'vue'
 
 // Text Input component parameters:
 //     Optional:
@@ -22,144 +24,137 @@ import { defineProps, defineEmits, withDefaults, ref, watch } from 'vue'
 //     - hasError: boolean (error state styling, defaults to false)
 //     - width: number (undefined default)
 //     - initialValue: string (initial value, defaults to empty string)
+//     - errorMessage: string (error message to display, defaults to empty string)
 const props = withDefaults(
     defineProps<{
       placeholder?: string;
-      variant?: 'neutral' | 'positive' | 'negative' ;
+      variant?: 'neutral' | 'positive' | 'negative';
       hasError?: boolean;
       width?: number;
       initialValue?: string;
-    }>(),{
+      errorMessage?: string;
+    }>(), {
       placeholder: '',
       variant: 'neutral',
       hasError: false,
       initialValue: '',
+      errorMessage: '',
     }
 );
 
 const internalValue = ref(props.initialValue);
+const hasError = ref(props.hasError);
+const errorMessage = ref(props.errorMessage);
+
+const getWidth = () => {
+  const width = props.width || 400;
+  return `${width}px`;
+};
 
 const handleInput = (event: Event) => {
   const target = event.target as HTMLInputElement;
   internalValue.value = target.value;
-};
-
-
-/**
- *  We can change this if we want to use the input as a button
- * */
-const handleEnter = () => {
-  emit('enter', internalValue.value);
+  
+  // Clear error when user starts typing
+  if (hasError.value) {
+    clearError();
+  }
 };
 
 const emit = defineEmits<{
-  enter: [value: string];
+  errorCleared: [];
 }>();
 
-// Watch for prop changes to update internal value
+// Watch for prop changes to update internal state
 watch(() => props.initialValue, (newValue) => {
   internalValue.value = newValue;
+});
+
+watch(() => props.hasError, (newValue) => {
+  hasError.value = newValue;
+});
+
+watch(() => props.errorMessage, (newValue) => {
+  errorMessage.value = newValue;
+});
+
+// Methods to control error state from external code
+const setError = (message: string) => {
+  hasError.value = true;
+  errorMessage.value = message;
+  emit('errorCleared');
+};
+
+const clearError = () => {
+  hasError.value = false;
+  errorMessage.value = '';
+  emit('errorCleared');
+};
+
+// Expose methods for external use
+defineExpose({
+  setError,
+  clearError,
+  getValue: () => internalValue.value
 });
 </script>
 
 <style scoped>
-.custom-input {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 30px;
-  background-color: #00081A;
-  border: 2px solid #fff;
-  outline: none;
-  transition: all 0.3s ease;
-  transform: translate(4px, 4px);
+.text-input-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
 
-  /* font */
-  font-size: 25px;
-  font-family: "Jersey 10", sans-serif;
-  font-weight: 400;
+.text-input {
+  width: 85%; /* Leave 15% space for the "!!!" */
+  padding-right: 15%;
+  height: 40px;
+  color: #00081A;
+  font-size: 30px;
+  border: none;
+  padding-bottom: 7px;
+  background-image: linear-gradient(to right, #00081A 0%, #00081A 100%);
+  background-size: 100% 2px;
+  background-repeat: no-repeat;
+  background-position: bottom 5px left;
+}
+
+.text-input.has-error {
+  background-image: linear-gradient(to right, #ff0000 0%, #ff0000 100%);
+  border-top: 5px solid #AA0707;
+  border-right: 2px solid #AA0707;
+  border-bottom: 2px solid #AA0707;
+  border-left: 5px solid #AA0707;
+}
+
+/* Floating "!!!" when there's an error */
+.text-input-container.has-error::after {
+  content: "!!!";
+  position: absolute;
+  right: 0;
+  color: #ff0000;
+  font-size: 50px;
   font-style: normal;
+  font-weight: 400;
+  line-height: normal;
 }
 
-.input-background-shadow {
-  display: inline-block;
-  padding: 0 4px 4px 0;
-  transition: all 0.3s ease;
+.error-message {
+  font-size: 20px;
+  width: 80%;
+  align-self: flex-end;
+  border-top: 5px solid #AA0707;
+  border-right: 2px solid #AA0707;
+  border-bottom: 2px solid #AA0707;
+  border-left: 5px solid #AA0707;
+  padding: 4px 6px;
 }
 
-.custom-input:focus {
-  transform: translate(8px, 8px);
-}
-
-.custom-input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.type-neutral {
-  border-color: #ffffff;
-  color: #ffffff;
-}
-
-.type-neutral:focus {
-  border-color: color-mix(in srgb, #ffffff 60%, black);
-  color: color-mix(in srgb, #ffffff 100%, black);
-  transition: all 0.1s linear;
-}
-
-.input-background-shadow.type-neutral {
-  background-color: #fff;
-}
-
-.input-background-shadow.type-neutral:focus-within {
-  background-color: color-mix(in srgb, #ffffff 60%, black);
-  transition: all 0.1s linear;
-}
-
-.type-positive {
-  border-color: #069701;
-  color: white;
-}
-
-.type-positive:focus {
-  border-color: color-mix(in srgb, #069701 40%, black);
-  color: color-mix(in srgb, #ffffff 40%, black);
-  transition: all 0.1s linear;
-}
-
-.input-background-shadow.type-positive {
-  background-color: #069701;
-}
-
-.input-background-shadow.type-positive:focus-within {
-  background-color: color-mix(in srgb, #069701 40%, black);
-  transition: all 0.1s linear;
-}
-
-.type-negative {
-  border-color: #8f0000;
-  color: white;
-}
-
-.type-negative:focus {
-  border-color: color-mix(in srgb, #8f0000 40%, black);
-  color: color-mix(in srgb, #ffffff 40%, black);
-  transition: all 0.1s linear;
-}
-
-.input-background-shadow.type-negative {
-  background-color: #8f0000;
-}
-
-.input-background-shadow.type-negative:focus-within {
-  background-color: color-mix(in srgb, #8f0000 40%, black);
-  transition: all 0.1s linear;
-}
-
-.custom-input.hasError {
-  opacity: 0.4;
-  border-color: #5a5a5a;
-}
-
-.input-background-shadow.hasError {
-  background-color: #5a5a5a;
+.text-input::placeholder {
+  opacity: 0.58;
+  color: #00081A;
+  font-size: 30px;
 }
 </style>
