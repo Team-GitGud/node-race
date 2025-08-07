@@ -108,8 +108,9 @@ defineExpose({
 }
 
 .text-input {
-  width: 85%; /* Leave 15% space for the "!!!" */
+  width: 83%; /* Leave 17% space for the "!!!" */
   padding-right: 15%;
+  padding-left: 2%;
   height: 40px;
   color: #00081A;
   font-size: 30px;
@@ -119,6 +120,42 @@ defineExpose({
   background-size: 100% 2px;
   background-repeat: no-repeat;
   background-position: bottom 5px left;
+  transition: all 0.3s ease;
+  caret-color: #00081A;
+}
+
+.text-input:focus {
+  outline: none;
+  transform: scale(1.02);
+  box-shadow: 0 0 10px rgba(0, 8, 26, 0.2);
+  transition: all 0.2s ease;
+}
+
+.text-input:not(:focus) {
+  transform: scale(1);
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.text-input:focus::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 20px;
+  background-color: #00081A;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
 }
 
 .text-input.has-error {
@@ -127,6 +164,7 @@ defineExpose({
   border-right: 2px solid #AA0707;
   border-bottom: 2px solid #AA0707;
   border-left: 5px solid #AA0707;
+  transition: all 0.3s ease;
 }
 
 /* Floating "!!!" when there's an error */
@@ -139,6 +177,7 @@ defineExpose({
   font-style: normal;
   font-weight: 400;
   line-height: normal;
+  animation: fadeIn 0.3s ease-in;
 }
 
 .error-message {
@@ -150,6 +189,29 @@ defineExpose({
   border-bottom: 2px solid #AA0707;
   border-left: 5px solid #AA0707;
   padding: 4px 6px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .text-input::placeholder {
