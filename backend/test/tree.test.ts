@@ -1,6 +1,12 @@
 import { describe, it, expect } from "vitest";
 import {Tree} from "../src/tree-management/tree";
 import {Node} from "../src/tree-management/node";
+import {preorderDFS} from "../src/tree-management/preorderDFS";
+import {postorderDFS} from "../src/tree-management/postorderDFS";
+import {inorderDFS} from "../src/tree-management/inorderDFS";
+import {preorderBFS} from "../src/tree-management/preorderBFS";
+import {postorderBFS} from "../src/tree-management/postorderBFS";
+import {inorderBFS} from "../src/tree-management/inorderBFS";
 describe("Tree generation", () => {
     it("Tree should generate on instantiation of type", () => {
         let generator = new Tree;
@@ -22,9 +28,15 @@ describe("Tree generation", () => {
     });
     it("Each node in the tree should have an id number", () => {
         let generator = new Tree;
+        generator.random = () => {return 0;};
+        generator.root = generator.generateTree();
         expect(generator.root.id).toBe(0);
         expect(generator.root.leftChild?.id).toBe(1);
         expect(generator.root.rightChild?.id).toBe(2);
+        expect(generator.root.leftChild?.leftChild?.id).toBe(3);
+        expect(generator.root.leftChild?.rightChild?.id).toBe(4);
+        expect(generator.root.rightChild?.leftChild?.id).toBe(5);
+        expect(generator.root.rightChild?.rightChild?.id).toBe(6);
     });
     it("Tree should fully generate when random returns 0", () => {
         let generator = new Tree;
@@ -48,5 +60,166 @@ describe("Tree generation", () => {
         expect(generator.root.rightChild?.rightChild?.leftChild).toBeNull();
         expect(generator.root.rightChild?.rightChild?.rightChild).toBeNull();
     });
+});
+
+describe("preorderDFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new preorderDFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(0);
+        expect(generatedOrder.get(1)).toBe(1);
+        expect(generatedOrder.get(2)).toBe(4);
+        expect(generatedOrder.get(3)).toBe(2);
+        expect(generatedOrder.get(4)).toBe(3);
+        expect(generatedOrder.get(5)).toBe(5);
+        expect(generatedOrder.get(6)).toBe(6);
+
+    })
+});
+
+
+describe("postorderDFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new postorderDFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(6);
+        expect(generatedOrder.get(1)).toBe(2);
+        expect(generatedOrder.get(2)).toBe(5);
+        expect(generatedOrder.get(3)).toBe(0);
+        expect(generatedOrder.get(4)).toBe(1);
+        expect(generatedOrder.get(5)).toBe(3);
+        expect(generatedOrder.get(6)).toBe(4);
+
+    })
+
+});
+
+describe("inorderDFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new inorderDFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(3);
+        expect(generatedOrder.get(1)).toBe(1);
+        expect(generatedOrder.get(2)).toBe(5);
+        expect(generatedOrder.get(3)).toBe(0);
+        expect(generatedOrder.get(4)).toBe(2);
+        expect(generatedOrder.get(5)).toBe(4);
+        expect(generatedOrder.get(6)).toBe(6);
+
+    })
+
+});
+
+describe("preorderBFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new preorderBFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(0);
+        expect(generatedOrder.get(1)).toBe(1);
+        expect(generatedOrder.get(2)).toBe(2);
+        expect(generatedOrder.get(3)).toBe(3);
+        expect(generatedOrder.get(4)).toBe(4);
+        expect(generatedOrder.get(5)).toBe(5);
+        expect(generatedOrder.get(6)).toBe(6);
+
+    })
+
+});
+
+describe("postorderBFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new postorderBFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(6);
+        expect(generatedOrder.get(1)).toBe(4);
+        expect(generatedOrder.get(2)).toBe(5);
+        expect(generatedOrder.get(3)).toBe(0);
+        expect(generatedOrder.get(4)).toBe(1);
+        expect(generatedOrder.get(5)).toBe(2);
+        expect(generatedOrder.get(6)).toBe(3);
+
+    })
+
+});
+
+describe("postorderBFS tests", ()=>{
+    it("Maximum tree is navigated fully and in the correct order", ()=>{
+        let tree = new Tree;
+        tree.random = () => {return 0;};
+        tree.root = tree.generateTree();
+
+
+        let generatedOrder = new inorderBFS().solveTree(tree.root)
+        let generatedOrderLength = 0;
+        generatedOrder.forEach((id, order) => {
+            generatedOrderLength++;
+        })
+        expect(generatedOrderLength).toBe(7); // Make sure the tree is explored fully
+
+        // Make sure the order is correct
+        expect(generatedOrder.get(0)).toBe(3);
+        expect(generatedOrder.get(1)).toBe(1);
+        expect(generatedOrder.get(2)).toBe(5);
+        expect(generatedOrder.get(3)).toBe(0);
+        expect(generatedOrder.get(4)).toBe(2);
+        expect(generatedOrder.get(5)).toBe(4);
+        expect(generatedOrder.get(6)).toBe(6);
+
+    })
 
 });
