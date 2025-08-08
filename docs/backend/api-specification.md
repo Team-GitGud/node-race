@@ -68,23 +68,58 @@ All WebSocket connections must authenticate with their token immediately upon co
   - `202 Accepted` — Game start is handled asynchronously over WebSocket.
 ---
 
+
 ## WebSocket API
 
 ### Connection
 
 - **URL Format:**  
   `wss://server/ws/v1/lobbies/{lobbyCode}`
-- **On Connect:**  
-  Must send `AUTH` message immediately.
 
-#### AUTH Action
+- **Expected Workflow:**  
+  1. Client opens WebSocket connection to the above URL.  
+  2. Client **must** send an `AUTH` message as the **first** message.  
+  3. Server validates token:
+     - If valid: sends `AUTH_SUCCESS` event containing initial lobby state.
+     - If invalid: sends `AUTH_FAILED` event and closes the connection.
 
+---
+
+### AUTH Action
+
+**Client → Server**
 ```json
 {
   "action": "AUTH",
   "token": "h_sess_a1b2c3d4e5f6" // or player token
 }
 ```
+
+**Server → Client (Success)**
+```json
+{
+  "type": "AUTH_SUCCESS",
+  "role": "host",
+  "lobbyCode": "ABCD1",
+  "playerId": "p_host_123",
+  "settings": { "algorithm": "all", "treeCount": 5 },
+  "players": [
+    { "playerId": "p_z9y8x7w6", "username": "PlayerTwo" }
+  ]
+}
+```
+
+**Server → Client (Failure)**
+```json
+{
+  "type": "AUTH_FAILED",
+  "reason": "Invalid or expired token."
+}
+```
+
+**Notes:**
+- Clients that fail authentication will have their connection closed immediately after `AUTH_FAILED` is sent.
+- Tokens are **single-use**: if the same token is reused in another connection, the server should invalidate both connections to prevent session hijacking.
 
 ---
 
@@ -119,7 +154,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ## Server → Client Events
 
-### Lobby State (after AUTH)
+### Lobby State (to host) (after AUTH)
 
 ```json
 {
