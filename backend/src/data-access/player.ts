@@ -1,5 +1,5 @@
 export class Player {
-    name : string;
+    name: string;
     ip: string;
     score: number;
     questionStart: number;
@@ -21,7 +21,15 @@ export class Player {
         this.score = score;
     }
 
+    getName(): string {
+        return this.name;
+    }
+
     startGame(): void {
+        return;
+    }
+
+    endGame(): void {
         return;
     }
 
@@ -31,5 +39,5 @@ export class Player {
 
     setPrevQuestionTime(time: number): void {
         this.prevQuestionTime = time;
-    }   
+    }
 }
