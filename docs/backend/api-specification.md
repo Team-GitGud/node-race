@@ -118,6 +118,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```
 
 **Notes:**
+- In Settings, algorithm has three modes in the beginning. [all, dfs, bfs]. It can be set to one of these.
 - Clients that fail authentication will have their connection closed immediately after `AUTH_FAILED` is sent.
 - Tokens are **single-use**: if the same token is reused in another connection, the server should invalidate both connections to prevent session hijacking.
 
@@ -266,6 +267,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ## Notes for Implementation
 
+- In Settings, algorithm has three modes in the beginning. [all, dfs, bfs]. It can be set to one of these.
 - Always validate tokens on the backend during WebSocket `AUTH`.
 - Maintain mapping from WebSocket connection → authenticated player/host.
 - Disconnect clients who do not send `AUTH` within a short timeout (e.g., 3 seconds).
