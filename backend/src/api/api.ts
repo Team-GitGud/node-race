@@ -1,6 +1,10 @@
 import express from 'express';
 import cors from 'cors';
+//const WebSocket = require('ws');
+import { WebSocket, WebSocketServer } from 'ws';
 
+const WS_PORT: number = 8090;
+const wss = new WebSocketServer({ port: WS_PORT });
 export function api() {
     const app = express();
     const port = 3000;
@@ -9,15 +13,11 @@ export function api() {
         credentials: true
     }));
 
-    app.get('/helloworld/', (req, res) => {
-        res.send('Hello, World from Express with TypeScript!');
-        console.log("Request recieved");
-    });
+    wss.on("connection", (ws: WebSocket) => {
+        ws.on("message", (data: any) => {
 
-    app.get('/hi/', (req, res) => {
-        res.send('hi');
-        console.log("Request recieved");
-    });
+        })
+    })
 
     app.get('/health', (req, res) => {
         res.status(200).json({ status: 'ok' });
