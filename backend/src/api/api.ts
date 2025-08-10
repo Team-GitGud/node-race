@@ -1,38 +1,55 @@
 import express from 'express';
 import cors from 'cors';
-import { WebSocket, WebSocketServer } from 'ws';
+import { WebSocket, WebSocketServer, RawData } from 'ws';
 import { IncomingMessage } from 'node:http';
 import http from 'http';
+import { LobbyManager } from '../data-access/lobbyManager';
 
 
-export function api() {
-    const app = express();
-    const EXPRESS_PORT = 3000;
+export class api {
+    static app = express();
+    static PORT: number = 3000;
+    static lobbies: LobbyManager = new LobbyManager();
 
-    app.use(cors({
-        credentials: true
-    }));
+    constructor() {
 
-    app.get('/health', (req, res) => {
-        res.status(200).json({ status: 'ok' });
-    });
+    }
 
-    app.get('/', (req, res) => {
-        res.send("Hi");
-    });
+    static init() {
+        this.app.use(cors({
+            credentials: true
+        }));
 
-    const server = http.createServer(app)
-    const wss = new WebSocketServer({ server });
-    wss.on("listening", () => { })
-    wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
+        this.app.get('/health', (req, res) => {
+            res.status(200).json({ status: 'ok' });
+        });
 
-        const path: string = req.url ?? "";
-        console.log(path);
+        this.app.get('/', (req, res) => {
+            res.send("Hi");
+        });
 
-        ws.on("message", (data: any) => {
+        const server = http.createServer(this.app)
+        const wss = new WebSocketServer({ server });
+        wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
 
+            const path: String = req.url ?? "";
+            console.log(path);
+            this.handleRequests(path)
+
+            ws.on("message", (data: RawData) => {
+                let jsonMessage: JSON = JSON.parse(data.toString());
+                console.log(jsonMessage);
+                this.handleMessages(jsonMessage);
+            })
         })
-    })
 
-    server.listen(EXPRESS_PORT);
+        server.listen(this.PORT);
+    }
+
+    static handleRequests(path: String) {
+    }
+
+    static handleMessages(message: JSON) {
+
+    }
 }
