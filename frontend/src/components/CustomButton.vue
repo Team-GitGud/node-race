@@ -25,7 +25,10 @@ Props:
 		type="button"
 		@click="action"
 	>
-		<div class="btn-inner" :style="{ width: width ? `${width}px` : undefined }">
+		<div 
+			:class="['btn-inner', { shrink }]"
+			:style="{ width: width ? `${width}px` : undefined }"
+		>
 			<slot />
 		</div>
 	</button>
@@ -39,12 +42,8 @@ withDefaults(
 		type?: 'neutral' | 'positive' | 'negative';
 		disabled?: boolean;
 		width?: number;
-	}>(),
-	{
-		action: () => { return null; },
-		type: 'neutral',
-		disabled: false,
-	}
+		shrink?: boolean;
+	}>(), { type: 'neutral' }
 );
 </script>
 
@@ -60,6 +59,7 @@ withDefaults(
 	cursor: pointer;
 	transition: var(--transition);
 }
+
 .btn-inner {
 	display: inline-flex;
 	align-items: center;
@@ -70,6 +70,10 @@ withDefaults(
 	transition: var(--transition);
 	transform: translate(4px, 4px);
 	font-size: 25px;
+}
+
+.btn-inner.shrink {
+	padding: 2px 10px;
 }
 
 /* Button hover effect */
