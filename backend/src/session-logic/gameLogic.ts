@@ -5,4 +5,8 @@ export class GameLogic{
     generateQuestions(): void{
 
     }
+
+    getQuestionString(): string{
+        return JSON.stringify(this.questions);;
+    }
 }
