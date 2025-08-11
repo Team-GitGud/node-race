@@ -30,9 +30,9 @@ defineProps<{ blur?: boolean }>();
 .bg-container .overlay {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 8, 26, 0.8);
     z-index: -1;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
 }
 
 .bg-container img {
