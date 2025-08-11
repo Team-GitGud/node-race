@@ -30,7 +30,7 @@ export class api {
 
             const path: String = req.url ?? "";
             console.log(path);
-            this.handleRequests(ws, path);
+            this.handleInitialConnection(ws, path);
 
             ws.on("message", (data: RawData) => {
                 try {
@@ -48,7 +48,7 @@ export class api {
         server.listen(this.PORT);
     }
 
-    static handleRequests(ws: WebSocket, path: String) {
+    static handleInitialConnection(ws: WebSocket, path: String) {
     }
 
     static handleMessages(message: any) {
