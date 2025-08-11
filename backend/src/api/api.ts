@@ -11,21 +11,17 @@ export class api {
     static PORT: number = 3000;
     static lobbies: LobbyManager = new LobbyManager();
 
-    constructor() {
-
-    }
-
+    /**
+    * Initilizes the api by setting up a listner at the specified port and WebSocket.
+    */
     static init() {
         this.app.use(cors({
             credentials: true
         }));
 
+        // health check
         this.app.get('/health', (req, res) => {
             res.status(200).json({ status: 'ok' });
-        });
-
-        this.app.get('/', (req, res) => {
-            res.send("Hi");
         });
 
         const server = http.createServer(this.app)
@@ -34,22 +30,28 @@ export class api {
 
             const path: String = req.url ?? "";
             console.log(path);
-            this.handleRequests(path)
+            this.handleRequests(ws, path);
 
             ws.on("message", (data: RawData) => {
-                let jsonMessage: JSON = JSON.parse(data.toString());
-                console.log(jsonMessage);
-                this.handleMessages(jsonMessage);
-            })
+                try {
+                    const jsonMessage = JSON.parse(data.toString()) as { name?: string };
+                    console.log(jsonMessage.name);
+                    this.handleMessages(jsonMessage);
+                } catch (error) {
+                    ws.send("Error with json message");
+                    console.log("Error with json message");
+                    return;
+                }
+            });
         })
 
         server.listen(this.PORT);
     }
 
-    static handleRequests(path: String) {
+    static handleRequests(ws: WebSocket, path: String) {
     }
 
-    static handleMessages(message: JSON) {
-
+    static handleMessages(message: any) {
+        console.log("inside handle message" + message.name)
     }
 }

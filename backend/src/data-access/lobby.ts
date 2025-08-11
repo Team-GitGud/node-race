@@ -10,15 +10,17 @@ export class Lobby {
     gameStarted: boolean = false;
     lobbyID: string = '';
     players: Player[] = [];
+    hostToken: string;
     timer: any = null;
     ws: WebSocket;
 
     /**
      * This WebSocket is communicating with the lobby host
      */
-    constructor(id: string, ws: WebSocket) {
-        this.lobbyID = id;
+    constructor(ws: WebSocket) {
         this.ws = ws;
+        this.lobbyID = this.generateKey();
+        this.hostToken = this.generateHostToken();
     }
 
     /**
@@ -32,18 +34,53 @@ export class Lobby {
         this.players.push(p);
     }
 
+    /**
+    * Starts a game by sending the start signal to every player in the lobby
+    */
     startGame(): void {
+        this.gameStarted = true;
         this.players.forEach((p: Player) => p.startGame());
     }
 
+    /**
+    * Ends a game by sending the end signal to every payer in the lobby
+    */
     endGame(): void {
+        this.gameStarted = false;
         this.players.forEach((p: Player) => p.endGame());
     }
 
+    /**
+    * Updates the score of a player
+    * May be removed later and replaced with calculateScore
+    */
     updateScore(playerName: string, score: number): void {
         let p: Player | undefined = this.players.find((pl) => pl.name == playerName);
         if (p == undefined) { return; }
         p.setScore(score);
+    }
+
+    /**
+     * Generates the token for the host, used to authenticate host actions like remove player
+     */
+    generateHostToken(): string {
+        return `h_sess_${this.generateKey()}`
+    }
+
+    /**
+     * generates a random string of length 5
+    */
+    generateKey(): string {
+        const length: number = 5;
+        const characters: String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const charactersLength = characters.length;
+
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+
+        return result;
     }
 
     calculateScore(): void {

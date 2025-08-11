@@ -1,17 +1,12 @@
+import { Lobby } from "./lobby";
+import { ApiResponseFactory } from "../api/apiResponseFactory";
 
 export class LobbyManager {
+    lobbies: Map<string, Lobby> = new Map<string, Lobby>;
 
-
-    generateKey(): string {
-        const length: number = 5;
-        const characters: String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-        const charactersLength = characters.length;
-
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-
-        return result;
+    createLobby(ws: WebSocket) {
+        const lobby: Lobby = new Lobby(ws);
+        this.lobbies.set(lobby.lobbyID, lobby);
+        ws.send(""); //TODO: send data
     }
 }

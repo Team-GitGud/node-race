@@ -2,7 +2,8 @@ const ws = new WebSocket(`ws://localhost:3000/thing`);
 
 ws.onopen = () => {
     console.log(`Connected to ws://localhost:3000/thing`);
-    ws.send("Joe")
+    ws.send('{"name": "joe"}')
+    ws.send('{"Joe": "')
 };
 
 ws.onmessage = (event) => {
