@@ -1,222 +1,209 @@
+<!--
+Usage:
+<TextInput
+	ref="inputRef"
+	placeholder="Enter text here..."
+	:width="300"
+	initial-value="Initial text"
+/>
+<CustomButton text="Enter" :action="handleEnter">Enter</CustomButton>
+
+const inputRef = ref<InstanceType<typeof TextInput> | null>(null);
+
+function handleEnter() {
+	if (!inputRef.value) return;
+	const value = inputRef.value.getValue();
+	if (value !== "Correct Value") {
+		inputRef.value.setError("Incorrect value, please try again.");
+	} else {
+		inputRef.value.clearError();
+		alert("Correct value entered!", value);
+	}
+}
+
+Import this component in your Vue file:
+import TextInput from '@/components/TextInput.vue';
+
+Props:
+- placeholder (optional, string): Placeholder text for the input field. Defaults to an empty string.
+- width (optional, number): Width of the input field in pixels. Defaults to 400.
+- initialValue (optional, string): Initial value of the input field. Defaults to an empty string.
+-->
 <template>
-  <div class="text-input-container" :class="{ 'has-error': hasError }" :style="{ width: getWidth() }">
-    <input
-        class="text-input"
-        :value="internalValue"
-        :placeholder="placeholder"
-        :class="{ 'has-error': hasError }"
-        @input="handleInput"
-    />
-    
-    <span v-if="hasError && errorMessage" class="error-message">
-      {{ errorMessage }}
-    </span>
-  </div>
+	<div
+		class="text-input-container"
+		:class="{ 'has-error': errorMessage }"
+		:style="{ width: width + 'px' }"
+	>
+		<input 
+			class="text-input"
+			:class="{ 'has-error': errorMessage }"
+			:placeholder="placeholder"
+			v-model="inputValue"
+			@input="clearError"
+		/>
+		<span v-if="errorMessage" class="error-message">
+			{{ errorMessage }}
+		</span>
+	</div>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, defineExpose, withDefaults, ref, watch } from 'vue'
+import { defineProps, defineExpose, withDefaults, ref, watch } from 'vue'
 
-// Text Input component parameters:
-//     Optional:
-//     - placeholder: string (placeholder text in input)
-//     - variant: string (styling variant, default to neutral)
-//     - hasError: boolean (error state styling, defaults to false)
-//     - width: number (undefined default)
-//     - initialValue: string (initial value, defaults to empty string)
-//     - errorMessage: string (error message to display, defaults to empty string)
 const props = withDefaults(
-    defineProps<{
-      placeholder?: string;
-      variant?: 'neutral' | 'positive' | 'negative';
-      hasError?: boolean;
-      width?: number;
-      initialValue?: string;
-      errorMessage?: string;
-    }>(), {
-      placeholder: '',
-      variant: 'neutral',
-      hasError: false,
-      initialValue: '',
-      errorMessage: '',
-    }
+	defineProps<{
+		placeholder?: string;
+		width?: number;
+		initialValue?: string;
+	}>(), { width: 400 }
 );
 
-const internalValue = ref(props.initialValue);
-const hasError = ref(props.hasError);
-const errorMessage = ref(props.errorMessage);
-
-const getWidth = () => {
-  const width = props.width || 400;
-  return `${width}px`;
-};
-
-const handleInput = (event: Event) => {
-  const target = event.target as HTMLInputElement;
-  internalValue.value = target.value;
-  
-  // Clear error when user starts typing
-  if (hasError.value) {
-    clearError();
-  }
-};
-
-const emit = defineEmits<{
-  errorCleared: [];
-}>();
+// Internal initial state for the input value and error message
+const inputValue = ref(props.initialValue);
+const errorMessage = ref('');
 
 // Watch for prop changes to update internal state
 watch(() => props.initialValue, (newValue) => {
-  internalValue.value = newValue;
-});
-
-watch(() => props.hasError, (newValue) => {
-  hasError.value = newValue;
-});
-
-watch(() => props.errorMessage, (newValue) => {
-  errorMessage.value = newValue;
+	inputValue.value = newValue;
 });
 
 // Methods to control error state from external code
 const setError = (message: string) => {
-  hasError.value = true;
-  errorMessage.value = message;
-  emit('errorCleared');
+	errorMessage.value = message;
 };
-
 const clearError = () => {
-  hasError.value = false;
-  errorMessage.value = '';
-  emit('errorCleared');
+	if (!errorMessage.value) return;
+	errorMessage.value = '';
 };
 
 // Expose methods for external use
 defineExpose({
-  setError,
-  clearError,
-  getValue: () => internalValue.value
+	setError,
+	clearError,
+	getValue: () => inputValue.value
 });
 </script>
 
 <style scoped>
 .text-input-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
 }
 
 .text-input {
-  width: 83%; /* Leave 17% space for the "!!!" */
-  padding-right: 15%;
-  padding-left: 2%;
-  height: 40px;
-  color: #00081A;
-  font-size: 30px;
-  border: none;
-  padding-bottom: 7px;
-  background-image: linear-gradient(to right, #00081A 0%, #00081A 100%);
-  background-size: 100% 2px;
-  background-repeat: no-repeat;
-  background-position: bottom 5px left;
-  transition: all 0.3s ease;
-  caret-color: #00081A;
+	width: 83%;
+	/* Leave 17% space for the "!!!" */
+	padding-right: 15%;
+	padding-left: 2%;
+	height: 40px;
+	color: var(--background-color);
+	font-size: 30px;
+	border: none;
+	padding-bottom: 7px;
+	background-image: linear-gradient(to right, var(--background-color) 0%, var(--background-color) 100%);
+	background-size: 100% 2px;
+	background-repeat: no-repeat;
+	background-position: bottom 5px left;
+	transition: border-color 0.3s ease, border-width 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+	caret-color: var(--background-color);
+	border: 0px solid transparent;
 }
 
 .text-input:focus {
-  outline: none;
-  transform: scale(1.02);
-  box-shadow: 0 0 10px rgba(0, 8, 26, 0.2);
-  transition: all 0.2s ease;
+	outline: none;
+	transform: scale(1.02);
+	box-shadow: 0 0 10px rgba(0, 8, 26, 0.2);
 }
 
 .text-input:not(:focus) {
-  transform: scale(1);
-  box-shadow: none;
-  transition: all 0.2s ease;
+	transform: scale(1);
+	box-shadow: none;
 }
 
 .text-input:focus::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 2px;
-  height: 20px;
-  background-color: #00081A;
-  animation: blink 1s infinite;
+	content: '';
+	position: absolute;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 2px;
+	height: 20px;
+	background-color: var(--background-color);
+	animation: blink 1s infinite;
 }
 
 @keyframes blink {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0;
-  }
+	0%,
+	50% {
+		opacity: 1;
+	}
+
+	51%,
+	100% {
+		opacity: 0;
+	}
 }
 
 .text-input.has-error {
-  background-image: linear-gradient(to right, #ff0000 0%, #ff0000 100%);
-  border-top: 5px solid #AA0707;
-  border-right: 2px solid #AA0707;
-  border-bottom: 2px solid #AA0707;
-  border-left: 5px solid #AA0707;
-  transition: all 0.3s ease;
+	background-image: linear-gradient(to right, var(--negative-color) 0%, var(--negative-color) 100%);
+	border-color: var(--negative-color);
+	border-width: 5px 2px 2px 5px;
+	border-style: solid;
 }
 
 /* Floating "!!!" when there's an error */
 .text-input-container.has-error::after {
-  content: "!!!";
-  position: absolute;
-  right: 0;
-  color: #ff0000;
-  font-size: 50px;
-  font-style: normal;
-  font-weight: 400;
-  line-height: normal;
-  animation: fadeIn 0.3s ease-in;
+	content: "!!!";
+	position: absolute;
+	right: 0;
+	color: var(--negative-color);
+	font-size: 50px;
+	font-style: normal;
+	font-weight: 400;
+	line-height: normal;
+	animation: fadeIn 0.3s ease-in;
 }
 
 .error-message {
-  font-size: 20px;
-  width: 80%;
-  align-self: flex-end;
-  border-top: 5px solid #AA0707;
-  border-right: 2px solid #AA0707;
-  border-bottom: 2px solid #AA0707;
-  border-left: 5px solid #AA0707;
-  padding: 4px 6px;
-  animation: slideIn 0.3s ease-out;
+	font-size: 20px;
+	width: 80%;
+	align-self: flex-end;
+	border-color: var(--negative-color);
+	border-width: 5px 2px 2px 5px;
+	border-style: solid;
+	padding: 4px 6px;
+	animation: slideIn 0.3s ease-out;
 }
 
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
+	from {
+		opacity: 0;
+		transform: scale(0.8);
+	}
+
+	to {
+		opacity: 1;
+		transform: scale(1);
+	}
 }
 
 @keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 .text-input::placeholder {
-  opacity: 0.58;
-  color: #00081A;
-  font-size: 30px;
+	opacity: 0.58;
+	color: var(--background-color);
 }
 </style>

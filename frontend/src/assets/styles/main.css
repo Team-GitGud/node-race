@@ -8,7 +8,7 @@
     --negative-color: #AA0707;
     --background-color: #00081A;
     --text-color: #ffff;
-    --text-color-active: #666666;
+    --disabled: #666666;
 }
 
 * {
@@ -20,8 +20,8 @@
 
 /* General text styling */
 html {
-  color: #ffff;
-  background-color: #00081A;
+    color: #ffff;
+    background-color: #00081A;
 }
 
 h1, h2, h3, h4 {
