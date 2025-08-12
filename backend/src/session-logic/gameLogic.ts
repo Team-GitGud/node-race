@@ -10,7 +10,7 @@ import { preorderDFS } from "../tree-management/preorderDFS";
 export class GameLogic{
     questions: Question[] = [];
     numberNormalQuestions = 4;
-    numberDifficultQuestions = 1;
+    numberDifficultQuestions = 0;
     difficultMaxDepth = 5;
     generateQuestions(): void{
 
