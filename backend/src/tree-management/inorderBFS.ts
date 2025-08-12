@@ -17,7 +17,7 @@ export class inorderBFS implements SolveTree{
         // Fill the 2dlist of layers
         while(layers[layer].length != 0){
             let current = layers[layer][cursor];
-            if (layer + 1 > layers.length) layers.push([]); // Make a new layer if on final layer
+            if (layer + 1 >= layers.length) layers.push([]); // Make a new layer if on final layer
             if(current.leftChild != null){
                 layers[layer + 1].push(current.leftChild);
             }
