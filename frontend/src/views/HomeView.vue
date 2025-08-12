@@ -5,7 +5,7 @@
 		</div>
 		<div class="button_container">
 			<CustomButton text="Open Modal" :action="() => isModalOpen = true" />
-			<CustomButton style="margin-left: 10px;" text="Demo Question" :action="() => $router.push('/question/')" />
+			<CustomButton style="margin-left: 10px;" text="Question Navigation" :action="() => $router.push('/question-navigation/')" />
 		</div>
 		<div class="input_container" style="margin-top: 20px;">
 			<TextInput ref="testInputRef" placeholder="Enter some text..." :width="300" @enter="handleEnter"/>
