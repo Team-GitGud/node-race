@@ -7,9 +7,11 @@ import {Node} from "../tree-management/node";
 export class Question{
     solution: Map<number, number>;
     tree: Node;
+    questionType: string;
 
-    constructor(root: Node, solution: Map<number, number>){
+    constructor(root: Node, solution: Map<number, number>, questionType: string){
         this.solution = solution;
         this.tree = root;
+        this.questionType = questionType;
     }
 }
