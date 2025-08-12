@@ -5,11 +5,11 @@ import {Node} from "../tree-management/node";
  *  Could later be expanded to have a score weighting depending on how scoring works
  */
 export class Question{
-    solution: Map<number, number>;
+    solution: { [k: string]: number; }; // Maps dont convert to JSON nicely
     tree: Node;
     questionType: string;
 
-    constructor(root: Node, solution: Map<number, number>, questionType: string){
+    constructor(root: Node, solution: { [k: string]: number; }, questionType: string){
         this.solution = solution;
         this.tree = root;
         this.questionType = questionType;

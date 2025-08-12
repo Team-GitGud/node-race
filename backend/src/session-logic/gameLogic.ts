@@ -50,7 +50,7 @@ export class GameLogic{
                     solver = new postorderDFS();
                     questionType = "Post order Depth first search";
             }
-            this.questions.push(new Question(tree.root, solver.solveTree(tree.root), questionType)); 
+            this.questions.push(new Question(tree.root, Object.fromEntries(solver.solveTree(tree.root)), questionType)); 
         }
 
         // Make difficult questions with a chance at larger trees
@@ -90,7 +90,7 @@ export class GameLogic{
                     solver = new postorderDFS();
                     questionType = "Post order Depth first search";
             }
-            this.questions.push(new Question(tree.root, solver.solveTree(tree.root), questionType)); 
+            this.questions.push(new Question(tree.root, Object.fromEntries(solver.solveTree(tree.root)), questionType)); 
         }
 
 
