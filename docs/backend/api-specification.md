@@ -20,7 +20,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ### 1. Create a New Lobby
 
-- **Method:** `POST /api/v1/lobbies`
+- **Method:** `POST /api/v1/lobby/create`
 - **Request Body:** _(Empty)_
 - **Response:**
 ```json
@@ -39,11 +39,12 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ### 2. Join a Lobby
 
-- **Method:** `POST /api/v1/lobbies/{lobbyCode}/join`
+- **Method:** `POST /api/v1/lobby/join`
 - **Request Body:**
 ```json
 {
   "username": "PlayerTwo"
+  lobbyCode: AcScS
 }
 ```
 - **Response:**
@@ -61,8 +62,13 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ### 3. Start the Game
 
-- **Method:** `POST /api/v1/lobbies/{lobbyCode}/start`
-- **Request Body:** _(Empty)_
+- **Method:** `POST /api/v1/lobby/start`
+- **Request Body:
+```json
+{
+  lobbyCode: AaBbCc
+}
+```
 - **Authentication:** Verified through WebSocket session (not HTTP headers).
 - **Response:**
   - `202 Accepted` — Game start is handled asynchronously over WebSocket.
@@ -74,7 +80,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 ### Connection
 
 - **URL Format:**  
-  `wss://server/ws/v1/lobbies/{lobbyCode}`
+  `wss://server/ws/v1/lobby/create`
 
 - **Expected Workflow:**  
   1. Client opens WebSocket connection to the above URL.  
