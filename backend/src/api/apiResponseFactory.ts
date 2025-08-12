@@ -1,5 +1,10 @@
 export class ApiResponseFactory {
-    static createLobbyResponse(): String {
-        return "a"
+    static createLobbyResponse(lobbyCode: string, hostToken: string): String {
+        return `
+        {
+            "lobbyCode: ${lobbyCode}
+            "hostToken: ${hostToken}
+        }
+        `;
     }
 }

@@ -49,9 +49,22 @@ export class api {
     }
 
     static handleInitialConnection(ws: WebSocket, path: String) {
+        switch (path) {
+            case (ApiPaths.CREATE_LOBBY):
+                this.lobbies.createLobby(ws);
+                console.log("New lobby created");
+                break;
+
+            default:
+                ws.send("Error: path not found");
+        }
     }
 
     static handleMessages(message: any) {
         console.log("inside handle message" + message.name)
     }
+}
+
+class ApiPaths {
+    static CREATE_LOBBY = '/api/v1/lobby/create';
 }
