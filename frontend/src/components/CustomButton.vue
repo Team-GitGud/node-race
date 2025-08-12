@@ -1,141 +1,123 @@
+<!--
+Usage:
+<CustomButton
+	:action="() => isModalOpen = true"
+	type="positive"
+	:isDisabled="isDisabled"
+	:width="200"
+>
+	Button Text
+</CustomButton>
+
+Import this component in your Vue file:
+import CustomButton from '@/components/CustomButton.vue';
+
+Props:
+- action (optional, function): The function to call when the button is clicked. Defaults to returning null.
+- type (optional, string): The type of button, can be 'neutral', 'positive', or 'negative'. Defaults to 'neutral'.
+- disabled (optional, boolean): Whether the button is disabled. Defaults to false.
+- width (optional, number): The width of the button in pixels. Defaults to undefined (auto width).
+-->
 <template>
-	<div class="button-background-shadow" :class="[`type-${type}`, { disabled }]">
-		<button
-			:class="['custom-button', `type-${type}`, { disabled }]"
-			:disabled="disabled"
+	<button 
+		:class="['btn', `${type}`, { disabled }]"
+		:disabled="disabled"
+		type="button"
+		@click="action"
+	>
+		<div 
+			:class="['btn-inner', { shrink }]"
 			:style="{ width: width ? `${width}px` : undefined }"
-			@click="action"
 		>
-			<!-- {{ icon }}  Temperary until actual icons are implemented -->
-			{{ text }}
-		</button>
-	</div>
+			<slot />
+		</div>
+	</button>
 </template>
 
 <script lang="ts" setup>
 import { defineProps, withDefaults } from 'vue';
-
-// Button component parameters:
-//     Mandatory: text and action
-//     Optional:
-//     - type: string (values of neutral, positive, negative with a default of neutral)
-//     - disabled: boolean (whether or not the button is disabled, defaults to false)
-//     - icon: string (a fontawesome icon string, undefined default)
-//     - width: number (undefined default)
 withDefaults(
 	defineProps<{
-		text: string;
-		action: () => void;
+		action?: () => void;
 		type?: 'neutral' | 'positive' | 'negative';
 		disabled?: boolean;
-		icon?: string;
 		width?: number;
-	}>(),
-	{
-		text: 'this is a button',
-		type: 'neutral',
-		disabled: false,
-	}
+		shrink?: boolean;
+	}>(), { type: 'neutral' }
 );
-
 </script>
 
-<style>
-.custom-button {
+<style scoped>
+/* Button styles */
+.btn {
+	--transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, filter 0.1s linear;
+	display: inline-block;
+	padding: 0 4px 4px 0;
+	margin: 10px 5px;
+	outline: none;
+	border: none;
+	cursor: pointer;
+	transition: var(--transition);
+}
+
+.btn-inner {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	padding: 2px 30px;
-	background-color: #00081A;
-	border: 2px solid #fff;
-	cursor: pointer;
-	transition: all 0.3s ease;
+	background-color: var(--background-color);
+	border: 2px solid var(--text-color);
+	transition: var(--transition);
 	transform: translate(4px, 4px);
-
-	/* font */
 	font-size: 25px;
-	font-family: "Jersey 10", sans-serif;
-	font-weight: 400;
-	font-style: normal;
 }
 
-.button-background-shadow {
-	display: inline-block;
-	padding: 0 4px 4px 0;
-	transition: all 0.3s ease;
+.btn-inner.shrink {
+	padding: 2px 10px;
 }
 
-.custom-button:hover:not(.disabled) {
+/* Button hover effect */
+.btn:hover:not(.disabled) .btn-inner {
 	transform: translate(8px, 8px);
 }
 
-.type-neutral {
-	border-color: #ffffff;
-	color: #ffffff;
+/* Type modifiers */
+.btn.neutral {
+	background-color: var(--text-color);
+}
+.btn.neutral .btn-inner {
+	border-color: var(--text-color);
+	color: var(--text-color);
 }
 
-.type-neutral:active:not(.disabled) {
-	border-color: color-mix(in srgb, #ffffff 40%, black);
-	color: color-mix(in srgb, #ffffff 40%, black);
-	transition: all 0.1s linear;
+.btn.positive {
+	background-color: var(--positive-color);
+}
+.btn.positive .btn-inner {
+	border-color: var(--positive-color);
+	color: var(--text-color);
 }
 
-.button-background-shadow.type-neutral {
-	background-color: #fff;
+.btn.negative {
+	background-color: var(--negative-color);
+}
+.btn.negative .btn-inner {
+	border-color: var(--negative-color);
+	color: var(--text-color);
 }
 
-.button-background-shadow.type-neutral:active:not(.disabled) {
-	background-color: color-mix(in srgb, #ffffff 40%, black);
-	transition: all 0.1s linear;
+/* Active states */
+.btn:active:not(.disabled) {
+	filter: brightness(0.4);
 }
 
-.type-positive {
-	border-color: #069701;
-	color: white;
-}
-
-.type-positive:active:not(.disabled) {
-	border-color: color-mix(in srgb, #069701 40%, black);
-	color: color-mix(in srgb, #ffffff 40%, black);
-	transition: all 0.1s linear;
-}
-
-.button-background-shadow.type-positive {
-	background-color: #069701;
-}
-
-.button-background-shadow.type-positive:active:not(.disabled) {
-	background-color: color-mix(in srgb, #069701 40%, black);
-	transition: all 0.1s linear;
-}
-
-.type-negative {
-	border-color: #8f0000;
-	color: white;
-}
-
-.type-negative:active:not(.disabled) {
-	border-color: color-mix(in srgb, #8f0000 40%, black);
-	color: color-mix(in srgb, #ffffff 40%, black);
-	transition: all 0.1s linear;
-}
-
-.button-background-shadow.type-negative {
-	background-color: #8f0000;
-}
-
-.button-background-shadow.type-negative:active:not(.disabled) {
-	background-color: color-mix(in srgb, #8f0000 40%, black);
-	transition: all 0.1s linear;
-}
-
-.custom-button.disabled {
-	opacity: 0.4;
-	border-color: #5a5a5a;
+/* Disabled state */
+.btn.disabled {
+	background-color: var(--disabled);
 	cursor: not-allowed;
 }
-
-.button-background-shadow.disabled {
-	background-color: #5a5a5a;
+.btn.disabled .btn-inner {
+	opacity: 0.4;
+	border-color: var(--disabled);
 }
 </style>

@@ -167,23 +167,23 @@ watch(() => [props.node.leftChild, props.node.rightChild], updateLines);
     cursor: pointer;
 }
 .node-btn.duplicate:not(.incorrect):not(.correct), .node-btn:not(.selected):not(.incorrect):not(.correct) {
-    background-color: #235F9C;
-    box-shadow: 2px 2px 0 2px #1D4A77;
+    background-color: var(--secondary-color);
+    box-shadow: 2px 2px 0 2px var(--tertiary-color);
 }
 .node-btn.selected:not(.duplicate):not(.incorrect):not(.correct), .node-btn:not(.selected):not(.incorrect):not(.correct):hover {
-    background-color: #4F95D8;
-    box-shadow: 2px 2px 0 2px #235F9C;
+    background-color: var(--primary-color);
+    box-shadow: 2px 2px 0 2px var(--secondary-color);
 }
 .node-btn.incorrect {
-    background-color: #8F0000;
-    box-shadow: 2px 2px 0 2px color-mix(in srgb, #8f0000 40%, black);
+    background-color: var(--negative-color);
+    box-shadow: 2px 2px 0 2px color-mix(in srgb, var(--negative-color) 40%, black);
 }
 .node-btn.correct {
-    background-color: #049702;
-    box-shadow: 2px 2px 0 2px color-mix(in srgb, #049702 40%, black);
+    background-color: var(--positive-color);
+    box-shadow: 2px 2px 0 2px color-mix(in srgb, var(--positive-color) 40%, black);
 }
 .node-btn span {
-    color: white;
+    color: var(--text-color);
     font-size: 2.4rem;
 }
 .children {
