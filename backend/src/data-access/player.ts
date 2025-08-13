@@ -1,18 +1,23 @@
 import { WebSocket } from 'ws';
+import { Lobby } from './lobby';
 
 export class Player {
     name: string;
-    ip: string;
+    ID: string;
+    ws: WebSocket;
     score: number;
     questionStart: number;
     prevQuestionTime: number;
 
-    constructor(name: string, ip: string) {
+    constructor(name: string, ws: WebSocket) {
         this.name = name;
-        this.ip = ip;
+        this.ws = ws;
         this.score = 0;
         this.questionStart = 0;
         this.prevQuestionTime = 0;
+        this.ID = Lobby.generateKey();
+        ws.send(this.ID);
+        //TODO: reformat the send into the api specs style
     }
 
     getScore(): number {

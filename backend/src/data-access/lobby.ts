@@ -20,18 +20,18 @@ export class Lobby {
      */
     constructor(ws: WebSocket) {
         this.ws = ws;
-        this.lobbyID = this.generateKey();
+        this.lobbyID = Lobby.generateKey();
         this.hostToken = this.generateHostToken();
     }
 
     /**
     * Creates a Player object and add to the list of playars
-    * TODO return something if a player with this name exists 
     */
-    join(playerName: string, ip: string): void {
-        //TODO chage ip to WebSocket
-        if (this.players.some(p => p.getName() == playerName)) return;
-        let p: Player = new Player(playerName, ip);
+    join(playerName: string, ws: WebSocket): void {
+        if (this.players.some(p => p.getName() == playerName)) {
+            ws.send("Students cannot have the same name");
+        }
+        let p: Player = new Player(playerName, ws);
         this.players.push(p);
     }
 
@@ -65,13 +65,13 @@ export class Lobby {
      * Generates the token for the host, used to authenticate host actions like remove player
      */
     generateHostToken(): string {
-        return `h_sess_${this.generateKey()}`
+        return `h_sess_${Lobby.generateKey()}`
     }
 
     /**
      * generates a random string of length 5
     */
-    generateKey(): string {
+    static generateKey(): string {
         const length: number = 5;
         const characters: String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
         const charactersLength = characters.length;

@@ -18,4 +18,5 @@ ws.onclose = () => {
     console.log("Connection closed");
 };
 
-const a = new WebSocket(`ws://localhost:3000/api/v1/lobbies`);
+const a = new WebSocket(`ws://localhost:3000/api/v1/lobby/create`);
+const b = new WebSocket(`ws://localhost:3000/api/v1/lobby/join?name=joeJoin`);

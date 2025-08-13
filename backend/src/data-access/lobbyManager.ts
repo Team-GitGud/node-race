@@ -3,7 +3,7 @@ import { ApiResponseFactory } from "../api/apiResponseFactory";
 import { WebSocket } from 'ws';
 
 export class LobbyManager {
-    lobbies: Map<string, Lobby> = new Map<string, Lobby>;
+    lobbies: Map<string, Lobby> = new Map<string, Lobby>();
 
     /**
     * creates a lobby
@@ -18,6 +18,6 @@ export class LobbyManager {
      * gets the lobby with the accociated lobbyID
      */
     getLobby(lobbyID: string): Lobby {
-        return this.lobbies.get(lobbyID);
+        return this.lobbies.get(lobbyID)!;
     }
 }
