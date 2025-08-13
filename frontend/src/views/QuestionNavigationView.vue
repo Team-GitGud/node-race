@@ -1,5 +1,11 @@
 <template>
     <div class="question-navigation-view">
+        <CustomButton 
+            :action="() => $router.push('/')" 
+            text="Back to Home" 
+            type="neutral"
+            style="position: absolute; top: 20px; left: 20px;" 
+        />
         <h2 class="page-title">Question Navigation</h2>
         <div class="questions-container">
             <div class="question-wrapper" v-for="question in question_list" :key="question.id">
@@ -13,6 +19,7 @@
 import QuestionCard from '@/components/QuestionCard.vue';
 import { Question } from '@/types/Question';
 import { Node } from '@/types/Node';
+import CustomButton from '@/components/CustomButton.vue';
 
 var question_list : Question[] = [];
 
