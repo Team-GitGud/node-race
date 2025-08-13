@@ -13,7 +13,7 @@ import { onMounted, ref } from 'vue';
 const lobbyCode = ref('');
 
 onMounted(async () => {
-    const lc = APIManager.getInstance().getLobbyCode();
+    const lc = APIManager.getInstance().getSession()?.lobbyCode;
     if (!lc) {
         alert('No lobby code found. Please create a session first.');
         router.push('/');
