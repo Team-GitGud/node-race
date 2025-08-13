@@ -40,18 +40,28 @@ function navigateToQuestion() {
     border-style: solid;
     width: 600px;
     margin-bottom: 20px;
+    transition: filter 0.1s ease;
 }
 
 .question-card.status-null {
     border-color: var(--accent-color);
+    cursor: pointer;
+}
+
+.question-card.status-null:hover {
+    border-color: var(--accent-color);
+    cursor: pointer;
+    filter: brightness(0.4);
 }
 
 .question-card.status-true {
     border-color: var(--positive-color);
+    cursor: not-allowed;
 }
 
 .question-card.status-false {
     border-color: var(--negative-color);
+    cursor: not-allowed;
 }
 
 .question-name {
