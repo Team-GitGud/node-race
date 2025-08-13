@@ -1,2 +1,2 @@
 import { api } from './api/api';
-api();
+api.init();
