@@ -1,7 +1,7 @@
 <template>
     <div class="question-container" @click="navigateToQuestion">
         <div :class="['question-card', `status-${question.answerStatus}`]">
-            <h3 class="question-name">Demo Question</h3>
+            <h3 class="question-name">Demo Question: {{ question.id }}</h3>
             <div class="checkbox" v-if="question.answerStatus == null" />
             <h4 class="tick" v-if="question.answerStatus == true" >✔</h4>
             <h3 class="cross" v-if="question.answerStatus == false" >X</h3>
@@ -39,6 +39,7 @@ function navigateToQuestion() {
     border-width: 7px 3px 3px 7px;
     border-style: solid;
     width: 600px;
+    margin-bottom: 20px;
 }
 
 .question-card.status-null {
@@ -74,7 +75,7 @@ function navigateToQuestion() {
 }
 
 .cross {
-    margin-right: 30px;
+    margin-right: 35px;
     color: var(--negative-color);
 }
 </style>
