@@ -54,6 +54,34 @@ class APIManager {
             }
         });
     }
+
+    /** Join an existing session (lobby) */
+    public async joinSession(lobbyCode: string, playerName: string): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const wsProtocol = this.apiAddress.startsWith('https') ? 'wss' : 'ws';
+            const wsUrl = `${this.apiAddress.replace(/^http/, wsProtocol)}/api/v1/lobby/join?lobbyID=${encodeURIComponent(lobbyCode)}&name=${encodeURIComponent(playerName)}`;
+            const ws = new WebSocket(wsUrl);
+
+            ws.onerror = () => {
+                reject(new Error('WebSocket connection failed'));
+            };
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    // Adjust this check based on your backend's join response
+                    if (data.playerId) {
+                        this.ws = ws;
+                        this.lobbyCode = lobbyCode;
+                        resolve(true);
+                    } else {
+                        resolve(false);
+                    }
+                } catch {
+                    resolve(false);
+                }
+            };
+        })
+    }
 }
 
 export default APIManager;
