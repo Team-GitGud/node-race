@@ -1,5 +1,6 @@
 import { WebSocket } from 'ws';
 import { Lobby } from './lobby';
+import { ApiResponseFactory } from '../api/apiResponseFactory';
 
 export class Player {
     name: string;
@@ -16,8 +17,7 @@ export class Player {
         this.questionStart = 0;
         this.prevQuestionTime = 0;
         this.ID = Lobby.generateKey();
-        ws.send(this.ID);
-        //TODO: reformat the send into the api specs style
+        ws.send(ApiResponseFactory.playerJoinResponse(this.ID));
     }
 
     getScore(): number {
