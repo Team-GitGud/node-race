@@ -1,11 +1,9 @@
 export class ApiResponseFactory {
     static createLobbyResponse(lobbyCode: string, hostToken: string): String {
-        return `
-        {
-            "lobbyCode: "${lobbyCode}"
-            "hostToken: "${hostToken}"
-        }
-        `;
+        return JSON.stringify({
+            lobbyCode,
+            hostToken
+        });
     }
 
     static playerJoinResponse(playerId: string): String {
