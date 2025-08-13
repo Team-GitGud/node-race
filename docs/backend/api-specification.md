@@ -39,40 +39,17 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ### 2. Join a Lobby
 
-- **Method:** `POST /api/v1/lobby/join`
-- **Request Body:**
-```json
-{
-  "username": "PlayerTwo"
-  lobbyCode: AcScS
-}
-```
+- **Method:** `POST /api/v1/lobby/join?name=<username>&lobbyID=<lobbyID>`
+- **Request Body:** (Empty) - parameters are passed throught the url
 - **Response:**
 ```json
 {
   "playerId": "p_z9y8x7w6",
-  "playerToken": "p_sess_f6e5d4c3b2a1"
 }
 ```
 
 - **Errors:**
   - `404 Not Found`: Invalid or expired lobby code.
-
----
-
-### 3. Start the Game
-
-- **Method:** `POST /api/v1/lobby/start`
-- **Request Body:
-```json
-{
-  lobbyCode: AaBbCc
-}
-```
-- **Authentication:** Verified through WebSocket session (not HTTP headers).
-- **Response:**
-  - `202 Accepted` — Game start is handled asynchronously over WebSocket.
----
 
 
 ## WebSocket API
@@ -151,6 +128,19 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "KICK_PLAYER",
+  "data": {
+    "playerId": "p_z9y8x7w6"
+  }
+}
+```
+
+---
+
+### Start the game (host only)
+
+```json
+{
+  "action": "START_GAME",
   "data": {
     "playerId": "p_z9y8x7w6"
   }
