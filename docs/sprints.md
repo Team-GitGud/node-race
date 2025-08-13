@@ -33,9 +33,9 @@
   - Prepare the backend for hosting, and ensure the lobby system is functional.
 - **Tasks:**
   - [X] Create the QuestionView component w/ Question types, with demo question prepared.
-  - [ ] Update HomeView component to match latest Figma design.
+  - [X] Update HomeView component to match latest Figma design.
   - [X] Prepare general site-wide styles and themes.
-  - [ ] Setup lobby system in the backend for users to join and create lobbies.
+  - [X] Setup lobby system in the backend for users to join and create lobbies.
   - [X] Continued work of question generation in the backend.
   - [X] Setup hosting for the backend after previous sprint's research and feedback from tutor.
 
@@ -46,8 +46,21 @@
   - Connect hosting and joining sessions from the backend to the frontend.
   - Prepare question navigation view in the frontend.
 - **Tasks:**
-  - [ ] Connect hosting and joining sessions from the backend to the frontend.
-  - [ ] Prepared question navigation view in the frontend.
-  - [ ] Finalize question generation and work on the game logic in the backend.
+  - [X] Setup hosting and joining backend endpoints.
+  - [X] Prepared question navigation view in the frontend.
+  - [X] Finalize question generation and work on the game logic in the backend.
   - [ ] Finalize frontend and backend hosting.
-  - [ ] Applying general styles and themes across the frontend.
+  - [X] Applying general styles and themes across the frontend.
+
+## Sprint 5
+- **Start Date:** 13/08/2025
+- **End Date:** 22/08/2025
+- **Goals:**
+  - Setup API connection between the frontend and backend with the API Manager.
+  - Progressing with frontend pages and polishing/refining backend.
+  - Start preparing database connection to backend.
+- **Tasks:**
+  - [ ] Create API Manager to handle API requests and responses from the frontend to the backend.
+  - [ ] Create the Host and Join pages in the frontend.
+  - [ ] Refine/polish backend code and ensure endpoints are functional and ready.
+  - [ ] Start working on the database logic for storing global leaderboard.

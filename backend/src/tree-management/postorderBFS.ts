@@ -12,11 +12,11 @@ export class postorderBFS implements SolveTree{
         let order: Map<number, number> = new Map();
         let cursor = 0;
         let layer = 0;
-        let layers: Node[][] = [[root],[],[],[]];
+        let layers: Node[][] = [[root],[],[],[],[]];
         // Fill the 2dlist of layers
         while(layers[layer].length != 0){
             let current = layers[layer][cursor];
-            if (layer + 1 > layers.length) layers.push([]); // Make a new layer if on final layer
+            if (layer + 1 >= layers.length) layers.push([]); // Make a new layer if on final layer
             if(current.leftChild != null){
                 layers[layer + 1].push(current.leftChild);
             }
