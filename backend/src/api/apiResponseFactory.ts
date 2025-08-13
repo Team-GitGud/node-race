@@ -7,10 +7,8 @@ export class ApiResponseFactory {
     }
 
     static playerJoinResponse(playerId: string): String {
-        return `
-        {
-        "playerId": "${playerId}",
-        }
-        `;
+        return JSON.stringify({
+            playerId
+        });
     }
 }

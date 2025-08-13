@@ -56,7 +56,7 @@ class APIManager {
                 try {
                     const data = JSON.parse(event.data);
                     if (data.playerId) {
-                        this.session = new PlayerSession(ws, lobbyCode, data.playerId);
+                        this.session = new PlayerSession(ws, lobbyCode, data.playerId, playerName);
                         resolve(true);
                     } else {
                         resolve(false);

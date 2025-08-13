@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import QuestionView from '../views/QuestionView.vue'
 import HostView from '../views/HostView.vue'
+import JoinView from '../views/JoinView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -18,6 +19,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/host',
     name: 'host',
     component: HostView
+  },
+  {
+    path: '/join',
+    name: 'join',
+    component: JoinView
   }
 ]
 

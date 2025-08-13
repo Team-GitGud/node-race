@@ -71,7 +71,7 @@ function joinGame() {
 
 	APIManager.getInstance().joinSession(code, name)
 		.then(() => {
-			router.push('/lobby?code=' + code);
+			router.push('/join');
 		})
 		.catch((error) => {
 			alert(`Failed to join session: ${error.message}`);
