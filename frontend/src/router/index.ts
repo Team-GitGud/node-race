@@ -3,12 +3,18 @@ import HomeView from '../views/HomeView.vue'
 import QuestionView from '../views/QuestionView.vue'
 import HostView from '../views/HostView.vue'
 import JoinView from '../views/JoinView.vue'
+import QuestionNavigationView from '@/views/QuestionNavigationView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     name: 'home',
     component: HomeView
+  },
+  {
+    path: '/question-navigation',
+    name: 'question-navigation',
+    component: QuestionNavigationView,
   },
   {
     path: '/question',
