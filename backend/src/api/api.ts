@@ -5,6 +5,7 @@ import { IncomingMessage } from 'node:http';
 import http from 'http';
 import { LobbyManager } from '../data-access/lobbyManager';
 import { url } from 'node:inspector';
+import { Lobby } from '../data-access/lobby';
 
 
 export class api {
@@ -25,15 +26,19 @@ export class api {
             res.status(200).json({ status: 'ok' });
         });
 
+        // Create Server
         const server = http.createServer(this.app)
         const wss = new WebSocketServer({ server });
-        wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
 
+        // Create Websocker
+        wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
+            // Deal with connection
             this.handleInitialConnection(ws, req);
 
+            // Deal with requests
             ws.on("message", (data: RawData) => {
                 try {
-                    const jsonMessage = JSON.parse(data.toString()) as { name?: string };
+                    const jsonMessage = JSON.parse(data.toString());
                     console.log(jsonMessage.name);
                     this.handleMessages(jsonMessage);
                 } catch (error) {
@@ -58,15 +63,23 @@ export class api {
         switch (path) {
             case (ApiPaths.CREATE_LOBBY):
                 this.lobbies.createLobby(ws);
-                console.log("New lobby created");
                 break;
 
             case (ApiPaths.JOIN_LOBBY):
+                // Parse url urlParameters
                 const urlParameters = Object.fromEntries(fullURL.searchParams.entries());
                 const playerName: string = urlParameters.name;
                 const lobbyID: string = urlParameters.lobbyID;
-                this.lobbies.getLobby(lobbyID).join(playerName, ws);
-                console.log(`Player: ${playerName} Joined Lobby: ${lobbyID}`);
+
+                // Check if lobbyID is correct before joining game
+                const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyID, ws);
+                if (lobby === undefined) {
+                    ws.send("LobbyID not found");
+                    console.log(`Player: ${playerName} attempted to Join ${lobbyID} but ID doesn't exist`);
+                } else {
+                    lobby.join(playerName, ws);
+                    console.log(`Player: ${playerName} Joined Lobby: ${lobbyID}`);
+                }
                 break;
 
             default:
