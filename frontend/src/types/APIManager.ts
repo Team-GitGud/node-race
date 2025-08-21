@@ -9,6 +9,7 @@ class APIManager {
 
     private constructor() {
         this.apiAddress = process.env.VUE_APP_BACKEND_URL || '';
+        console.log("Address:", this.apiAddress);
     }
 
     public static getInstance(): APIManager {
