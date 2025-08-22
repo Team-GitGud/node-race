@@ -1,29 +1,35 @@
-import { Node } from './Node';
+import { Node } from './tree/Node';
 
 export class Question {
     id: string;
     title: string;
     root: Node;
-    correctOrder: Record<string, number>
+    correctOrder: Map<number, number>;
+    answerStatus: boolean | null;
 
-    constructor(id: string, title: string, root: Node, correctOrder: Record<string, number>) {
+    constructor(id: string, title: string, root: Node, correctOrder: Map<number, number>) {
         this.id = id;
         this.title = title;
         this.root = root;
         this.correctOrder = correctOrder;
+        this.answerStatus = null;
     }
 
-    isCorrect(selectedOrder: Record<string, number>): boolean {
-        const keys1 = Object.keys(this.correctOrder);
-        const keys2 = Object.keys(selectedOrder);
-
-        if (keys1.length !== keys2.length) return false;
-
-        for (const key of keys1) {
-            if (this.correctOrder[key] !== selectedOrder[key]) {
-                return false;
+    public isCorrect(selectedOrder: Map<number, number>): boolean {
+        // Check if both maps have the same size and all key-value pairs match
+        if (this.correctOrder.size !== selectedOrder.size) {
+            this.answerStatus = false;
+            return this.answerStatus;
+        }
+    
+        for (const [key, value] of this.correctOrder) {
+            if (selectedOrder.get(key) !== value) {
+                this.answerStatus = false;
+                return this.answerStatus;
             }
         }
-        return true;
+    
+        this.answerStatus = true;
+        return this.answerStatus;
     }
 }

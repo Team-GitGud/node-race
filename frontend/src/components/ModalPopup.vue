@@ -63,21 +63,18 @@ defineProps<{ title?: string }>();
     min-width: 300px;
     z-index: 1002;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
-    border: 1px solid var(--text-color);
+    border-width: 7px 3px 3px 7px;
+    border-style: solid;
+    border-color: var(--accent-color);
 }
 
 .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--text-color);
+    border-bottom: 1px solid var(--accent-color);
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
-}
-
-.modal-header h3 {
-    margin: 0;
-    font-size: 28px;
 }
 
 .modal-body {
@@ -90,6 +87,6 @@ defineProps<{ title?: string }>();
     gap: 0.5rem;
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--text-color);
+    border-top: 1px solid var(--accent-color);
 }
 </style>

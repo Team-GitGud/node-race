@@ -12,6 +12,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from 'vue';
+import APIManager from '@/types/APIManager';
 
 const isConnected = ref(false);
 let intervalId: number | undefined;
@@ -21,12 +22,7 @@ let intervalId: number | undefined;
  * Updates isConnected accordingly.
  */
 async function checkConnection() {
-    try {
-        const res = await fetch(`${process.env.VUE_APP_BACKEND_URL}/health`);
-        isConnected.value = res.ok;
-    } catch {
-        isConnected.value = false;
-    }
+    isConnected.value = await APIManager.getInstance().healthCheck();
 }
 
 onMounted(() => {

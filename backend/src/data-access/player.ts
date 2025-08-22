@@ -1,16 +1,23 @@
+import { WebSocket } from 'ws';
+import { Lobby } from './lobby';
+import { ApiResponseFactory } from '../api/apiResponseFactory';
+
 export class Player {
     name: string;
-    ip: string;
+    ID: string;
+    ws: WebSocket;
     score: number;
     questionStart: number;
     prevQuestionTime: number;
 
-    constructor(name: string, ip: string) {
+    constructor(name: string, ws: WebSocket) {
         this.name = name;
-        this.ip = ip;
+        this.ws = ws;
         this.score = 0;
         this.questionStart = 0;
         this.prevQuestionTime = 0;
+        this.ID = Lobby.generateKey();
+        ws.send(ApiResponseFactory.playerJoinResponse(this.ID));
     }
 
     getScore(): number {
@@ -25,8 +32,8 @@ export class Player {
         return this.name;
     }
 
-    startGame(): void {
-        return;
+    startGame(questions: string): void {
+        this.ws.send(ApiResponseFactory.startGamePlayerResponse(questions));
     }
 
     endGame(): void {
@@ -40,4 +47,15 @@ export class Player {
     setPrevQuestionTime(time: number): void {
         this.prevQuestionTime = time;
     }
+
+    toJsonString(): string {
+        return JSON.stringify(`
+        {
+            "name": "${this.name}",
+            "id": "${this.ID}",
+            "score": "${this.score}"
+        }
+        `);
+    }
+
 }
