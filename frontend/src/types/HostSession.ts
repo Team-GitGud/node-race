@@ -41,6 +41,8 @@ export class HostSession extends Session {
             this.ws.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.type === "GAME_STARTED") {
+                    // TODO: Handle game started for Host Session.
+                    // Maybe send the host to the leaderboard page.
                     resolve(true);
                 } else {
                     reject(new Error("Failed to start game"));
