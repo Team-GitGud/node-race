@@ -20,8 +20,10 @@ import QuestionCard from '@/components/QuestionCard.vue';
 import { Question } from '@/types/Question';
 import { Node } from '@/types/tree/Node';
 import CustomButton from '@/components/CustomButton.vue';
+import { PlayerSession } from '@/types/PlayerSession';
+import APIManager from '@/types/APIManager';
 
-var question_list : Question[] = [];
+var question_list : Question[] = (APIManager.getInstance().getSession() as PlayerSession).getQuestions() || [];
 
 // Demo tree setup
 // const demoRoot = new Node('A');

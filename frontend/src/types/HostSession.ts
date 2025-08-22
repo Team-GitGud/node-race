@@ -1,6 +1,7 @@
 import { Session } from './Session';
 import { Player } from './Player';
 import { Question } from './Question';
+import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
 
 export class HostSession extends Session {
     hostId: string;
@@ -21,8 +22,12 @@ export class HostSession extends Session {
         });
     }
 
-    public handleGameStarted(questions: Question[]) {
-        console.log("Game started with questions:", questions);
+    public handleGameStarted(questions: BackendQuestion[]) {
+        if (questions !== undefined && questions.length > 0) {
+            // If there's no players, for some reason there's no questions generated.
+            const adaptedQuestions = QuestionAdapter.fromBackendQuestions(questions);
+            console.log("Adapted questions:", adaptedQuestions);
+        }
     }
 
     public handleSessionEnded(reason: string) {

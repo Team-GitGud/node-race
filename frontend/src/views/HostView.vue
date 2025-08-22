@@ -30,6 +30,10 @@ const startGame = () => {
     // We check to make sure Host is the session.
     if (apiManager.getSession() instanceof HostSession) {
         (apiManager.getSession() as HostSession).startGame();
+
     }
 };
+APIManager.getInstance().getSession()?.addEventListener("GAME_STARTED_HOST", (data) => {
+    router.push('/leaderboard');
+});
 </script>

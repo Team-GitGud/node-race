@@ -1,6 +1,7 @@
 import { Session } from './Session';
 import { Player } from './Player';
 import { Question } from './Question';
+import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
 
 export class PlayerSession extends Session {
     private player: Player;
@@ -25,8 +26,9 @@ export class PlayerSession extends Session {
         return this.player;
     }
 
-    public handleGameStarted(questions: Question[]) {
-        console.log("Game started with questions:", questions);
+    public handleGameStarted(questions: BackendQuestion[]) {
+        this.questions = QuestionAdapter.fromBackendQuestions(questions);
+        console.log("Player session questions:", this.questions);
     }
 
     public handlePlayerKicked(reason: string) {

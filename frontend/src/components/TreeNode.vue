@@ -23,14 +23,14 @@
             ref="nodeBtn"
             @click="handleClick"
             :class="{ 
-                'selected': selectedOrder[node.id] !== -1, 
-                'duplicate': Object.values(selectedOrder).filter(v => v === selectedOrder[node.id]).length > 1,
+                'selected': selectedOrder.has(node.id), 
+                'duplicate': Array.from(selectedOrder.values()).filter(v => v === selectedOrder.get(node.id)).length > 1,
                 'incorrect': result === false,
                 'correct': result === true
             }"
         >
-            <span v-if="selectedOrder[node.id] !== -1">
-                {{ selectedOrder[node.id] }}
+            <span v-if="selectedOrder.has(node.id)">
+                {{ selectedOrder.get(node.id) }}
             </span>
         </button>
         <div class="children" ref="childrenContainer">
@@ -58,29 +58,39 @@ import { Node } from '@/types/tree/Node';
 
 const props = defineProps<{
     node: Node;
-    selectedOrder: Record<string, number>;
+    selectedOrder: Map<number, number>;
     result: boolean | null;
 }>();
 
 const emit = defineEmits<{
-    (e: 'select', newOrder: Record<string, number>): void;
+    (e: 'select', newOrder: Map<number, number>): void;
 }>();
 
 function handleClick() {
-    let newOrder = { ...props.selectedOrder };
-    const current = newOrder[props.node.id];
-    if (current === -1) {
-        const max = Math.max(...Object.values(newOrder), 0);
-        newOrder[props.node.id] = max + 1;
-    } else if (current >= Object.keys(newOrder).length) {
-        newOrder[props.node.id] = 1;
+    console.log('Click detected on node:', props.node);
+    console.log('Node ID:', props.node.id);
+    console.log('Node type:', typeof props.node.id);
+    
+    let newOrder = new Map(props.selectedOrder);
+    const current = newOrder.get(props.node.id);
+    
+    if (current === undefined) {
+        // Node hasn't been selected yet, add it to the next position
+        const nextPosition = newOrder.size + 1;
+        newOrder.set(props.node.id, nextPosition);
+        console.log(`Node ${props.node.id} selected as position ${nextPosition}`);
+        console.log('New order map:', newOrder);
     } else {
-        newOrder[props.node.id] = current + 1;
+        // Node already selected, remove it
+        newOrder.delete(props.node.id);
+        console.log(`Node ${props.node.id} deselected`);
+        console.log('New order map:', newOrder);
     }
+    
     emit('select', newOrder);
 }
 
-function emitSelect(newOrder: Record<string, number>) {
+function emitSelect(newOrder: Map<number, number>) {
     emit('select', newOrder);
 }
 
