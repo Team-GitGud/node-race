@@ -1,4 +1,5 @@
-import { Player } from "./player.ts"
+import { Player } from "./player"
+import { WebSocket } from 'ws';
 
 /**
  * This class represents a lobby in NodeRace and its purpose is to:

@@ -1,5 +1,5 @@
-import { SolveTree } from "./solvetree.ts";
-import {Node} from "./node.ts";
+import { SolveTree } from "./solveTree";
+import { Node } from "./node";
 
 
 export class postorderBFS implements SolveTree{
