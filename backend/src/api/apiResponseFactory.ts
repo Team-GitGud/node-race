@@ -2,7 +2,7 @@ export class ApiResponseFactory {
     static createLobbyResponse(lobbyCode: string, hostToken: string): String {
         return JSON.stringify(`
         {
-            "lobbyCode": "${lobbyCode}"
+            "lobbyCode": "${lobbyCode}",
             "hostToken": "${hostToken}"
         }
         `);
@@ -11,7 +11,7 @@ export class ApiResponseFactory {
     static playerJoinResponse(playerId: string): String {
         return JSON.stringify(`
         {
-            "playerId": "${playerId}",
+            "playerId": "${playerId}"
         }
         `);
     }
