@@ -112,7 +112,7 @@ export class api {
     }
 
     static getAllPlayers(message: any, ws: WebSocket): void {
-        const lobbyId = message.data.lobbyID;
+        const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
             ws.send("LobbyID not found");
@@ -128,7 +128,7 @@ export class api {
     }
 
     static startGame(message: any, ws: WebSocket) {
-        const lobbyId = message.data.lobbyID;
+        const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
             ws.send("LobbyID not found");
@@ -144,7 +144,7 @@ export class api {
     }
 
     static kickPlayer(message: any, ws: WebSocket): void {
-        const lobbyId = message.data.lobbyID;
+        const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
             ws.send("LobbyID not found");
