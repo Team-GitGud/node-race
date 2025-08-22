@@ -3,19 +3,21 @@ import { Player } from './Player';
 import { Question } from './Question';
 
 export class PlayerSession extends Session {
-    player: Player;
+    private player: Player;
+    private questions: Array<Question>;
 
     // In Java, this would look like: Map<String, List<Runnable>>
     // Each event such as "KICK_PLAYER" will have multiple listeners, maybe one from the View and from the Session.
     private eventListeners: Map<string, ((data: any) => void)[]> = new Map();
 
-    constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string) {
+    public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
         super(ws, lobbyCode);
         this.player = new Player(playerId, nickname);
         this.setMessageListener();
+        this.questions = questions;
     }
 
-    getPlayer(): Player {
+    public getPlayer(): Player {
         return this.player;
     }
 
@@ -94,5 +96,7 @@ export class PlayerSession extends Session {
                 runnable(data);
             });
         }
+    public getQuestions(): Array<Question> {
+        return this.questions;
     }
 }
