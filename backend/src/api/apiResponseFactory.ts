@@ -46,7 +46,7 @@ export class ApiResponseFactory {
     static startGameHostResponse(): string {
         return JSON.stringify(`
         {
-            "type": "PLAYER_JOINED"
+            "type": "GAME_STARTED_HOST"
         }
         `);
     }
@@ -57,6 +57,23 @@ export class ApiResponseFactory {
             "type": "ALL_PLAYERS",
             "players": ${playerArray}
         }
+        `);
+    }
+
+    static playerRejoinResponse(name: string, score: string, questions: string | undefined): string {
+        return JSON.stringify(`
+        {
+            "name": "${name}",
+            "score": "${score}",
+            "questions": "${questions}"
+        }
+        `);
+    }
+
+    static hostRejoinResponse(players: string): string {
+        return JSON.stringify(`
+        {
+            "players": "${players}" }
         `);
     }
 }
