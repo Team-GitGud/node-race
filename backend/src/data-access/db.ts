@@ -41,5 +41,9 @@ export class Database{
         this.addDataEntry(new Entry(this.data.length, name, score));
         return this.recentRank;
     }
+
+    getLeaderboard(): Array<Entry>{
+        return this.data.slice(0, 10);
+    }
         
 }
