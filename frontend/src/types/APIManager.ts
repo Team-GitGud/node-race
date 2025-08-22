@@ -54,7 +54,7 @@ class APIManager {
         this.startLoading();
         return new Promise((resolve, reject) => {
             const wsProtocol = this.apiAddress.startsWith('https') ? 'wss' : 'ws';
-            const wsUrl = this.apiAddress.replace(/^http/, wsProtocol) + '/api/v1/lobby/create';
+            const wsUrl = this.apiAddress.replace(/^https?/, wsProtocol) + '/api/v1/lobby/create';
             const ws = new WebSocket(wsUrl);
 
             ws.onerror = () => reject(new Error('WebSocket connection failed'));
@@ -83,7 +83,7 @@ class APIManager {
         this.startLoading();
         return new Promise((resolve, reject) => {
             const wsProtocol = this.apiAddress.startsWith('https') ? 'wss' : 'ws';
-            const wsUrl = `${this.apiAddress.replace(/^http/, wsProtocol)}/api/v1/lobby/join?lobbyID=${encodeURIComponent(lobbyCode)}&name=${encodeURIComponent(playerName)}`;
+            const wsUrl = `${this.apiAddress.replace(/^https?/, wsProtocol)}/api/v1/lobby/join?lobbyID=${encodeURIComponent(lobbyCode)}&name=${encodeURIComponent(playerName)}`;
             const ws = new WebSocket(wsUrl);
 
             ws.onerror = () => reject(new Error('WebSocket connection failed'));
