@@ -38,7 +38,6 @@ export class InactivityChecker {
         if (this.currentTime >= this.inactivityThreshold) {
             this.handleInactivity();
         }
-        console.log(`Inactivity time: ${this.currentTime / 1000} seconds`);
     }
 
     /** Handles inactivity (leave lobby, cleanup, etc.) */
