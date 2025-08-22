@@ -61,7 +61,11 @@ class APIManager {
             ws.onmessage = (event) => {
                 this.stopLoading();
                 try {
-                    const data = JSON.parse(event.data);
+                    let data = JSON.parse(event.data);
+                    // Parse differently if data is a string.
+                    if (typeof data === 'string') {
+                        data = JSON.parse(data);
+                    }
                     if (data.lobbyCode && data.hostToken) {
                         this.session = new HostSession(ws, data.lobbyCode, data.hostToken);
                         resolve(true);
@@ -86,7 +90,11 @@ class APIManager {
             ws.onmessage = (event) => {
                 this.stopLoading();
                 try {
-                    const data = JSON.parse(event.data);
+                    let data = JSON.parse(event.data);
+                    // Parse differently if data is a string.
+                    if (typeof data === 'string') {
+                        data = JSON.parse(data);
+                    }
                     if (data.playerId) {
                         this.session = new PlayerSession(ws, lobbyCode, data.playerId, playerName, []);
                         resolve(true);
