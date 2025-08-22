@@ -99,16 +99,32 @@ export class api {
                 break;
 
             case ("START_GAME"):
-                ws.send("Start not implemented yet");
+                this.startGame(message, ws);
                 break;
 
             case ("GET_ALL_PLAYERS"):
-                ws.send("Get players not implemented yet");
+                this.getAllPlayers(message, ws);
                 break;
 
             default:
                 ws.send("Error: no action block found");
         }
+    }
+
+    static getAllPlayers(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyID;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        const hostId = message.hostId;
+        if (!lobby.validateHost(hostId)) {
+            return;
+        }
+
+        lobby.sendAllPlayers();
     }
 
     static startGame(message: any, ws: WebSocket) {

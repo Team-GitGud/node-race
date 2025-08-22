@@ -34,14 +34,28 @@ export class ApiResponseFactory {
         `);
     }
 
-    static startGamePlayerResponse(): string {
-
+    static startGamePlayerResponse(questions: string): string {
+        return JSON.stringify(`
+        {
+            "type": "GAME_STARTED",
+            "questions": ${questions} 
+        }
+        `);
     }
 
     static startGameHostResponse(): string {
         return JSON.stringify(`
         {
             "type": "PLAYER_JOINED"
+        }
+        `);
+    }
+
+    static getAllPlayerResponse(playerArray: string): string {
+        return JSON.stringify(`
+        {
+            "type": "ALL_PLAYERS",
+            "players": ${playerArray}
         }
         `);
     }

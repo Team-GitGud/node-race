@@ -168,7 +168,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 {
   "type": "ALL_PLAYERS",
   "players": [
-        {"id": "adsfsafd", "name": "Donald"}
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
     ]
 }
 ```
@@ -252,7 +252,6 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "type": "GAME_STARTED",
-  "date": "2025-08-08T16:35:00Z",
   "questions": [
     {
       "id": "q1",

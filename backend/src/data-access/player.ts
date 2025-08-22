@@ -32,8 +32,8 @@ export class Player {
         return this.name;
     }
 
-    startGame(): void {
-        return;
+    startGame(questions: string): void {
+        this.ws.send(ApiResponseFactory.startGamePlayerResponse(questions));
     }
 
     endGame(): void {
@@ -47,4 +47,15 @@ export class Player {
     setPrevQuestionTime(time: number): void {
         this.prevQuestionTime = time;
     }
+
+    toJsonString(): string {
+        return JSON.stringify(`
+        {
+            "name": "${this.name}",
+            "id": "${this.ID}",
+            "score": "${this.score}"
+        }
+        `);
+    }
+
 }
