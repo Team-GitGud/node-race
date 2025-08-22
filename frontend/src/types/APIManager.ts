@@ -9,6 +9,7 @@ class APIManager {
 
     private constructor() {
         this.apiAddress = process.env.VUE_APP_BACKEND_URL || '';
+        console.log("Address:", this.apiAddress);
     }
 
     public static getInstance(): APIManager {
@@ -56,7 +57,7 @@ class APIManager {
                 try {
                     const data = JSON.parse(event.data);
                     if (data.playerId) {
-                        this.session = new PlayerSession(ws, lobbyCode, data.playerId, playerName);
+                        this.session = new PlayerSession(ws, lobbyCode, data.playerId, playerName, []);
                         resolve(true);
                     } else {
                         resolve(false);
