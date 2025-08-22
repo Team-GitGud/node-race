@@ -6,11 +6,12 @@ import { TreeAdapter } from "./tree/TreeAdapter";
  * the frontend. This is the backend format.
  */
 interface BackendQuestion {
-    solution: Map<string, number>;
-    tree: any; // Will turn into a Tree object.
+    solution: Record<string, number>;
+    tree: any;
     questionType: "Post order Depth first search" | 
-    "Pre order Depth first search" | 
-    "In order Depth first search";
+                 "Pre order Depth first search" | 
+                 "In order Depth first search" |
+                 "Pre order Breadth first search";
 }
 
 export class QuestionAdapter {
@@ -20,10 +21,11 @@ export class QuestionAdapter {
             const tree = TreeAdapter.fromBackendTree(backendQuestion[i].tree);
 
             const solution = new Map<number, number>();
-            for (const [key, value] of backendQuestion[i].solution) {
-                solution.set(Number(key), value);
+            for (const [key, value] of Object.entries(backendQuestion[i].solution)) {
+                if (value !== undefined) {
+                    solution.set(Number(key), value);
+                }
             }
-
             const question = new Question(
                 i.toString(),
                 backendQuestion[i].questionType,
