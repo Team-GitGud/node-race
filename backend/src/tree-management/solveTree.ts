@@ -1,4 +1,4 @@
-import {Node} from "./node.ts";
+import {Node} from "./node";
 
 export interface SolveTree {
 
