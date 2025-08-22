@@ -51,6 +51,31 @@ All WebSocket connections must authenticate with their token immediately upon co
 - **Errors:**
   - `404 Not Found`: Invalid or expired lobby code.
 
+--- 
+### 3. Rejoin Lobby
+
+- **Method:** `POST /api/v1/lobby/rejoin?id=<playerId>&lobbyId=<lobbyId>`
+- **Request Body:** (Empty) - parameters are passed throught the url
+- **Response:** score and questions may be null/blank if game hasn't started yet
+
+##### player
+```json
+{
+  "name": "Joe",
+  "score": "100",
+  "questions": [questions]
+}
+
+```
+##### host 
+```json
+{
+  "players": [players]
+}
+
+```
+
+nickname, score, questions
 
 ## WebSocket API
 
