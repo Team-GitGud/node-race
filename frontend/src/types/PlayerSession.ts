@@ -96,6 +96,8 @@ export class PlayerSession extends Session {
                 runnable(data);
             });
         }
+    }
+
     public getQuestions(): Array<Question> {
         return this.questions;
     }
