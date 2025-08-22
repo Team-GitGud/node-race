@@ -5,6 +5,7 @@ import { IncomingMessage } from 'node:http';
 import http from 'http';
 import { LobbyManager } from '../data-access/lobbyManager';
 import { url } from 'node:inspector';
+import { Lobby } from '../data-access/lobby';
 
 
 export class api {
@@ -25,17 +26,20 @@ export class api {
             res.status(200).json({ status: 'ok' });
         });
 
+        // Create Server
         const server = http.createServer(this.app)
         const wss = new WebSocketServer({ server });
-        wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
 
+        // Create Websocker
+        wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
+            // Deal with connection
             this.handleInitialConnection(ws, req);
 
+            // Deal with requests
             ws.on("message", (data: RawData) => {
                 try {
-                    const jsonMessage = JSON.parse(data.toString()) as { name?: string };
-                    console.log(jsonMessage.name);
-                    this.handleMessages(jsonMessage);
+                    const jsonMessage = JSON.parse(data.toString());
+                    this.handleMessages(jsonMessage, ws);
                 } catch (error) {
                     ws.send("Error with json message");
                     console.log("Error with json message");
@@ -58,15 +62,23 @@ export class api {
         switch (path) {
             case (ApiPaths.CREATE_LOBBY):
                 this.lobbies.createLobby(ws);
-                console.log("New lobby created");
                 break;
 
             case (ApiPaths.JOIN_LOBBY):
+                // Parse url urlParameters
                 const urlParameters = Object.fromEntries(fullURL.searchParams.entries());
                 const playerName: string = urlParameters.name;
                 const lobbyID: string = urlParameters.lobbyID;
-                this.lobbies.getLobby(lobbyID).join(playerName, ws);
-                console.log(`Player: ${playerName} Joined Lobby: ${lobbyID}`);
+
+                // Check if lobbyID is correct before joining game
+                const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyID);
+                if (lobby === undefined) {
+                    ws.send("LobbyID not found");
+                    console.log(`Player: ${playerName} attempted to Join ${lobbyID} but ID doesn't exist`);
+                } else {
+                    lobby.join(playerName, ws);
+                    console.log(`Player: ${playerName} Joined Lobby: ${lobbyID}`);
+                }
                 break;
 
             default:
@@ -74,8 +86,78 @@ export class api {
         }
     }
 
-    static handleMessages(message: any) {
-        console.log("inside handle message" + message.name)
+    static handleMessages(message: any, ws: WebSocket) {
+        const action: string = message.action;
+
+        switch (action) {
+            case ("UPDATE_SETTINGS"):
+                ws.send("Update not implemented yet");
+                break;
+
+            case ("KICK_PLAYER"):
+                this.kickPlayer(message, ws);
+                break;
+
+            case ("START_GAME"):
+                this.startGame(message, ws);
+                break;
+
+            case ("GET_ALL_PLAYERS"):
+                this.getAllPlayers(message, ws);
+                break;
+
+            default:
+                ws.send("Error: no action block found");
+        }
+    }
+
+    static getAllPlayers(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyID;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        const hostId = message.hostId;
+        if (!lobby.validateHost(hostId)) {
+            return;
+        }
+
+        lobby.sendAllPlayers();
+    }
+
+    static startGame(message: any, ws: WebSocket) {
+        const lobbyId = message.data.lobbyID;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        const hostId = message.hostId;
+        if (!lobby.validateHost(hostId)) {
+            return;
+        }
+
+        lobby.startGame();
+    }
+
+    static kickPlayer(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyID;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        const hostId = message.hostId;
+        if (!lobby.validateHost(hostId)) {
+            return;
+        }
+
+        const playerId: string = message.data.playerId;
+        lobby.removePlayer(playerId)
     }
 }
 

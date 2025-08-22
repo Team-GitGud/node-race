@@ -12,12 +12,13 @@ export class LobbyManager {
         const lobby: Lobby = new Lobby(ws);
         this.lobbies.set(lobby.lobbyID, lobby);
         ws.send(ApiResponseFactory.createLobbyResponse(lobby.lobbyID, lobby.hostToken).toString());
+        console.log("New lobby created");
     }
 
     /**
      * gets the lobby with the accociated lobbyID
      */
-    getLobby(lobbyID: string): Lobby {
-        return this.lobbies.get(lobbyID)!;
+    getLobby(lobbyID: string): Lobby | undefined {
+        return this.lobbies.get(lobbyID);
     }
 }

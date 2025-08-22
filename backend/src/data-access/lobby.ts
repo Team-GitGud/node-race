@@ -1,5 +1,7 @@
+import { ApiResponseFactory } from "../api/apiResponseFactory.ts";
 import { Player } from "./player.ts"
 import { WebSocket } from 'ws';
+import { GameLogic } from "../session-logic/gameLogic.ts";
 
 /**
  * This class represents a lobby in NodeRace and its purpose is to:
@@ -14,6 +16,7 @@ export class Lobby {
     hostToken: string;
     timer: any = null;
     ws: WebSocket;
+    gameLogic: GameLogic;
 
     /**
      * This WebSocket is communicating with the lobby host
@@ -22,6 +25,8 @@ export class Lobby {
         this.ws = ws;
         this.lobbyID = Lobby.generateKey();
         this.hostToken = this.generateHostToken();
+        this.gameLogic = new GameLogic();
+        this.gameLogic.generateQuestions();
     }
 
     /**
@@ -40,7 +45,8 @@ export class Lobby {
     */
     startGame(): void {
         this.gameStarted = true;
-        this.players.forEach((p: Player) => p.startGame());
+        this.ws.send(ApiResponseFactory.startGameHostResponse());
+        this.players.forEach((p: Player) => p.startGame(this.gameLogic.getQuestionJSON()));
     }
 
     /**
@@ -82,6 +88,22 @@ export class Lobby {
         }
 
         return result;
+    }
+
+    removePlayer(playerID: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerID)[0];
+        this.players = this.players.filter(p => p.ID !== playerID);
+
+        removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID));
+    }
+
+    validateHost(id: string): boolean {
+        return id === this.hostToken;
+    }
+
+    sendAllPlayers(): void {
+        this.ws.send(ApiResponseFactory.getAllPlayerResponse(JSON.stringify(this.players.map((p: Player) => p.toJsonString()))));
     }
 
     calculateScore(): void {
