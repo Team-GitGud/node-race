@@ -35,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/join',
     name: 'join',
-    component: JoinView
+    component: PlayerLobbyView
   },
   {
     path: '/leaderboard',
