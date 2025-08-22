@@ -54,7 +54,7 @@
 
 <script lang="ts" setup>
 import { defineProps, defineEmits, ref, onMounted, watch, nextTick } from 'vue';
-import { Node } from '@/types/Node';
+import { Node } from '@/types/tree/Node';
 
 const props = defineProps<{
     node: Node;

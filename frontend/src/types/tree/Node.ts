@@ -1,9 +1,9 @@
 export class Node {
-    id: string;
-    leftChild?: Node;
-    rightChild?: Node;
+    id: number;
+    leftChild: Node | null;
+    rightChild: Node | null;
 
-    constructor(id: string, leftChild?: Node, rightChild?: Node) {
+    constructor(id: number, leftChild: Node | null, rightChild: Node | null) {
         this.id = id;
         this.leftChild = leftChild;
         this.rightChild = rightChild;

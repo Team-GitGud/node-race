@@ -5,9 +5,8 @@ import { Question } from './Question';
 export class PlayerSession extends Session {
     player: Player;
 
-    // Listening for events like game started, player kicked, etc.
-    // I'm doing this to separate concerns of the session and the event listeners.
-    // String -> List<Runnable> (java). Because each event will call multiple listeners.
+    // In Java, this would look like: Map<String, List<Runnable>>
+    // Each event such as "KICK_PLAYER" will have multiple listeners, maybe one from the View and from the Session.
     private eventListeners: Map<string, ((data: any) => void)[]> = new Map();
 
     constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string) {
