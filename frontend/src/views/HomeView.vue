@@ -23,7 +23,7 @@
 					</div>
 				</template>
 				<template #footer>
-					<CustomButton :action="() => joinIsOpen = false" type="positive">Connect</CustomButton>
+					<CustomButton :action="() => $router.push('/player-lobby/')" type="positive">Connect</CustomButton>
 					<CustomButton :action="() => joinIsOpen = false" type="negative">Close</CustomButton>
 				</template>
 			</ModalPopup>
