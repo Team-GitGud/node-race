@@ -28,7 +28,7 @@
 				</template>
 			</ModalPopup>
 	
-			<CustomButton>Host</CustomButton>
+			<CustomButton :action="() => handleHostClick()">Host</CustomButton>
 			<CustomButton shrink :action="() => $router.push('/question/')">?</CustomButton>
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
@@ -39,13 +39,44 @@
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import ConnectionStatus from '@/components/ConnectionStatus.vue';
 import CustomButton from '@/components/CustomButton.vue'
-import ModalPopup from '@/components/ModalPopup.vue'
+import ModalPopup from '@/components/ModalPopup.vue';
 import TextInput from '@/components/TextInput.vue';
+import APIManager from '@/types/APIManager';
+import router from '@/router';
 import { ref } from 'vue';
+
+async function handleHostClick() {
+	if (await APIManager.getInstance().createSession()) {
+		router.push('/host');
+	} else {
+		alert('Failed to create a new session. Please try again later.');
+	}
+}
 
 const joinIsOpen = ref<boolean>(false);
 const nicknameInput = ref<InstanceType<typeof TextInput> | null>(null);
 const codeInput = ref<InstanceType<typeof TextInput> | null>(null);
+
+function joinGame() {
+	if (!codeInput.value || !nicknameInput.value) return;
+
+	const code = codeInput.value.getValue();
+	const name = nicknameInput.value.getValue();
+
+	if (!code || !name) {
+		alert('Please enter both lobby code and nickname.');
+		return;
+	}
+
+	APIManager.getInstance().joinSession(code, name)
+		.then(() => {
+			router.push('/join');
+		})
+		.catch((error) => {
+			alert(`Failed to join session: ${error.message}`);
+		});
+}
+
 
 </script>
 
