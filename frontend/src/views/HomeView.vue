@@ -23,7 +23,7 @@
 					</div>
 				</template>
 				<template #footer>
-					<CustomButton :action="() => $router.push('/player-lobby/')" type="positive">Connect</CustomButton>
+					<CustomButton :action="() => joinGame()" type="positive">Connect</CustomButton>
 					<CustomButton :action="() => joinIsOpen = false" type="negative">Close</CustomButton>
 				</template>
 			</ModalPopup>
@@ -70,7 +70,7 @@ function joinGame() {
 
 	APIManager.getInstance().joinSession(code, name)
 		.then(() => {
-			router.push('/join');
+			router.push('/lobby');
 		})
 		.catch((error) => {
 			alert(`Failed to join session: ${error.message}`);

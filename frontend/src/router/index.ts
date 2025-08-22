@@ -13,8 +13,8 @@ const routes: Array<RouteRecordRaw> = [
     component: HomeView
   },
   {
-    path: '/player-lobby',
-    name: 'player-lobby',
+    path: '/lobby',
+    name: 'lobby',
     component: PlayerLobbyView,
   },
   {
@@ -32,11 +32,6 @@ const routes: Array<RouteRecordRaw> = [
     name: 'host',
     component: HostView
   },
-  {
-    path: '/join',
-    name: 'join',
-    component: JoinView
-  }
 ]
 
 const router = createRouter({
