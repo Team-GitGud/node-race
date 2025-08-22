@@ -1,6 +1,7 @@
 import { Session } from './Session';
 import { Player } from './Player';
 import { Question } from './Question';
+import APIManager from './APIManager';
 
 export class PlayerSession extends Session {
     private player: Player;
@@ -100,5 +101,20 @@ export class PlayerSession extends Session {
 
     public getQuestions(): Array<Question> {
         return this.questions;
+    }
+
+    /**
+     * Leaves the session: disconnects the WebSocket and cleans up.
+     * TODO: Send a message to the backend to notify leaving the lobby.
+     */
+    public leaveSession() {
+        // TODO: Send a "LEAVE_LOBBY" message to the backend if needed
+        // Example: this.ws.send(JSON.stringify({ type: "LEAVE_LOBBY" }));
+
+        // Disconnect the WebSocket
+        this.disconnect();
+
+        // Optionally, clean up session in APIManager
+        APIManager.getInstance().clearSession();
     }
 }
