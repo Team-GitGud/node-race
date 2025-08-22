@@ -18,7 +18,7 @@ export class LobbyManager {
     /**
      * gets the lobby with the accociated lobbyID
      */
-    getLobby(lobbyID: string, ws: WebSocket): Lobby | undefined {
+    getLobby(lobbyID: string): Lobby | undefined {
         return this.lobbies.get(lobbyID);
     }
 }

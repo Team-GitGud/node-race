@@ -1,3 +1,4 @@
+import { ApiResponseFactory } from "../api/apiResponseFactory.ts";
 import { Player } from "./player.ts"
 import { WebSocket } from 'ws';
 
@@ -40,6 +41,7 @@ export class Lobby {
     */
     startGame(): void {
         this.gameStarted = true;
+        this.ws.send(ApiResponseFactory.startGameHostResponse());
         this.players.forEach((p: Player) => p.startGame());
     }
 
@@ -82,6 +84,18 @@ export class Lobby {
         }
 
         return result;
+    }
+
+    removePlayer(playerID: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerID)[0];
+        this.players = this.players.filter(p => p.ID !== playerID);
+
+        removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID));
+    }
+
+    validateHost(id: string): boolean {
+        return id === this.hostToken;
     }
 
     calculateScore(): void {
