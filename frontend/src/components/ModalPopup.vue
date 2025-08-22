@@ -16,7 +16,6 @@ import CustomButton from '@/components/CustomButton.vue';
 Props:
 - title (optional, string): If provided, displays a header with the title and a close button. If omitted, only a close button appears in the top-right.
 -->
-
 <template>
     <div class="modal-popup">
         <div class="overlay" @click="$emit('close')"></div>
@@ -59,19 +58,19 @@ defineProps<{ title?: string }>();
 
 .modal {
     position: relative;
-    background: #00040D;
+    background: var(--background-color);
     padding: 1.5rem;
     min-width: 300px;
     z-index: 1002;
     box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
-    border: 1px solid white;
+    border: 1px solid var(--text-color);
 }
 
 .modal-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--text-color);
     padding-bottom: 0.5rem;
     margin-bottom: 1rem;
 }
@@ -91,6 +90,6 @@ defineProps<{ title?: string }>();
     gap: 0.5rem;
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--text-color);
 }
 </style>

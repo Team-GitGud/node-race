@@ -1,22 +1,31 @@
 <template>
 	<div class="home">
-		<div class="image_container">
-			<img src="../assets/home_page_as_image.png" alt="Home page image"/>
+		<ScreenBackground />
+		<div class="button-container">
+			<CustomButton :action="() => handleJoinClick()">Join</CustomButton>
+			<CustomButton :action="() => handleHostClick()">Host</CustomButton>
+			<CustomButton shrink :action="() => $router.push('/question/')">?</CustomButton>
 		</div>
-		<div class="button_container">
-			<CustomButton text="Open Modal" :action="() => isModalOpen = true" />
-			<CustomButton style="margin-left: 10px;" text="Demo Question" :action="() => $router.push('/question/')" />
-		</div>
-		<div class="input_container" style="margin-top: 20px;">
-			<TextInput ref="testInputRef" placeholder="Enter some text..." :width="300" @enter="handleEnter"/>
-		</div>
-		<ModalPopup title="Modal Popup" v-if="isModalOpen" @close="isModalOpen = false">
+		<ModalPopup title="Join Game" v-if="joinPopup" @close="joinPopup = false">
 			<template #body>
-				<p style="font-size: 24px; margin: 0;">This is a modal popup example.</p>
+				<TextInput
+					ref="codeInput"
+					placeholder="Enter lobby code..."
+				/>
+				<TextInput
+					ref="nameInput"
+					placeholder="Enter nickname"
+				/>
 			</template>
 			<template #footer>
-				<CustomButton text="Action 1" :action="() => console.log('Action 1 clicked')" type="positive" />
-				<CustomButton text="Close" :action="() => isModalOpen = false" type="negative" />
+				<CustomButton
+					:action="() => joinGame()"
+					type="positive"
+				>Join</CustomButton>
+				<CustomButton
+					:action="() => joinPopup = false"
+					type="negative"
+				>Cancel</CustomButton>
 			</template>
 		</ModalPopup>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
@@ -24,47 +33,60 @@
 </template>
 
 <script lang="ts" setup>
+import ScreenBackground from '@/components/ScreenBackground.vue';
 import ConnectionStatus from '@/components/ConnectionStatus.vue';
 import CustomButton from '@/components/CustomButton.vue'
-import TextInput from '@/components/TextInput.vue'
-import { ref } from 'vue';
 import ModalPopup from '@/components/ModalPopup.vue';
+import TextInput from '@/components/TextInput.vue';
+import APIManager from '@/types/APIManager';
+import router from '@/router';
+import { ref } from 'vue';
 
-const isModalOpen = ref(false);
-const handleEnter = (value: string) => {
-  console.log('Enter pressed with value:', value);
-};
+async function handleHostClick() {
+	if (await APIManager.getInstance().createSession()) {
+		router.push('/host');
+	} else {
+		alert('Failed to create a new session. Please try again later.');
+	}
+}
+
+const joinPopup = ref(false);
+const codeInput = ref<InstanceType<typeof TextInput> | null>(null);
+const nameInput = ref<InstanceType<typeof TextInput> | null>(null);
+
+function handleJoinClick() {
+	joinPopup.value = true;
+}
+
+function joinGame() {
+	if (!codeInput.value || !nameInput.value) return;
+
+	const code = codeInput.value.getValue();
+	const name = nameInput.value.getValue();
+
+	if (!code || !name) {
+		alert('Please enter both lobby code and nickname.');
+		return;
+	}
+
+	APIManager.getInstance().joinSession(code, name)
+		.then(() => {
+			router.push('/join');
+		})
+		.catch((error) => {
+			alert(`Failed to join session: ${error.message}`);
+		});
+}
+
+
 </script>
 
 <style>
-.image_container {
-	display: flex;
-	justify-content: center;
-	max-height: 100vh;
-	overflow: hidden;
-}
-
-img {
-	height: 100vh;
-	width: auto;
-	position: fixed;
-	z-index: -1;
-	overflow-y: hidden;
-}
-
-.button_container {
+.button-container {
 	display: flex;
 	justify-content: center;
 	position: fixed;
 	top: calc(100vh - 45vh);
-	width: 100%;
-}
-
-.input_container {
-	display: flex;
-	justify-content: center;
-	position: fixed;
-	top: calc(100vh - 40vh);
 	width: 100%;
 }
 </style>

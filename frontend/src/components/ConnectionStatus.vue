@@ -16,6 +16,10 @@ import { ref, onMounted, onUnmounted } from 'vue';
 const isConnected = ref(false);
 let intervalId: number | undefined;
 
+/**
+ * Checks server connection by pinging the health endpoint.
+ * Updates isConnected accordingly.
+ */
 async function checkConnection() {
     try {
         const res = await fetch(`${process.env.VUE_APP_BACKEND_URL}/health`);
@@ -43,20 +47,19 @@ onUnmounted(() => {
 }
 
 .status-light {
-    display: inline-block;
     width: 1em;
     height: 1em;
     border-radius: 50%;
-    border: 1px solid #333;
+    display: inline-block;
 }
 
 .status-light.connected {
-    background-color: green;
-    box-shadow: 0 0 5px green;
+    background-color: var(--positive-color);
+    box-shadow: 0 0 5px var(--positive-color);
 }
 
 .status-light.disconnected {
-    background-color: red;
-    box-shadow: 0 0 5px red;
+    background-color: var(--negative-color);
+    box-shadow: 0 0 5px var(--negative-color);
 }
 </style>
