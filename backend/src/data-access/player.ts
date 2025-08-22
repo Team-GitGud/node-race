@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
 import { Lobby } from './lobby';
 import { ApiResponseFactory } from '../api/apiResponseFactory';
+import {Timer} from "./timer";
 
 export class Player {
     name: string;
@@ -15,7 +16,7 @@ export class Player {
         this.ws = ws;
         this.score = 0;
         this.questionStart = 0;
-        this.prevQuestionTime = 0;
+        this.prevQuestionTime = 360;
         this.ID = Lobby.generateKey();
         ws.send(ApiResponseFactory.playerJoinResponse(this.ID));
     }
@@ -24,8 +25,15 @@ export class Player {
         return this.score;
     }
 
-    setScore(score: number): void {
-        this.score = score;
+    /** Calculates score and adds it to previous score
+     * then resets the time score penalty
+     * 
+     * @param score 
+     */
+    calculateScore(score: number, timer: Timer): void {
+        
+        this.score = score + 100 + (900 * (this.prevQuestionTime - timer.getTime())/this.prevQuestionTime);
+        this.prevQuestionTime = timer.getTime();
     }
 
     getName(): string {
