@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import QuestionView from '../views/QuestionView.vue'
 import HostView from '../views/HostView.vue'
-import JoinView from '../views/JoinView.vue'
 import QuestionNavigationView from '@/views/QuestionNavigationView.vue'
 import PlayerLobbyView from '@/views/PlayerLobbyView.vue'
 
