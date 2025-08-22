@@ -3,7 +3,7 @@ export class Node {
     leftChild: Node | null;
     rightChild: Node | null;
 
-    constructor(id: number, leftChild: Node | null, rightChild: Node | null) {
+    constructor(id: number, leftChild: Node | null = null, rightChild: Node | null = null) {
         this.id = id;
         this.leftChild = leftChild;
         this.rightChild = rightChild;

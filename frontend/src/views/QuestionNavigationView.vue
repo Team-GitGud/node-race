@@ -18,32 +18,32 @@
 <script lang="ts" setup>
 import QuestionCard from '@/components/QuestionCard.vue';
 import { Question } from '@/types/Question';
-import { Node } from '@/types/Node';
+import { Node } from '@/types/tree/Node';
 import CustomButton from '@/components/CustomButton.vue';
 
 var question_list : Question[] = [];
 
 // Demo tree setup
-const demoRoot = new Node('A');
-const demoQuestion = new Question(
-    '1',
-    'Click the nodes in depth-first order',
-    demoRoot,
-    { 'A': 1 },
-);
+// const demoRoot = new Node('A');
+// const demoQuestion = new Question(
+//     '1',
+//     'Click the nodes in depth-first order',
+//     demoRoot,
+//     { 'A': 1 },
+// );
 
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
-question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
+// question_list.push(demoQuestion);
 
 </script>
 
