@@ -1,15 +1,22 @@
 import { Session } from './Session';
 import { Player } from './Player';
+import { Question } from './Question';
 
 export class PlayerSession extends Session {
-    player: Player;
+    private player: Player;
+    private questions: Array<Question>;
 
-    constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string) {
+    public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
         super(ws, lobbyCode);
         this.player = new Player(playerId, nickname);
+        this.questions = questions;
     }
 
-    getPlayer(): Player {
+    public getPlayer(): Player {
         return this.player;
+    }
+
+    public getQuestions(): Array<Question> {
+        return this.questions;
     }
 }
