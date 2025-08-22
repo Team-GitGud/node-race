@@ -1,7 +1,7 @@
-import { ApiResponseFactory } from "../api/apiResponseFactory.ts";
-import { Player } from "./player.ts"
+import { ApiResponseFactory } from "../api/apiResponseFactory";
+import { Player } from "./player"
 import { WebSocket } from 'ws';
-import { GameLogic } from "../session-logic/gameLogic.ts";
+import { GameLogic } from "../session-logic/gameLogic";
 
 /**
  * This class represents a lobby in NodeRace and its purpose is to:
