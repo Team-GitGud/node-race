@@ -111,6 +111,7 @@ export class Lobby {
             this.ws.close();
             this.ws = playerWs;
             this.ws.send(ApiResponseFactory.hostRejoinResponse(JSON.stringify(this.players.map((p: Player) => p.toJsonString()))));
+            return;
         }
         const player = this.getPlayer(playerId);
         if (player === undefined) {
