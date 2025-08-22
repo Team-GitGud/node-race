@@ -4,6 +4,7 @@ import QuestionView from '../views/QuestionView.vue'
 import HostView from '../views/HostView.vue'
 import JoinView from '../views/JoinView.vue'
 import QuestionNavigationView from '@/views/QuestionNavigationView.vue'
+import LeaderboardView from '@/views/LeaderboardView.vue'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -30,6 +31,11 @@ const routes: Array<RouteRecordRaw> = [
     path: '/join',
     name: 'join',
     component: JoinView
+  },
+  {
+    path: '/leaderboard',
+    name: 'leaderboard',
+    component: LeaderboardView
   }
 ]
 
