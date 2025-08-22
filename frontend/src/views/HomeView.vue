@@ -2,32 +2,35 @@
 	<div class="home">
 		<ScreenBackground />
 		<div class="button-container">
-			<CustomButton :action="() => handleJoinClick()">Join</CustomButton>
+			<CustomButton :action="() => joinIsOpen = true">Join</CustomButton>
+			<ModalPopup title="Join a Game" v-if="joinIsOpen" @close="joinIsOpen = false">
+				<template #body>
+					<div class="input-container">
+						<h4 class="input-heading">Nickname: </h4>
+						<TextInput
+							ref="nicknameInput"
+							placeholder="Jeff"
+							:width="300"
+						/>
+					</div>
+					<div class="input-container">
+						<h4 class="input-heading">Game Code: </h4>
+						<TextInput
+							ref="codeInput"
+							placeholder="30021c"
+							:width="300"
+						/>
+					</div>
+				</template>
+				<template #footer>
+					<CustomButton :action="() => joinGame()" type="positive">Connect</CustomButton>
+					<CustomButton :action="() => joinIsOpen = false" type="negative">Close</CustomButton>
+				</template>
+			</ModalPopup>
+	
 			<CustomButton :action="() => handleHostClick()">Host</CustomButton>
 			<CustomButton shrink :action="() => $router.push('/question/')">?</CustomButton>
 		</div>
-		<ModalPopup title="Join Game" v-if="joinPopup" @close="joinPopup = false">
-			<template #body>
-				<TextInput
-					ref="codeInput"
-					placeholder="Enter lobby code..."
-				/>
-				<TextInput
-					ref="nameInput"
-					placeholder="Enter nickname"
-				/>
-			</template>
-			<template #footer>
-				<CustomButton
-					:action="() => joinGame()"
-					type="positive"
-				>Join</CustomButton>
-				<CustomButton
-					:action="() => joinPopup = false"
-					type="negative"
-				>Cancel</CustomButton>
-			</template>
-		</ModalPopup>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
 	</div>
 </template>
@@ -50,19 +53,15 @@ async function handleHostClick() {
 	}
 }
 
-const joinPopup = ref(false);
+const joinIsOpen = ref<boolean>(false);
+const nicknameInput = ref<InstanceType<typeof TextInput> | null>(null);
 const codeInput = ref<InstanceType<typeof TextInput> | null>(null);
-const nameInput = ref<InstanceType<typeof TextInput> | null>(null);
-
-function handleJoinClick() {
-	joinPopup.value = true;
-}
 
 function joinGame() {
-	if (!codeInput.value || !nameInput.value) return;
+	if (!codeInput.value || !nicknameInput.value) return;
 
 	const code = codeInput.value.getValue();
-	const name = nameInput.value.getValue();
+	const name = nicknameInput.value.getValue();
 
 	if (!code || !name) {
 		alert('Please enter both lobby code and nickname.');
@@ -71,7 +70,7 @@ function joinGame() {
 
 	APIManager.getInstance().joinSession(code, name)
 		.then(() => {
-			router.push('/join');
+			router.push('/lobby');
 		})
 		.catch((error) => {
 			alert(`Failed to join session: ${error.message}`);
@@ -89,4 +88,15 @@ function joinGame() {
 	top: calc(100vh - 45vh);
 	width: 100%;
 }
+
+.input-container {
+	display: flex;
+	justify-content: space-between;
+	margin: 30px 15px 30px 15px;
+}
+
+.input-heading {
+	margin-right: 40px;
+}
+
 </style>
