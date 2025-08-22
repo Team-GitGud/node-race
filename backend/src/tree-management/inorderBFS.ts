@@ -1,31 +1,31 @@
-import { SolveTree } from "./solvetree.ts";
-import {Node} from "./node.ts";
+import { SolveTree } from "./solveTree.ts";
+import { Node } from "./node.ts";
 
 
-export class inorderBFS implements SolveTree{
+export class inorderBFS implements SolveTree {
     /**
      * This generates the order of explored nodes stored in a map with the node id being the key
      * And the order it was explored in being the value.
      * @param root The root of the tree to generate a solution from
      */
-    solveTree(root: Node): Map<number, number>{
+    solveTree(root: Node): Map<number, number> {
         let order: Map<number, number> = new Map();
         let cursor = 0;
         let layer = 0;
         let marker = new Node();
-        let layers: Node[][] = [[root],[],[],[],[],[]]; // Cursed but making it dynamically grow wasn't working
+        let layers: Node[][] = [[root], [], [], [], [], []]; // Cursed but making it dynamically grow wasn't working
         // Fill the 2dlist of layers
-        while(layers[layer].length != 0){
+        while (layers[layer].length != 0) {
             let current = layers[layer][cursor];
             if (layer + 1 >= layers.length) layers.push([]); // Make a new layer if on final layer
-            if(current.leftChild != null){
+            if (current.leftChild != null) {
                 layers[layer + 1].push(current.leftChild);
             }
             layers[layer + 1].push(marker);
-            if(current.rightChild != null){
+            if (current.rightChild != null) {
                 layers[layer + 1].push(current.rightChild);
             }
-            if (cursor < layers[layer].length-1){
+            if (cursor < layers[layer].length - 1) {
                 cursor++;
             } else {
                 layer++;
@@ -34,11 +34,11 @@ export class inorderBFS implements SolveTree{
 
             // empty the layer if its only markers
             let nonMarkerFound = false;
-            layers[layer].forEach((node: Node)=>{
+            layers[layer].forEach((node: Node) => {
                 if (node.id != -1) nonMarkerFound = true;
             });
-            if (!nonMarkerFound){
-                while(layers[layer].length != 0) layers[layer].pop();
+            if (!nonMarkerFound) {
+                while (layers[layer].length != 0) layers[layer].pop();
             }
         }
         layer--;
@@ -46,31 +46,31 @@ export class inorderBFS implements SolveTree{
         let nodes: Node[] = [];
         cursor = 0;
         // I swear there is a method to my madness
-        layers.forEach((level: Node[])=>{
+        layers.forEach((level: Node[]) => {
             level.reverse();
         });
-        while(layers[layer].length != 0){
+        while (layers[layer].length != 0) {
             let currentLayer = layer;
             let current = layers[layer].pop();
-            if (current != undefined){
+            if (current != undefined) {
                 let a = new Node();
                 a.id = current.id;
                 nodes.push(a);
-                while (current.id == -1){
+                while (current.id == -1) {
                     currentLayer--; // move upwards
                     current = layers[currentLayer].pop();
-                    if (current == undefined){
+                    if (current == undefined) {
                         current = marker;
                         break;
                     }
                 }
-                
+
                 order.set(current.id, cursor);
                 cursor++;
-            } else{
-            } 
+            } else {
+            }
         }
-    
+
 
         return order;
     }
