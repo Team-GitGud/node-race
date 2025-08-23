@@ -248,6 +248,9 @@ nickname, score, questions
 {
   "type": "PLAYER_LEFT",
   "playerId": "p_z9y8x7w6"
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
 }
 ```
 

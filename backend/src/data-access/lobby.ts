@@ -96,7 +96,7 @@ export class Lobby {
         this.players = this.players.filter(p => p.ID !== playerID);
 
         removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
-        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
     validateHost(id: string): boolean {

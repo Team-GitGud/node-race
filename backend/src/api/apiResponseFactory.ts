@@ -11,17 +11,18 @@ export class ApiResponseFactory {
     static playerJoinResponse(playerId: string, playerArray: string): String {
         return JSON.stringify(`
         {
-            "playerId": "${playerId}"
+            "playerId": "${playerId}",
             "players": ${playerArray}
         }
         `);
     }
 
-    static kickPlayerResponse(type: string, reason: string): String {
+    static kickPlayerResponse(type: string, reason: string, playerArray: string): String {
         return JSON.stringify(`
         {
             "type": "${type}",
-            "reason": "${reason}"
+            "reason": "${reason}",
+            "players": ${playerArray}
         }
         `);
     }
