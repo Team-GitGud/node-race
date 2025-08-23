@@ -37,6 +37,7 @@ export class Lobby {
         }
         let p: Player = new Player(playerName, ws);
         this.players.push(p);
+        ws.send(ApiResponseFactory.playerJoinResponse(p.ID, this.getAllPlayersJson()))
     }
 
     /**
@@ -95,7 +96,7 @@ export class Lobby {
         this.players = this.players.filter(p => p.ID !== playerID);
 
         removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
-        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
     validateHost(id: string): boolean {
@@ -103,14 +104,14 @@ export class Lobby {
     }
 
     sendAllPlayers(): void {
-        this.ws.send(ApiResponseFactory.getAllPlayerResponse(JSON.stringify(this.players.map((p: Player) => p.toJsonString()))));
+        this.ws.send(ApiResponseFactory.getAllPlayerResponse(this.getAllPlayersJson()));
     }
 
     rejoinLobby(playerId: string, playerWs: WebSocket): void {
         if (playerId === this.lobbyID) {
             this.ws.close();
             this.ws = playerWs;
-            this.ws.send(ApiResponseFactory.hostRejoinResponse(JSON.stringify(this.players.map((p: Player) => p.toJsonString()))));
+            this.ws.send(ApiResponseFactory.hostRejoinResponse(this.getAllPlayersJson()));
             return;
         }
         const player = this.getPlayer(playerId);
@@ -124,6 +125,10 @@ export class Lobby {
 
     getPlayer(playerId: string): Player | undefined {
         return this.players.filter(p => p.ID === playerId)[0];
+    }
+
+    getAllPlayersJson(): string {
+        return JSON.stringify(this.players.map((p: Player) => p.toJsonString()));
     }
 
     calculateScore(): void {

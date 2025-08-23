@@ -17,7 +17,6 @@ export class Player {
         this.questionStart = 0;
         this.prevQuestionTime = 0;
         this.ID = Lobby.generateKey();
-        ws.send(ApiResponseFactory.playerJoinResponse(this.ID));
     }
 
     getScore(): number {

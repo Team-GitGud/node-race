@@ -8,10 +8,11 @@ export class ApiResponseFactory {
         `);
     }
 
-    static playerJoinResponse(playerId: string): String {
+    static playerJoinResponse(playerId: string, playerArray: string): String {
         return JSON.stringify(`
         {
-            "playerId": "${playerId}"
+            "playerId": "${playerId}",
+            "players": ${playerArray}
         }
         `);
     }
@@ -25,11 +26,12 @@ export class ApiResponseFactory {
         `);
     }
 
-    static playerLeftResponse(type: string, playerId: string): String {
+    static playerLeftResponse(type: string, playerId: string, playerArray: string): String {
         return JSON.stringify(`
         {
             "type": "${type}",
-            "playerId": "${playerId}"
+            "playerId": "${playerId}",
+            "players": ${playerArray}
         }
         `);
     }
