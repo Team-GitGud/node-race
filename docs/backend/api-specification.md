@@ -51,6 +51,31 @@ All WebSocket connections must authenticate with their token immediately upon co
 - **Errors:**
   - `404 Not Found`: Invalid or expired lobby code.
 
+--- 
+### 3. Rejoin Lobby
+
+- **Method:** `POST /api/v1/lobby/rejoin?id=<playerId>&lobbyId=<lobbyId>`
+- **Request Body:** (Empty) - parameters are passed throught the url
+- **Response:** score and questions may be null/blank if game hasn't started yet
+
+##### player
+```json
+{
+  "name": "Joe",
+  "score": "100",
+  "questions": [questions]
+}
+
+```
+##### host 
+```json
+{
+  "players": [players]
+}
+
+```
+
+nickname, score, questions
 
 ## WebSocket API
 
@@ -114,6 +139,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "UPDATE_SETTINGS",
+  "hostId": "afdkjd",
   "data": {
     "algorithm": "dfs",
     "treeCount": 5
@@ -128,7 +154,9 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "KICK_PLAYER",
+  "hostId": "afdkjd",
   "data": {
+    "lobbyId": XADIE
     "playerId": "p_z9y8x7w6"
   }
 }
@@ -141,9 +169,32 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "START_GAME",
+  "hostID": "afdkjd",
   "data": {
-    "playerId": "p_z9y8x7w6"
+    "lobbyId": "aslksah"
   }
+}
+```
+----
+### Get all players (host only)
+
+#### request
+```json
+{
+  "action": "GET_ALL_PLAYERS",
+  "hostID": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah"
+  }
+}
+```
+#### response
+```json
+{
+  "type": "ALL_PLAYERS",
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
 }
 ```
 
@@ -226,7 +277,6 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "type": "GAME_STARTED",
-  "date": "2025-08-08T16:35:00Z",
   "questions": [
     {
       "id": "q1",

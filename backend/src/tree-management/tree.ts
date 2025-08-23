@@ -1,4 +1,4 @@
-import {Node} from "./node.ts";
+import {Node} from "./node";
 
 /**
  * Class used to generate a tree and store the root node. 

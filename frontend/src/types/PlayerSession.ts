@@ -1,6 +1,7 @@
 import { Session } from './Session';
 import { Player } from './Player';
 import { Question } from './Question';
+import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
 import { InactivityChecker } from './InactivityChecker';
 import APIManager from './APIManager';
 
@@ -16,8 +17,16 @@ export class PlayerSession extends Session {
     public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
         super(ws, lobbyCode);
         this.player = new Player(playerId, nickname);
-        this.setMessageListener();
         this.questions = questions;
+        
+        // Set up event listeners for incoming messages
+        this.addEventListener("GAME_STARTED", (data) => {
+            this.handleGameStarted(data.questions);
+        });
+        
+        this.addEventListener("PLAYER_KICKED", (data) => {
+            this.handlePlayerKicked(data.reason);
+        });
     }
 
     public getPlayer(): Player {
@@ -42,22 +51,22 @@ export class PlayerSession extends Session {
         }
     }
 
-    public handleGameStarted(questions: Question[]) {
+    public handleGameStarted(questions: BackendQuestion[]) {
+        this.questions = QuestionAdapter.fromBackendQuestions(questions);
         // TODO: Handle game started for Player Session.
         console.log("Game started with questions:", questions);
-        
+
         // Start inactivity checker when game starts
         if (this.inactivityChecker) {
             this.inactivityChecker.stop();
         }
         this.inactivityChecker = new InactivityChecker();
         this.inactivityChecker.start();
-        
+
         this.emitEvent("GAME_STARTED", questions);
     }
 
     public handlePlayerKicked(reason: string) {
-        // TODO: Handle player kicked for Player Session.
         console.log("Player kicked with reason:", reason);
         
         if (this.inactivityChecker) {
