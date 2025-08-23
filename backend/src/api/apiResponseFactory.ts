@@ -67,7 +67,7 @@ export class ApiResponseFactory {
         {
             "name": "${name}",
             "score": "${score}",
-            "questions": "${questions}"
+            "questions": ${questions}
         }
         `);
     }
@@ -75,7 +75,8 @@ export class ApiResponseFactory {
     static hostRejoinResponse(players: string): string {
         return JSON.stringify(`
         {
-            "players": "${players}" }
+            "players": ${players}
+        }
         `);
     }
 }
