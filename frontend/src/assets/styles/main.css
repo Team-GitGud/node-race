@@ -54,3 +54,10 @@ h5 {
 p {
     font-size: 25px;
 }
+
+.border {
+    border-top: 7px solid #FFF;
+    border-right: 3px solid #FFF;
+    border-bottom: 3px solid #FFF;
+    border-left: 7px solid #FFF;
+}

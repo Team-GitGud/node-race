@@ -17,6 +17,7 @@
             <CustomButton :action="() => checkAnswer()" type="positive" :disabled="false">Submit</CustomButton>
             <CustomButton :action="() => resetOrder()" type="negative" :disabled="false">Reset</CustomButton>
         </div>
+        <TimerComponent class="timer-component" :gameTimer="gameTimer" />
     </div>
 </template>
 
@@ -27,27 +28,29 @@ import { Question } from '@/types/Question';
 import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
+import TimerComponent from '@/components/TimerComponent.vue';
+import { GameTimer } from '@/types/GameTimer';
 import { PlayerSession } from '@/types/PlayerSession';
 import { Node } from '@/types/tree/Node';
 import { usePlayerSession } from '@/types/usePlayerSession';
 
 const router = useRouter();
+const session = APIManager.getInstance().getSession();
+const gameTimer = ref<GameTimer | null>(null);
 
 interface Props {
     questionIndex?: number;
 }
-
 const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
 
 // Convert questionIndex to number
 const questionIndex = computed(() => Number(props.questionIndex));
-
 // Reactive data
 const { questions } = usePlayerSession();
-
 const selectedOrder = ref<Map<number, number>>(new Map());
+
 // We make this null to indicate the result hasn't been checked yet.
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
 const result = ref<boolean|null>(null);
@@ -64,7 +67,6 @@ const resetOrder = () => {
 const checkAnswer = async () => {
     console.log("Correct Order: ", currentQuestion.value.correctOrder);
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
-
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         session.addAnswer(props.questionIndex, result.value ?? false);
@@ -111,7 +113,6 @@ const answeredAllQuestions = async () => {
 }
 
 const hasAnsweredQuestion = (questionIndex: number) => {
-    const session = APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         const answers = session.getAnswers();
         return answers[questionIndex] !== undefined;
@@ -123,15 +124,19 @@ const currentQuestion = computed(() => {
 })
 
 onMounted(() => {
-    const session = APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         questions.value = session.getQuestions();
+        gameTimer.value = session.getGameTimer();
     }
     selectedOrder.value = new Map();
     result.value = null;
-
+    console.log("Length: ", questions.value.length);
     // Use for testing, remove later. This will create a mock question if we go to a question 0 with no lobby.
     if (questions.value.length == 0) {
+        const start = new Date().getTime();
+        const fiveMinutes = 1000 * 60 * 5;
+        gameTimer.value = new GameTimer(start, start + fiveMinutes);
+        gameTimer.value.start();
         questions.value.push(new Question(
             0,
             "In order Depth first search",
@@ -165,5 +170,11 @@ h2 {
 }
 .tree-container {
     margin: 2rem 0 3rem 0;
+}
+
+.timer-component {
+    position: absolute;
+    top: 20px;
+    right: 20px;
 }
 </style>
