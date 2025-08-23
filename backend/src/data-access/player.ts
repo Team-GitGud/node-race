@@ -16,7 +16,7 @@ export class Player {
         this.ws = ws;
         this.score = 0;
         this.questionStart = 0;
-        this.prevQuestionTime = 360;
+        this.prevQuestionTime = 0;
         this.ID = Lobby.generateKey();
     }
 
@@ -31,7 +31,7 @@ export class Player {
      */
     calculateScore(timer: Timer, correct: boolean ): void {
         if (correct){
-            this.score = this.score + 100 + (900 * (this.prevQuestionTime - timer.getTime())/this.prevQuestionTime);
+            this.score = this.score + 100 + (900 * ((timer.getTime() - this.prevQuestionTime)/100));
         }
         this.prevQuestionTime = timer.getTime();
     }
