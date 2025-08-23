@@ -73,10 +73,12 @@ export class Lobby {
         let correct = this.gameLogic.questions[questionNumber].solution
         for (let key in correct){
             if (correct[key] != answer[key]){
+                p.questionHistory.push(false);
                 p.calculateScore(this.timer, false);
                 return;
             }
         }
+        p.questionHistory.push(true);
         p.calculateScore(this.timer, true);
     }
 
