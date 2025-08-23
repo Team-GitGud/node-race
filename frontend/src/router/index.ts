@@ -23,9 +23,12 @@ const routes: Array<RouteRecordRaw> = [
     component: QuestionNavigationView,
   },
   {
-    path: '/question',
+    path: '/question/:questionIndex',
     name: 'question',
-    component: QuestionView
+    component: QuestionView,
+    props: (route) => ({
+      questionIndex: Number(route.params.questionIndex) // We have to do this because it's a number. Otherwise it will crash.
+    })
   },
   {
     path: '/host',

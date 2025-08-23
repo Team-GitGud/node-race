@@ -45,12 +45,43 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "playerId": "p_z9y8x7w6",
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+  
 }
 ```
 
 - **Errors:**
   - `404 Not Found`: Invalid or expired lobby code.
 
+--- 
+### 3. Rejoin Lobby
+
+- **Method:** `POST /api/v1/lobby/rejoin?id=<playerId>&lobbyId=<lobbyId>`
+- **Request Body:** (Empty) - parameters are passed throught the url
+- **Response:** score and questions may be null/blank if game hasn't started yet
+
+##### player
+```json
+{
+  "name": "Joe",
+  "score": "100",
+  "questions": [questions]
+}
+
+```
+##### host 
+```json
+{
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+}
+
+```
+
+nickname, score, questions
 
 ## WebSocket API
 
@@ -144,7 +175,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "START_GAME",
-  "hostID": "afdkjd",
+  "hostId": "afdkjd",
   "data": {
     "lobbyId": "aslksah"
   }
@@ -157,7 +188,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "GET_ALL_PLAYERS",
-  "hostID": "afdkjd",
+  "hostId": "afdkjd",
   "data": {
     "lobbyId": "aslksah"
   }
@@ -169,6 +200,25 @@ All WebSocket connections must authenticate with their token immediately upon co
   "type": "ALL_PLAYERS",
   "players": [
         {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+}
+```
+----
+### Get Leaderboard
+
+#### request
+```json
+{
+  "action": "GET_LEADERBOARD",
+  lobbyId: "ajsdlf"
+}
+```
+#### response
+```json
+{
+  "type": "LEADERBOARD",
+  "leaderboard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
     ]
 }
 ```
@@ -233,6 +283,9 @@ All WebSocket connections must authenticate with their token immediately upon co
 {
   "type": "PLAYER_LEFT",
   "playerId": "p_z9y8x7w6"
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
 }
 ```
 
