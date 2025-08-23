@@ -30,9 +30,9 @@ export class Player {
      * 
      * @param score 
      */
-    calculateScore(score: number, timer: Timer, correct: boolean ): void {
+    calculateScore(timer: Timer, correct: boolean ): void {
         if (correct){
-            this.score = score + 100 + (900 * (this.prevQuestionTime - timer.getTime())/this.prevQuestionTime);
+            this.score = this.score + 100 + (900 * (this.prevQuestionTime - timer.getTime())/this.prevQuestionTime);
         }
         this.prevQuestionTime = timer.getTime();
     }
