@@ -18,6 +18,11 @@
 <script lang="ts" setup>
 import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
+import router from '@/router';
+import APIManager from '@/types/APIManager';
+import { GameTimer } from '@/types/GameTimer';
+import { PlayerSession } from '@/types/PlayerSession';
+import { AlertService } from '@/types/AlertService';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
 
