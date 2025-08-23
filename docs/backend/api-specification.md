@@ -230,7 +230,7 @@ nickname, score, questions
 ```json
 {
   "action": "SUBMIT_ANSWER",
-  "playerID": "afdkjd",
+  "playerId": "afdkjd",
   "data": {
     "lobbyId": "aslksah",
     "answer": {"0":4,"1":0,"2":3,"3":1,"4":2},

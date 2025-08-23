@@ -155,7 +155,7 @@ export class api {
             return;
         }
 
-        lobby.calculateScore(message.playerID, message.data.answer, message.data.questionNumber);
+        lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber);
 
     }
 
