@@ -4,11 +4,13 @@ import { Question } from './Question';
 import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
 import { InactivityChecker } from './InactivityChecker';
 import APIManager from './APIManager';
+import { GameTimer } from './GameTimer';
 
 export class PlayerSession extends Session {
     private player: Player;
     private questions: Array<Question>;
     private answers: Array<boolean>;
+    private gameTimer: GameTimer | null = null;
     private inactivityChecker: InactivityChecker | null = null;
 
     public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
@@ -82,5 +84,13 @@ export class PlayerSession extends Session {
 
         // Optionally, clean up session in APIManager
         APIManager.getInstance().clearSession();
+    }
+
+    public setGameTimer(gameTimer: GameTimer) {
+        this.gameTimer = gameTimer;
+    }
+
+    public getGameTimer(): GameTimer | null {
+        return this.gameTimer;
     }
 }

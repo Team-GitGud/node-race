@@ -20,6 +20,7 @@ import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import router from '@/router';
 import APIManager from '@/types/APIManager';
+import { GameTimer } from '@/types/GameTimer';
 import { PlayerSession } from '@/types/PlayerSession';
 import { AlertService } from '@/types/AlertService';
 import { onMounted, onUnmounted, ref } from 'vue';
@@ -49,6 +50,11 @@ onMounted(() => {
     playerName.value = session.getPlayer().getNickname();
 
     session.addEventListener("GAME_STARTED", (data) => {
+        const start = new Date().getTime();
+        const fiveMinutes = 1000 * 60 * 5;
+        const gameTimer = new GameTimer(start, start + fiveMinutes);
+        session.setGameTimer(gameTimer);
+        gameTimer.start();
         router.push({
             path: '/question-navigation'
         });
