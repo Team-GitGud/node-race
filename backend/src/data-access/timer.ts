@@ -1,3 +1,5 @@
+import { setTimeout } from "node:timers";
+
 export class Timer {
     private startTimeStamp: number | null = null;
     private endTimeStamp: number | null = null;
@@ -14,9 +16,13 @@ export class Timer {
     }
 
     /** Starts the timer. */
-    start(): void {
+    start(callback: () => {}): void {
         this.startTimeStamp = Date.now();
         this.endTimeStamp = null;
+
+        setTimeout(() => {
+            callback();
+        }, 300000);
     }
 
     /** Stops the timer. */

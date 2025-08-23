@@ -3,6 +3,7 @@ import { Player } from "./player"
 import { WebSocket } from 'ws';
 import { GameLogic } from "../session-logic/gameLogic";
 import { Database } from "./db";
+import { LobbyManager } from "./lobbyManager";
 
 /**
  * This class represents a lobby in NodeRace and its purpose is to:
@@ -19,15 +20,17 @@ export class Lobby {
     database: Database = new Database();
     ws: WebSocket;
     gameLogic: GameLogic;
+    lobbyManager: LobbyManager;
 
     /**
      * This WebSocket is communicating with the lobby host
      */
-    constructor(ws: WebSocket) {
+    constructor(ws: WebSocket, lobbyManager: LobbyManager) {
         this.ws = ws;
         this.lobbyID = Lobby.generateKey();
         this.hostToken = this.generateHostToken();
         this.gameLogic = new GameLogic();
+        this.lobbyManager = lobbyManager;
     }
 
     /**
@@ -48,6 +51,7 @@ export class Lobby {
     startGame(): void {
         this.gameStarted = true;
         this.gameLogic.generateQuestions();
+        this.timer.start(this.endGame);
         this.ws.send(ApiResponseFactory.startGameHostResponse());
         this.players.forEach((p: Player) => p.startGame(this.gameLogic.getQuestionJSON()));
     }
@@ -57,6 +61,8 @@ export class Lobby {
     */
     endGame(): void {
         this.gameStarted = false;
+        this.ws.close()
+        this.lobbyManager.removeLobby(this.lobbyID);
         let db = new Database();
         this.players.forEach((p: Player) => {
             p.endGame();

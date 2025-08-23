@@ -53,6 +53,15 @@ export class ApiResponseFactory {
         `);
     }
 
+    static endGamePlayerResponse(questions: string): string {
+        return JSON.stringify(`
+        {
+            "type": "GAME_STARTED",
+            "questions": ${questions} 
+        }
+        `);
+    }
+
     static getAllPlayerResponse(playerArray: string): string {
         return JSON.stringify(`
         {
