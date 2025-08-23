@@ -50,8 +50,13 @@ export class Tree{
                     queuedNodes.push(node.leftChild);
                 }
                 if (i != this.maxDepth && this.random() < (1.0/(i+1))) {
-                    node.rightChild = new Node;
-                    queuedNodes.push(node.rightChild);
+                    if (node.leftChild != null){
+                        node.rightChild = new Node;
+                        queuedNodes.push(node.rightChild);
+                    } else {
+                        node.leftChild = new Node;
+                        queuedNodes.push(node.leftChild); 
+                    }
                 }
 
             })

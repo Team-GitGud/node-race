@@ -6,6 +6,7 @@ import http from 'http';
 import { LobbyManager } from '../data-access/lobbyManager';
 import { url } from 'node:inspector';
 import { Lobby } from '../data-access/lobby';
+import { ApiResponseFactory } from './apiResponseFactory';
 
 
 export class api {
@@ -57,6 +58,7 @@ export class api {
     */
     static handleInitialConnection(ws: WebSocket, data: IncomingMessage) {
         const fullURL: URL = new URL(data.url ?? "", "http://localhost");
+        const urlParameters = Object.fromEntries(fullURL.searchParams.entries());
         const path: string = fullURL.pathname;
 
         switch (path) {
@@ -66,18 +68,31 @@ export class api {
 
             case (ApiPaths.JOIN_LOBBY):
                 // Parse url urlParameters
-                const urlParameters = Object.fromEntries(fullURL.searchParams.entries());
                 const playerName: string = urlParameters.name;
-                const lobbyID: string = urlParameters.lobbyID;
+                const lobbyId: string = urlParameters.lobbyId;
 
                 // Check if lobbyID is correct before joining game
-                const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyID);
+                const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
                 if (lobby === undefined) {
                     ws.send("LobbyID not found");
-                    console.log(`Player: ${playerName} attempted to Join ${lobbyID} but ID doesn't exist`);
+                    console.log(`Player: ${playerName} attempted to Join ${lobbyId} but ID doesn't exist`);
                 } else {
                     lobby.join(playerName, ws);
-                    console.log(`Player: ${playerName} Joined Lobby: ${lobbyID}`);
+                    console.log(`Player: ${playerName} Joined Lobby: ${lobbyId}`);
+                }
+                break;
+
+            case (ApiPaths.REJOIN_LOBBY):
+                // Parse url urlParameters
+                const playerId: string = urlParameters.id;
+                const lobbyJoinId: string = urlParameters.lobbyId;
+
+                // Check if lobbyID is correct before joining game
+                const lobbyJoin: Lobby | undefined = this.lobbies.getLobby(lobbyJoinId);
+                if (lobbyJoin === undefined) {
+                    ws.send("Rejoin LobbyID not found");
+                } else {
+                    lobbyJoin.rejoinLobby(playerId, ws);
                 }
                 break;
 
@@ -106,9 +121,42 @@ export class api {
                 this.getAllPlayers(message, ws);
                 break;
 
+            case ("GET_LEADERBOARD"):
+                this.getAllPlayers(message, ws);
+                break;
+
+            case ("SUBMIT_ANSWER"):
+                this.submitAnswer(message, ws);
+                break;
+
             default:
                 ws.send("Error: no action block found");
         }
+    }
+
+    static getLeaderboard(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyId;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard()));
+
+    }
+
+
+    static submitAnswer(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyID;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber);
+
     }
 
     static getAllPlayers(message: any, ws: WebSocket): void {
@@ -164,4 +212,5 @@ export class api {
 class ApiPaths {
     static CREATE_LOBBY = '/api/v1/lobby/create';
     static JOIN_LOBBY = '/api/v1/lobby/join';
+    static REJOIN_LOBBY = '/api/v1/lobby/rejoin';
 }

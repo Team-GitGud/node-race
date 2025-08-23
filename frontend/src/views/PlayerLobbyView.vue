@@ -21,6 +21,7 @@ import ScreenBackground from '@/components/ScreenBackground.vue';
 import router from '@/router';
 import APIManager from '@/types/APIManager';
 import { PlayerSession } from '@/types/PlayerSession';
+import { AlertService } from '@/types/AlertService';
 import { onMounted, onUnmounted, ref } from 'vue';
 
 const waitingMessages = ref(["to Start", "to Start.", "to Start..", "to Start..."]);
@@ -34,18 +35,25 @@ const playerName = ref('');
 onMounted(() => {
     const session = APIManager.getInstance().getSession();
     if (!session) {
-        alert('No session found. Please create or join a session first.');
+        AlertService.alert('No session found. Please create or join a session first.');
         router.push('/');
         return;
     }
     if (!(session instanceof PlayerSession)) {
-        alert('This view is only for players. Please switch to the player view.');
+        AlertService.alert('This view is only for players. Please switch to the player view.');
         router.push('/');
         return;
     }
     
     lobbyCode.value = session.lobbyCode;
     playerName.value = session.getPlayer().getNickname();
+
+    session.addEventListener("GAME_STARTED", (data) => {
+        router.push({
+            path: '/question-navigation'
+        });
+    });
+
 
     intervalId = setInterval(() => {
     const currentIndex = waitingMessages.value.indexOf(currentMessage.value);

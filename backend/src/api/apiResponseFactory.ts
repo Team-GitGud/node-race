@@ -8,10 +8,11 @@ export class ApiResponseFactory {
         `);
     }
 
-    static playerJoinResponse(playerId: string): String {
+    static playerJoinResponse(playerId: string, playerArray: string): String {
         return JSON.stringify(`
         {
-            "playerId": "${playerId}"
+            "playerId": "${playerId}",
+            "players": ${playerArray}
         }
         `);
     }
@@ -25,11 +26,12 @@ export class ApiResponseFactory {
         `);
     }
 
-    static playerLeftResponse(type: string, playerId: string): String {
+    static playerLeftResponse(type: string, playerId: string, playerArray: string): String {
         return JSON.stringify(`
         {
             "type": "${type}",
-            "playerId": "${playerId}"
+            "playerId": "${playerId}",
+            "players": ${playerArray}
         }
         `);
     }
@@ -46,7 +48,16 @@ export class ApiResponseFactory {
     static startGameHostResponse(): string {
         return JSON.stringify(`
         {
-            "type": "PLAYER_JOINED"
+            "type": "GAME_STARTED_HOST"
+        }
+        `);
+    }
+
+    static endGamePlayerResponse(questions: string): string {
+        return JSON.stringify(`
+        {
+            "type": "GAME_STARTED",
+            "questions": ${questions} 
         }
         `);
     }
@@ -56,6 +67,33 @@ export class ApiResponseFactory {
         {
             "type": "ALL_PLAYERS",
             "players": ${playerArray}
+        }
+        `);
+    }
+
+    static playerRejoinResponse(name: string, score: string, questions: string | undefined): string {
+        return JSON.stringify(`
+        {
+            "name": "${name}",
+            "score": "${score}",
+            "questions": ${questions}
+        }
+        `);
+    }
+
+    static hostRejoinResponse(players: string): string {
+        return JSON.stringify(`
+        {
+            "players": ${players}
+        }
+        `);
+    }
+
+    static getLeaderboardResponse(leaderboard: string): string {
+        return JSON.stringify(`
+        {
+            "type": "LEADERBOARD",
+            "leaderboard": ${leaderboard} 
         }
         `);
     }

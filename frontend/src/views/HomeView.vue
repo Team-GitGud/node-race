@@ -23,13 +23,13 @@
 					</div>
 				</template>
 				<template #footer>
-					<CustomButton :action="() => joinGame()" type="positive">Connect</CustomButton>
+					<CustomButton :action="() => handleJoinGame()" type="positive">Connect</CustomButton>
 					<CustomButton :action="() => joinIsOpen = false" type="negative">Close</CustomButton>
 				</template>
 			</ModalPopup>
 	
 			<CustomButton :action="() => handleHostClick()">Host</CustomButton>
-			<CustomButton shrink :action="() => $router.push('/question/')">?</CustomButton>
+			<CustomButton shrink :action="() => $router.push('/question/0')">?</CustomButton>
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
 	</div>
@@ -42,6 +42,7 @@ import CustomButton from '@/components/CustomButton.vue'
 import ModalPopup from '@/components/ModalPopup.vue';
 import TextInput from '@/components/TextInput.vue';
 import APIManager from '@/types/APIManager';
+import { AlertService } from '@/types/AlertService';
 import router from '@/router';
 import { ref } from 'vue';
 
@@ -49,7 +50,7 @@ async function handleHostClick() {
 	if (await APIManager.getInstance().createSession()) {
 		router.push('/host');
 	} else {
-		alert('Failed to create a new session. Please try again later.');
+		AlertService.alert('Failed to create a new session. Please try again later.');
 	}
 }
 
@@ -57,24 +58,22 @@ const joinIsOpen = ref<boolean>(false);
 const nicknameInput = ref<InstanceType<typeof TextInput> | null>(null);
 const codeInput = ref<InstanceType<typeof TextInput> | null>(null);
 
-function joinGame() {
+async function handleJoinGame() {
 	if (!codeInput.value || !nicknameInput.value) return;
 
 	const code = codeInput.value.getValue();
 	const name = nicknameInput.value.getValue();
 
 	if (!code || !name) {
-		alert('Please enter both lobby code and nickname.');
+		AlertService.alert('Please enter both lobby code and nickname.');
 		return;
 	}
 
-	APIManager.getInstance().joinSession(code, name)
-		.then(() => {
-			router.push('/lobby');
-		})
-		.catch((error) => {
-			alert(`Failed to join session: ${error.message}`);
-		});
+	if (await APIManager.getInstance().joinSession(code, name)) {
+		router.push('/lobby');
+	} else {
+		AlertService.alert('Failed to join the session. Please check the code and try again.');
+	}
 }
 
 

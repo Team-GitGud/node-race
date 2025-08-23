@@ -54,10 +54,13 @@ class APIManager {
         this.startLoading();
         return new Promise((resolve, reject) => {
             const wsProtocol = this.apiAddress.startsWith('https') ? 'wss' : 'ws';
-            const wsUrl = this.apiAddress.replace(/^http/, wsProtocol) + '/api/v1/lobby/create';
+            const wsUrl = this.apiAddress.replace(/^https?/, wsProtocol) + '/api/v1/lobby/create';
             const ws = new WebSocket(wsUrl);
 
-            ws.onerror = () => reject(new Error('WebSocket connection failed'));
+            ws.onerror = () => {
+                this.stopLoading();
+                resolve(false); // Return false on error instead of throwing
+            };
             ws.onmessage = (event) => {
                 this.stopLoading();
                 try {
@@ -68,6 +71,8 @@ class APIManager {
                     }
                     if (data.lobbyCode && data.hostToken) {
                         this.session = new HostSession(ws, data.lobbyCode, data.hostToken);
+                        // Set up persistent message handler for the session
+                        this.setupSessionMessageHandler(ws);
                         resolve(true);
                     } else {
                         resolve(false);
@@ -83,10 +88,13 @@ class APIManager {
         this.startLoading();
         return new Promise((resolve, reject) => {
             const wsProtocol = this.apiAddress.startsWith('https') ? 'wss' : 'ws';
-            const wsUrl = `${this.apiAddress.replace(/^http/, wsProtocol)}/api/v1/lobby/join?lobbyID=${encodeURIComponent(lobbyCode)}&name=${encodeURIComponent(playerName)}`;
+            const wsUrl = `${this.apiAddress.replace(/^https?/, wsProtocol)}/api/v1/lobby/join?lobbyId=${encodeURIComponent(lobbyCode)}&name=${encodeURIComponent(playerName)}`;
             const ws = new WebSocket(wsUrl);
 
-            ws.onerror = () => reject(new Error('WebSocket connection failed'));
+            ws.onerror = () => {
+                this.stopLoading();
+                resolve(false); // Return false on error instead of throwing
+            };
             ws.onmessage = (event) => {
                 this.stopLoading();
                 try {
@@ -97,6 +105,8 @@ class APIManager {
                     }
                     if (data.playerId) {
                         this.session = new PlayerSession(ws, lobbyCode, data.playerId, playerName, []);
+                        // Set up persistent message handler for the session
+                        this.setupSessionMessageHandler(ws);
                         resolve(true);
                     } else {
                         resolve(false);
@@ -121,6 +131,33 @@ class APIManager {
 
     public getIsLoading(): Ref<boolean> {
         return this.isLoading;
+    }
+
+    /** Clears the current session */
+    public clearSession() {
+        this.session = null;
+    }
+
+    /**
+     * Sets up a persistent WebSocket message handler that routes messages to the current session's EventListener system
+     */
+    private setupSessionMessageHandler(ws: WebSocket) {
+        ws.onmessage = (event) => {
+            try {
+                let data = JSON.parse(event.data);
+                // Parse differently if data is a string
+                if (typeof data === 'string') {
+                    data = JSON.parse(data);
+                }
+                // Route the message to the session's EventListener system
+                if (this.session && data.type) {
+                    console.log("Emitting event:", data.type);
+                    this.session.emitEvent(data.type, data);
+                }
+            } catch (error) {
+                console.error('Error parsing WebSocket message:', error);
+            }
+        };
     }
 }
 

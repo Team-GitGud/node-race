@@ -2,6 +2,8 @@ import { ApiResponseFactory } from "../api/apiResponseFactory";
 import { Player } from "./player"
 import { WebSocket } from 'ws';
 import { GameLogic } from "../session-logic/gameLogic";
+import { Database } from "./db";
+import { LobbyManager } from "./lobbyManager";
 
 /**
  * This class represents a lobby in NodeRace and its purpose is to:
@@ -15,18 +17,20 @@ export class Lobby {
     players: Player[] = [];
     hostToken: string;
     timer: any = null;
+    database: Database = new Database();
     ws: WebSocket;
     gameLogic: GameLogic;
+    lobbyManager: LobbyManager;
 
     /**
      * This WebSocket is communicating with the lobby host
      */
-    constructor(ws: WebSocket) {
+    constructor(ws: WebSocket, lobbyManager: LobbyManager) {
         this.ws = ws;
         this.lobbyID = Lobby.generateKey();
         this.hostToken = this.generateHostToken();
         this.gameLogic = new GameLogic();
-        this.gameLogic.generateQuestions();
+        this.lobbyManager = lobbyManager;
     }
 
     /**
@@ -38,6 +42,7 @@ export class Lobby {
         }
         let p: Player = new Player(playerName, ws);
         this.players.push(p);
+        ws.send(ApiResponseFactory.playerJoinResponse(p.ID, this.getAllPlayersJson()))
     }
 
     /**
@@ -45,6 +50,8 @@ export class Lobby {
     */
     startGame(): void {
         this.gameStarted = true;
+        this.gameLogic.generateQuestions();
+        this.timer.start(this.endGame);
         this.ws.send(ApiResponseFactory.startGameHostResponse());
         this.players.forEach((p: Player) => p.startGame(this.gameLogic.getQuestionJSON()));
     }
@@ -54,17 +61,31 @@ export class Lobby {
     */
     endGame(): void {
         this.gameStarted = false;
-        this.players.forEach((p: Player) => p.endGame());
+        this.ws.close()
+        this.lobbyManager.removeLobby(this.lobbyID);
+        let db = new Database();
+        this.players.forEach((p: Player) => {
+            p.endGame();
+            db.addData(p.getName(), p.getScore());
+        });
     }
 
     /**
-    * Updates the score of a player
-    * May be removed later and replaced with calculateScore
+    * Calculates the score of a player.
     */
-    updateScore(playerName: string, score: number): void {
-        let p: Player | undefined = this.players.find((pl) => pl.name == playerName);
+    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number ): void {
+        let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
         if (p == undefined) { return; }
-        p.setScore(score);
+        let correct = this.gameLogic.questions[questionNumber].solution
+        for (let key in correct){
+            if (correct[key] != answer[key]){
+                p.questionHistory.push(false);
+                p.calculateScore(this.timer, false);
+                return;
+            }
+        }
+        p.questionHistory.push(true);
+        p.calculateScore(this.timer, true);
     }
 
     /**
@@ -95,7 +116,7 @@ export class Lobby {
         this.players = this.players.filter(p => p.ID !== playerID);
 
         removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
-        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
     validateHost(id: string): boolean {
@@ -103,11 +124,31 @@ export class Lobby {
     }
 
     sendAllPlayers(): void {
-        this.ws.send(ApiResponseFactory.getAllPlayerResponse(JSON.stringify(this.players.map((p: Player) => p.toJsonString()))));
+        this.ws.send(ApiResponseFactory.getAllPlayerResponse(this.getAllPlayersJson()));
     }
 
-    calculateScore(): void {
-        //TODO: implement when we figure out how score is supposed to be calculated
+    rejoinLobby(playerId: string, playerWs: WebSocket): void {
+        if (playerId === this.lobbyID) {
+            this.ws.close();
+            this.ws = playerWs;
+            this.ws.send(ApiResponseFactory.hostRejoinResponse(this.getAllPlayersJson()));
+            return;
+        }
+        const player = this.getPlayer(playerId);
+        if (player === undefined) {
+            playerWs.send("Rejoin Failed, playerID does not exist");
+            return;
+        }
+
+        player.rejoin(playerWs, this.gameLogic.getQuestionJSON());
+    }
+
+    getPlayer(playerId: string): Player | undefined {
+        return this.players.filter(p => p.ID === playerId)[0];
+    }
+
+    getAllPlayersJson(): string {
+        return JSON.stringify(this.players.map((p: Player) => p.toJsonString()));
     }
 
     getLeaderboard() {

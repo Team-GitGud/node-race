@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
 import { Lobby } from './lobby';
 import { ApiResponseFactory } from '../api/apiResponseFactory';
+import {Timer} from "./timer";
 
 export class Player {
     name: string;
@@ -9,6 +10,7 @@ export class Player {
     score: number;
     questionStart: number;
     prevQuestionTime: number;
+    questionHistory: Array<Boolean> = [];
 
     constructor(name: string, ws: WebSocket) {
         this.name = name;
@@ -17,15 +19,22 @@ export class Player {
         this.questionStart = 0;
         this.prevQuestionTime = 0;
         this.ID = Lobby.generateKey();
-        ws.send(ApiResponseFactory.playerJoinResponse(this.ID));
     }
 
     getScore(): number {
         return this.score;
     }
 
-    setScore(score: number): void {
-        this.score = score;
+    /** Calculates score and adds it to previous score
+     * then resets the time score penalty
+     * 
+     * @param score 
+     */
+    calculateScore(timer: Timer, correct: boolean ): void {
+        if (correct){
+            this.score = this.score + 100 + (900 * ((timer.getTime() - this.prevQuestionTime)/100));
+        }
+        this.prevQuestionTime = timer.getTime();
     }
 
     getName(): string {
@@ -37,7 +46,8 @@ export class Player {
     }
 
     endGame(): void {
-        return;
+        //this.ws.send(ApiResponseFactory.endGamePlayerResponse());
+        this.ws.close();
     }
 
     getPrevQuestionTime(): number {
@@ -46,6 +56,12 @@ export class Player {
 
     setPrevQuestionTime(time: number): void {
         this.prevQuestionTime = time;
+    }
+
+    rejoin(ws: WebSocket, questions: string | undefined): void {
+        this.ws.close();
+        this.ws = ws;
+        this.ws.send(ApiResponseFactory.playerRejoinResponse(this.name, this.score.toString(), questions));
     }
 
     toJsonString(): string {
