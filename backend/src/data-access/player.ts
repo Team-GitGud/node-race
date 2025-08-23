@@ -37,6 +37,7 @@ export class Player {
     }
 
     endGame(): void {
+        this.ws.close();
         return;
     }
 
