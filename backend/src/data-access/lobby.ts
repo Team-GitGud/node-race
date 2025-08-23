@@ -2,6 +2,7 @@ import { ApiResponseFactory } from "../api/apiResponseFactory";
 import { Player } from "./player"
 import { WebSocket } from 'ws';
 import { GameLogic } from "../session-logic/gameLogic";
+import { Database } from "./db";
 
 /**
  * This class represents a lobby in NodeRace and its purpose is to:
@@ -15,6 +16,7 @@ export class Lobby {
     players: Player[] = [];
     hostToken: string;
     timer: any = null;
+    database: Database = new Database();
     ws: WebSocket;
     gameLogic: GameLogic;
 
