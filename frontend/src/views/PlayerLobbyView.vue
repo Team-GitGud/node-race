@@ -33,33 +33,6 @@ let intervalId: number | undefined;
 const { lobbyCode, playerName } = usePlayerSession();
 
 onMounted(() => {
-    const session = APIManager.getInstance().getSession();
-    if (!session) {
-        AlertService.alert('No session found. Please create or join a session first.');
-        router.push('/');
-        return;
-    }
-    if (!(session instanceof PlayerSession)) {
-        AlertService.alert('This view is only for players. Please switch to the player view.');
-        router.push('/');
-        return;
-    }
-    
-    lobbyCode.value = session.lobbyCode;
-    playerName.value = session.getPlayer().getNickname();
-
-    session.addEventListener("GAME_STARTED", (data) => {
-        const start = new Date().getTime();
-        const fiveMinutes = 1000 * 60 * 5;
-        const gameTimer = new GameTimer(start, start + fiveMinutes);
-        session.setGameTimer(gameTimer);
-        gameTimer.start();
-        router.push({
-            path: '/question-navigation'
-        });
-    });
-
-
     intervalId = setInterval(() => {
         const currentIndex = waitingMessages.value.indexOf(currentMessage.value);
         const nextIndex = (currentIndex + 1) % waitingMessages.value.length;
