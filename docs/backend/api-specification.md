@@ -45,6 +45,10 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "playerId": "p_z9y8x7w6",
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+  
 }
 ```
 
@@ -70,7 +74,9 @@ All WebSocket connections must authenticate with their token immediately upon co
 ##### host 
 ```json
 {
-  "players": [players]
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
 }
 
 ```
