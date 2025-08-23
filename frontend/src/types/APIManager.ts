@@ -133,6 +133,11 @@ class APIManager {
         return this.isLoading;
     }
 
+    /** Clears the current session */
+    public clearSession() {
+        this.session = null;
+    }
+
     /**
      * Sets up a persistent WebSocket message handler that routes messages to the current session's EventListener system
      */
