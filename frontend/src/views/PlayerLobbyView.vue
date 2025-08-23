@@ -15,7 +15,7 @@
     </div>
 </template>
 
-<script lang="ts"  setup>
+<script lang="ts" setup>
 import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import router from '@/router';
@@ -23,15 +23,14 @@ import APIManager from '@/types/APIManager';
 import { GameTimer } from '@/types/GameTimer';
 import { PlayerSession } from '@/types/PlayerSession';
 import { AlertService } from '@/types/AlertService';
-import { onMounted, onUnmounted, ref } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { usePlayerSession } from '@/types/usePlayerSession';
 
 const waitingMessages = ref(["to Start", "to Start.", "to Start..", "to Start..."]);
 const currentMessage = ref<string>(waitingMessages.value[0]);
-
 let intervalId: number | undefined;
 
-const lobbyCode = ref('');
-const playerName = ref('');
+const { lobbyCode, playerName } = usePlayerSession();
 
 onMounted(() => {
     const session = APIManager.getInstance().getSession();
@@ -62,18 +61,17 @@ onMounted(() => {
 
 
     intervalId = setInterval(() => {
-    const currentIndex = waitingMessages.value.indexOf(currentMessage.value);
-    const nextIndex = (currentIndex + 1) % waitingMessages.value.length;
-    currentMessage.value = waitingMessages.value[nextIndex];
+        const currentIndex = waitingMessages.value.indexOf(currentMessage.value);
+        const nextIndex = (currentIndex + 1) % waitingMessages.value.length;
+        currentMessage.value = waitingMessages.value[nextIndex];
     }, 500);
 });
 
 onUnmounted(() => {
-  if (intervalId !== undefined) {
-    clearInterval(intervalId);
-  }
+    if (intervalId !== undefined) {
+        clearInterval(intervalId);
+    }
 });
-
 </script>
 
 <style>

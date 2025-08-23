@@ -13,10 +13,10 @@ export class PlayerSession extends Session {
     private gameTimer: GameTimer | null = null;
     private inactivityChecker: InactivityChecker | null = null;
 
-    public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
+    public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<BackendQuestion>) {
         super(ws, lobbyCode);
         this.player = new Player(playerId, nickname);
-        this.questions = questions;
+        this.questions = QuestionAdapter.fromBackendQuestions(questions);
         this.answers = new Array(questions.length).fill(undefined); // All questions are incorrect by default.
         
         // Set up event listeners for incoming messages
