@@ -33,6 +33,7 @@ import { ref, onMounted } from 'vue';
 import APIManager from '@/types/APIManager';
 import { PlayerSession } from '@/types/PlayerSession';
 import router from '@/router';
+import { AlertService } from '@/types/AlertService';
 
 const playerRank = ref();
 const playerRanks = ref();
@@ -41,12 +42,12 @@ const playerAnswers = ref();
 onMounted(() => {
     const session = APIManager.getInstance().getSession();
     if (!session) {
-        alert('No active session found. Please start a game first.');
+        AlertService.alert('No active session found. Please start a game first.');
         router.push('/');
         return;
     }
     if (!(session instanceof PlayerSession)) {
-        alert('This view is only available for player sessions.');
+        AlertService.alert('This view is only available for player sessions.');
         router.push('/');
         return;
     }

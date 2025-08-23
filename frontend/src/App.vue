@@ -1,4 +1,5 @@
 <template>
+	<AlertComponent />
 	<Transition name="fade">
 		<LoadingScreen v-if="isLoading" />
 	</Transition>
@@ -8,6 +9,7 @@
 <script lang="ts" setup>
 import LoadingScreen from './components/LoadingScreen.vue';
 import APIManager from './types/APIManager';
+import AlertComponent from './components/AlertComponent.vue';
 
 const isLoading = APIManager.getInstance().getIsLoading();
 </script>
