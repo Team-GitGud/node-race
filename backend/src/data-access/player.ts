@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
 import { Lobby } from './lobby';
 import { ApiResponseFactory } from '../api/apiResponseFactory';
+import {Timer} from "./timer";
 
 export class Player {
     name: string;
@@ -23,8 +24,16 @@ export class Player {
         return this.score;
     }
 
-    setScore(score: number): void {
-        this.score = score;
+    /** Calculates score and adds it to previous score
+     * then resets the time score penalty
+     * 
+     * @param score 
+     */
+    calculateScore(timer: Timer, correct: boolean ): void {
+        if (correct){
+            this.score = this.score + 100 + (900 * ((timer.getTime() - this.prevQuestionTime)/100));
+        }
+        this.prevQuestionTime = timer.getTime();
     }
 
     getName(): string {

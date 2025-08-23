@@ -61,13 +61,19 @@ export class Lobby {
     }
 
     /**
-    * Updates the score of a player
-    * May be removed later and replaced with calculateScore
+    * Calculates the score of a player.
     */
-    updateScore(playerName: string, score: number): void {
-        let p: Player | undefined = this.players.find((pl) => pl.name == playerName);
+    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number ): void {
+        let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
         if (p == undefined) { return; }
-        p.setScore(score);
+        let correct = this.gameLogic.questions[questionNumber].solution
+        for (let key in correct){
+            if (correct[key] != answer[key]){
+                p.calculateScore(this.timer, false);
+                return;
+            }
+        }
+        p.calculateScore(this.timer, true);
     }
 
     /**
@@ -131,10 +137,6 @@ export class Lobby {
 
     getAllPlayersJson(): string {
         return JSON.stringify(this.players.map((p: Player) => p.toJsonString()));
-    }
-
-    calculateScore(): void {
-        //TODO: implement when we figure out how score is supposed to be calculated
     }
 
     getLeaderboard() {
