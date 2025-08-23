@@ -1,13 +1,13 @@
 import { Node } from './tree/Node';
 
 export class Question {
-    id: string;
+    id: number;
     title: string;
     root: Node;
     correctOrder: Map<number, number>;
     answerStatus: boolean | null;
 
-    constructor(id: string, title: string, root: Node, correctOrder: Map<number, number>) {
+    constructor(id: number, title: string, root: Node, correctOrder: Map<number, number>) {
         this.id = id;
         this.title = title;
         this.root = root;
