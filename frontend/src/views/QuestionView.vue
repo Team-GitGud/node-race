@@ -29,6 +29,7 @@ import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
 import { PlayerSession } from '@/types/PlayerSession';
 import { Node } from '@/types/tree/Node';
+import { usePlayerSession } from '@/types/usePlayerSession';
 
 const router = useRouter();
 
@@ -40,7 +41,12 @@ const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
 
-const questions = ref<Question[]>([]);
+// Convert questionIndex to number
+const questionIndex = computed(() => Number(props.questionIndex));
+
+// Reactive data
+const { questions } = usePlayerSession();
+
 const selectedOrder = ref<Map<number, number>>(new Map());
 // We make this null to indicate the result hasn't been checked yet.
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
@@ -55,20 +61,19 @@ const resetOrder = () => {
     result.value = null;
 };
 
-const checkAnswer = () => {
+const checkAnswer = async () => {
     console.log("Correct Order: ", currentQuestion.value.correctOrder);
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
 
-    const session = APIManager.getInstance().getSession();
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         session.addAnswer(props.questionIndex, result.value ?? false);
     }
 
     // TODO: Send the result to the backend. Make the question not available for the player to answer again.
-    setTimeout(() => {
+    setTimeout(async () => {
         resetOrder();
-
-        if (answeredAllQuestions()) {
+        if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
         }
@@ -90,8 +95,8 @@ const checkAnswer = () => {
     }, 2000);
 };
 
-const answeredAllQuestions = () => {
-    const session = APIManager.getInstance().getSession();
+const answeredAllQuestions = async () => {
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         const answers = session.getAnswers();
         

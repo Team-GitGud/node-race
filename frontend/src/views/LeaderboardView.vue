@@ -46,11 +46,11 @@ onMounted(() => {
         router.push('/');
         return;
     }
-    if (!(session instanceof PlayerSession)) {
-        AlertService.alert('This view is only available for player sessions.');
-        router.push('/');
-        return;
-    }
+    // if (!(session instanceof PlayerSession)) {
+    //     AlertService.alert('This view is only available for player sessions.');
+    //     router.push('/');
+    //     return;
+    // }
     // If game not ended, redirect to question navigation
     // If game ended, call API to get player ranks and scores and fetch player answers
     playerRank.value = 1; // Example rank, replace with API call
@@ -59,10 +59,10 @@ onMounted(() => {
         { name: 'CaraL', score: 90 },
         { name: 'GalenG', score: 80 },
     ]; // Example ranks, replace with API call
-    playerAnswers.value = session.getQuestions().map(q => ({
-        question: q.title,
-        correct: !!q.answerStatus,
-    }));
+    // playerAnswers.value = session.getQuestions().map(q => ({
+    //     question: q.title,
+    //     correct: !!q.answerStatus,
+    // }));
 });
 </script>
 
