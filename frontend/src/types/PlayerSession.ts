@@ -10,10 +10,10 @@ export class PlayerSession extends Session {
     private questions: Array<Question>;
     private inactivityChecker: InactivityChecker | null = null;
 
-    public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
+    public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<BackendQuestion>) {
         super(ws, lobbyCode);
         this.player = new Player(playerId, nickname);
-        this.questions = questions;
+        this.questions = QuestionAdapter.fromBackendQuestions(questions);
         
         // Set up event listeners for incoming messages
         this.addEventListener("GAME_STARTED", (data) => {
