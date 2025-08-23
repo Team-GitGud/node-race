@@ -36,8 +36,8 @@ export class Player {
     }
 
     endGame(): void {
+        //this.ws.send(ApiResponseFactory.endGamePlayerResponse());
         this.ws.close();
-        return;
     }
 
     getPrevQuestionTime(): number {
