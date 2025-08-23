@@ -27,6 +27,7 @@ import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
 import { PlayerSession } from '@/types/PlayerSession';
+import { usePlayerSession } from '@/types/usePlayerSession';
 
 const route = useRoute();
 const router = useRouter();
@@ -44,7 +45,8 @@ const props = withDefaults(defineProps<Props>(), {
 const questionIndex = computed(() => Number(props.questionIndex));
 
 // Reactive data
-const questions = ref<Question[]>([]);
+const { questions } = usePlayerSession();
+
 const selectedOrder = ref<Map<number, number>>(new Map());
 const result = ref<boolean | null>(null);
 

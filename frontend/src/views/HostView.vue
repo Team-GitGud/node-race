@@ -7,34 +7,18 @@
 </template>
 
 <script lang="ts" setup>
-import router from '@/router';
-import APIManager from '@/types/APIManager';
-import { AlertService } from '@/types/AlertService';
 import CustomButton from '@/components/CustomButton.vue';
-import { onMounted, ref } from 'vue';
+import APIManager from '@/types/APIManager';
 import { HostSession } from '@/types/HostSession';
+import { useHostSession } from '@/types/useHostSession';
 
-const lobbyCode = ref('');
+const { lobbyCode } = useHostSession();
 
-onMounted(async () => {
-    const lc = APIManager.getInstance().getSession()?.lobbyCode;
-    if (!lc) {
-        AlertService.alert('No lobby code found. Please create a session first.');
-        router.push('/');
-    } else {
-        lobbyCode.value = lc;
-    }
-});
-
-const startGame = () => {
+const startGame = async () => {
     const apiManager = APIManager.getInstance();
-    // We check to make sure Host is the session.
-    if (apiManager.getSession() instanceof HostSession) {
-        (apiManager.getSession() as HostSession).startGame();
-
+    const session = await apiManager.getSession();
+    if (session instanceof HostSession) {
+        session.startGame();
     }
 };
-APIManager.getInstance().getSession()?.addEventListener("GAME_STARTED_HOST", (data) => {
-    router.push('/leaderboard');
-});
 </script>

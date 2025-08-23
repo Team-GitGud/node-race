@@ -8,7 +8,7 @@
         />
         <h2 class="page-title">Question Navigation</h2>
         <div class="questions-container">
-            <div class="question-wrapper" v-for="question in question_list" :key="question.id">
+            <div class="question-wrapper" v-for="question in questions" :key="question.id">
                 <QuestionCard :question="question" />
             </div>
         </div>
@@ -17,35 +17,11 @@
 
 <script lang="ts" setup>
 import QuestionCard from '@/components/QuestionCard.vue';
-import { Question } from '@/types/Question';
-import { Node } from '@/types/tree/Node';
 import CustomButton from '@/components/CustomButton.vue';
-import { PlayerSession } from '@/types/PlayerSession';
-import APIManager from '@/types/APIManager';
+import { usePlayerSession } from '@/types/usePlayerSession';
+import { watch } from 'vue';
 
-var question_list : Question[] = (APIManager.getInstance().getSession() as PlayerSession).getQuestions() || [];
-
-// Demo tree setup
-// const demoRoot = new Node('A');
-// const demoQuestion = new Question(
-//     '1',
-//     'Click the nodes in depth-first order',
-//     demoRoot,
-//     { 'A': 1 },
-// );
-
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
-// question_list.push(demoQuestion);
+const { questions } = usePlayerSession();
 
 </script>
 
