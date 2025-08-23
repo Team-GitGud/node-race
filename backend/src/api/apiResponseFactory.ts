@@ -17,21 +17,21 @@ export class ApiResponseFactory {
         `);
     }
 
-    static kickPlayerResponse(type: string, reason: string, playerArray: string): String {
+    static kickPlayerResponse(type: string, reason: string): String {
         return JSON.stringify(`
         {
             "type": "${type}",
-            "reason": "${reason}",
-            "players": ${playerArray}
+            "reason": "${reason}"
         }
         `);
     }
 
-    static playerLeftResponse(type: string, playerId: string): String {
+    static playerLeftResponse(type: string, playerId: string, playerArray: string): String {
         return JSON.stringify(`
         {
             "type": "${type}",
-            "playerId": "${playerId}"
+            "playerId": "${playerId}",
+            "players": ${playerArray}
         }
         `);
     }
