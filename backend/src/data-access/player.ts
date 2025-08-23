@@ -37,6 +37,7 @@ export class Player {
     }
 
     endGame(): void {
+        this.ws.close();
         return;
     }
 
@@ -46,6 +47,12 @@ export class Player {
 
     setPrevQuestionTime(time: number): void {
         this.prevQuestionTime = time;
+    }
+
+    rejoin(ws: WebSocket, questions: string | undefined): void {
+        this.ws.close();
+        this.ws = ws;
+        this.ws.send(ApiResponseFactory.playerRejoinResponse(this.name, this.score.toString(), questions));
     }
 
     toJsonString(): string {

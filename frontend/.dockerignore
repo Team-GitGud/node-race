@@ -1,0 +1,47 @@
+
+Dockerfile
+
+.dockerignore
+.git
+
+.env
+.env.local
+.env.*.local
+
+# Version control
+.git
+.gitignore
+
+# IDE and editor files
+.vscode
+.idea
+.cursor
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+
+# Dependency lock files (optional, include if you want to ensure consistent installs in Docker)
+# package-lock.json
+# yarn.lock
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+
+# macOS-specific files
+.DS_Store
+
+# Test-related files (optional, exclude if not needed in the production image)
+tests
+__tests__
+coverage
+
+# Documentation and miscellaneous
+README.md
+LICENSE
+docs

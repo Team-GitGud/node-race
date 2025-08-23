@@ -1,5 +1,7 @@
 import { Session } from './Session';
 import { Player } from './Player';
+import { Question } from './Question';
+import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
 
 export class HostSession extends Session {
     hostId: string;
@@ -9,6 +11,27 @@ export class HostSession extends Session {
         super(ws, lobbyCode);
         this.hostId = hostId;
         this.players = [];
+
+        // Set up event listeners for incoming messages
+        this.addEventListener("GAME_STARTED_HOST", (data) => {
+            this.handleGameStarted(data.questions);
+        });
+        
+        this.addEventListener("SESSION_ENDED", (data) => {
+            this.handleSessionEnded(data.reason);
+        });
+    }
+
+    public handleGameStarted(questions: BackendQuestion[]) {
+        if (questions !== undefined && questions.length > 0) {
+            // If there's no players, for some reason there's no questions generated.
+            const adaptedQuestions = QuestionAdapter.fromBackendQuestions(questions);
+            console.log("Adapted questions:", adaptedQuestions);
+        }
+    }
+
+    public handleSessionEnded(reason: string) {
+        console.log("Session ended with reason:", reason);
     }
 
     /**
@@ -38,16 +61,8 @@ export class HostSession extends Session {
                     lobbyId: this.lobbyCode,
                 }
             }));
-            this.ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === "GAME_STARTED") {
-                    // TODO: Handle game started for Host Session.
-                    // Maybe send the host to the leaderboard page.
-                    resolve(true);
-                } else {
-                    reject(new Error("Failed to start game"));
-                }
-        }});
+            resolve(true);
+        });
     }
 
     /**
@@ -60,14 +75,7 @@ export class HostSession extends Session {
                 action: "END_SESSION",
                 hostId: this.hostId,
             }));
-            this.ws.onmessage = (event) => {
-                const data = JSON.parse(event.data);
-                if (data.type === "SESSION_ENDED") {
-                    resolve(true);
-                } else {
-                    reject(new Error("Failed to end session"));
-                }
-            };
+            resolve(true);
         });
     }
 }

@@ -1,6 +1,5 @@
-import { SolveTree } from "./solveTree.ts";
-import { Node } from "./node.ts";
-
+import { SolveTree } from "./solveTree";
+import { Node } from "./node";
 
 export class inorderBFS implements SolveTree {
     /**

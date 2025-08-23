@@ -48,6 +48,13 @@ onMounted(() => {
     lobbyCode.value = session.lobbyCode;
     playerName.value = session.getPlayer().getNickname();
 
+    session.addEventListener("GAME_STARTED", (data) => {
+        router.push({
+            path: '/question-navigation'
+        });
+    });
+
+
     intervalId = setInterval(() => {
     const currentIndex = waitingMessages.value.indexOf(currentMessage.value);
     const nextIndex = (currentIndex + 1) % waitingMessages.value.length;
