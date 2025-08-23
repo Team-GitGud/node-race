@@ -16,7 +16,7 @@ export class Timer {
     }
 
     /** Starts the timer. */
-    start(callback: () => {}): void {
+    start(callback: () => void): void {
         this.startTimeStamp = Date.now();
         this.endTimeStamp = null;
 
