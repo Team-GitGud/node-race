@@ -25,12 +25,12 @@
             :class="{ 
                 'selected': selectedOrder.has(node.id), 
                 'duplicate': Array.from(selectedOrder.values()).filter(v => v === selectedOrder.get(node.id)).length > 1,
-                'incorrect': result === false,
-                'correct': result === true
+                'incorrect': result !== null && selectedOrder.get(node.id) != correctOrder.get(node.id),
+                'correct': result !== null && selectedOrder.get(node.id) == correctOrder.get(node.id)
             }"
         >
             <span v-if="selectedOrder.has(node.id)">
-                {{ selectedOrder.get(node.id) }}
+                {{ Number(selectedOrder.get(node.id)) + 1 }} <!-- +1 because the backend is 0-indexed -->
             </span>
         </button>
         <div class="children" ref="childrenContainer">
@@ -38,6 +38,7 @@
                 v-if="node.leftChild"
                 :node="node.leftChild"
                 :selectedOrder="selectedOrder"
+                :correctOrder="correctOrder"
                 :result="result"
                 @select="emitSelect"
             />
@@ -45,6 +46,7 @@
                 v-if="node.rightChild"
                 :node="node.rightChild"
                 :selectedOrder="selectedOrder"
+                :correctOrder="correctOrder"
                 :result="result"
                 @select="emitSelect"
             />
@@ -59,6 +61,7 @@ import { Node } from '@/types/tree/Node';
 const props = defineProps<{
     node: Node;
     selectedOrder: Map<number, number>;
+    correctOrder: Map<number, number>;
     result: boolean | null;
 }>();
 
@@ -67,26 +70,22 @@ const emit = defineEmits<{
 }>();
 
 function handleClick() {
-    console.log('Click detected on node:', props.node);
-    console.log('Node ID:', props.node.id);
-    console.log('Node type:', typeof props.node.id);
-    
-    let newOrder = new Map(props.selectedOrder);
+    const newOrder = new Map(props.selectedOrder);
     const current = newOrder.get(props.node.id);
     
     if (current === undefined) {
         // Node hasn't been selected yet, add it to the next position
-        const nextPosition = newOrder.size + 1;
+        const nextPosition = newOrder.size;
         newOrder.set(props.node.id, nextPosition);
-        console.log(`Node ${props.node.id} selected as position ${nextPosition}`);
-        console.log('New order map:', newOrder);
     } else {
         // Node already selected, remove it
         newOrder.delete(props.node.id);
-        console.log(`Node ${props.node.id} deselected`);
-        console.log('New order map:', newOrder);
     }
+
+    console.log("Result: ", props.result);
     
+    console.log("Selected Order: ", newOrder);
+    console.log("Correct Order: ", props.correctOrder);
     emit('select', newOrder);
 }
 

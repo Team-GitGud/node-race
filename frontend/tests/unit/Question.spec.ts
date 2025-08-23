@@ -13,7 +13,7 @@ describe('Question', () => {
       [2, 1],
       [3, 2]
     ]);
-    question = new Question('q1', 'Test Question', rootNode, correctOrder);
+    question = new Question(1, 'Test Question', rootNode, correctOrder);
   });
 
   describe('constructor', () => {
@@ -84,7 +84,7 @@ describe('Question', () => {
     });
 
     it('should handle empty maps', () => {
-      const emptyQuestion = new Question('q2', 'Empty', rootNode, new Map());
+      const emptyQuestion = new Question(2, 'Empty', rootNode, new Map());
       const emptySelected = new Map();
       
       expect(emptyQuestion.isCorrect(emptySelected)).toBe(true);
@@ -92,7 +92,7 @@ describe('Question', () => {
     });
 
     it('should handle single key-value pair', () => {
-      const singleQuestion = new Question('q3', 'Single', rootNode, new Map([[1, 0]]));
+      const singleQuestion = new Question(3, 'Single', rootNode, new Map([[1, 0]]));
       const correctAnswer = new Map([[1, 0]]);
       const wrongAnswer = new Map([[1, 1]]);
       

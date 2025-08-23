@@ -9,7 +9,7 @@ export class LobbyManager {
     * creates a lobby
     */
     createLobby(ws: WebSocket): void {
-        const lobby: Lobby = new Lobby(ws);
+        const lobby: Lobby = new Lobby(ws, this);
         this.lobbies.set(lobby.lobbyID, lobby);
         ws.send(ApiResponseFactory.createLobbyResponse(lobby.lobbyID, lobby.hostToken).toString());
         console.log("New lobby created");
@@ -20,5 +20,9 @@ export class LobbyManager {
      */
     getLobby(lobbyID: string): Lobby | undefined {
         return this.lobbies.get(lobbyID);
+    }
+
+    removeLobby(lobbyID: string): void {
+        this.lobbies.delete(lobbyID);
     }
 }

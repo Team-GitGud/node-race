@@ -175,7 +175,7 @@ nickname, score, questions
 ```json
 {
   "action": "START_GAME",
-  "hostID": "afdkjd",
+  "hostId": "afdkjd",
   "data": {
     "lobbyId": "aslksah"
   }
@@ -188,7 +188,7 @@ nickname, score, questions
 ```json
 {
   "action": "GET_ALL_PLAYERS",
-  "hostID": "afdkjd",
+  "hostId": "afdkjd",
   "data": {
     "lobbyId": "aslksah"
   }
@@ -203,8 +203,43 @@ nickname, score, questions
     ]
 }
 ```
+----
+### Get Leaderboard
+
+#### request
+```json
+{
+  "action": "GET_LEADERBOARD",
+  lobbyId: "ajsdlf"
+}
+```
+#### response
+```json
+{
+  "type": "LEADERBOARD",
+  "leaderboard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ]
+}
+```
 
 ---
+
+### Submit an answer (Player only)
+
+```json
+{
+  "action": "SUBMIT_ANSWER",
+  "playerId": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah",
+    "answer": {"0":4,"1":0,"2":3,"3":1,"4":2},
+    "questionNumber": 0
+  }
+}
+```
+
+----
 
 ## Server → Client Events
 

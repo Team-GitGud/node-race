@@ -7,38 +7,38 @@
                 v-if="currentQuestion"
                 :node="currentQuestion.root"
                 :selectedOrder="selectedOrder"
+                :correctOrder="currentQuestion.correctOrder"
                 :result="result"
                 @select="handleSelect"
                 style="margin-top: 0px;"
             />
         </div>
         <div style="display: flex; justify-content: center; gap: 20px;">
-            <CustomButton :action="() => checkAnswer()" type="positive" :disabled="result !== null">Submit</CustomButton>
-            <CustomButton :action="() => resetOrder()" type="negative" :disabled="isOriginal() || result !== null">Reset</CustomButton>
+            <CustomButton :action="() => checkAnswer()" type="positive" :disabled="false">Submit</CustomButton>
+            <CustomButton :action="() => resetOrder()" type="negative" :disabled="false">Reset</CustomButton>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { useRoute, useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { ref, computed, onMounted, watch, withDefaults, defineProps } from 'vue';
 import { Question } from '@/types/Question';
 import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
 import { PlayerSession } from '@/types/PlayerSession';
+import { Node } from '@/types/tree/Node';
 import { usePlayerSession } from '@/types/usePlayerSession';
 
-const route = useRoute();
 const router = useRouter();
 
-// Props for dynamic routing
 interface Props {
-    questionIndex?: string;
+    questionIndex?: number;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    questionIndex: "0"
+    questionIndex: 0
 });
 
 // Convert questionIndex to number
@@ -48,93 +48,110 @@ const questionIndex = computed(() => Number(props.questionIndex));
 const { questions } = usePlayerSession();
 
 const selectedOrder = ref<Map<number, number>>(new Map());
-const result = ref<boolean | null>(null);
+// We make this null to indicate the result hasn't been checked yet.
+// In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
+const result = ref<boolean|null>(null);
 
-// Computed properties
-const currentQuestion = computed(() => {
-    if (questions.value.length > 0 && questionIndex.value < questions.value.length) {
-        return questions.value[questionIndex.value];
-    }
-    return null;
-});
-
-const totalQuestions = computed(() => questions.value.length);
-
-// Methods
 const handleSelect = (newOrder: Map<number, number>) => {
-    if (result.value !== null) return;
-    
-    // Update the selectedOrder with the new order from TreeNode
     selectedOrder.value = newOrder;
-    console.log('New order received:', newOrder);
 };
 
 const resetOrder = () => {
     selectedOrder.value.clear();
     result.value = null;
-    console.log('Order reset');
-};
-
-const isOriginal = (): boolean => {
-    return selectedOrder.value.size === 0;
 };
 
 const checkAnswer = () => {
-    if (currentQuestion.value) {
-        result.value = currentQuestion.value.isCorrect(selectedOrder.value);
-        console.log('Answer checked:', result.value ? 'Correct!' : 'Incorrect');
-        
-        // Wait 2 seconds, then navigate to next question or leaderboard
-        setTimeout(() => {
-            const nextQuestionIndex = questionIndex.value + 1;
-            
-            console.log('Next question index:', questions.value.length);
-            if (nextQuestionIndex < questions.value.length) {
-                // Move to next question
-                console.log(`Moving to question ${nextQuestionIndex}`);
-                router.push(`/question/${nextQuestionIndex}`);
-            } else {
-                // No more questions, go to leaderboard
-                console.log('All questions completed, going to leaderboard');
-                router.push('/leaderboard');
+    console.log("Correct Order: ", currentQuestion.value.correctOrder);
+    result.value = currentQuestion.value.isCorrect(selectedOrder.value);
+
+    const session = APIManager.getInstance().getSession();
+    if (session && session instanceof PlayerSession) {
+        session.addAnswer(props.questionIndex, result.value ?? false);
+    }
+
+    // TODO: Send the result to the backend. Make the question not available for the player to answer again.
+    setTimeout(() => {
+        resetOrder();
+
+        if (answeredAllQuestions()) {
+            router.push("/leaderboard");
+            return;
+        }
+        if (props.questionIndex + 1 >= questions.value.length) {
+            router.push("/question-navigation");
+            return;
+        }
+
+        // This will cycle through all questions until it finds one that hasn't been answered.
+        let i = 1
+        while (hasAnsweredQuestion(props.questionIndex + i)) {
+            i++;
+            if (props.questionIndex + i >= questions.value.length) {
+                router.push("/question-navigation");
+                return;
             }
-        }, 2000);
-    }
+        }
+        router.push(`/question/${props.questionIndex + i}`);
+    }, 2000);
 };
 
-const goToQuestion = (index: number) => {
-    if (index >= 0 && index < questions.value.length) {
-        router.push(`/question/${index}`);
+const answeredAllQuestions = () => {
+    const session = APIManager.getInstance().getSession();
+    if (session && session instanceof PlayerSession) {
+        const answers = session.getAnswers();
+        
+        // Check if all previous questions (0 to currentIndex-1) have been answered
+        for (let i = 0; i < questions.value.length; i++) {
+            if (answers[i] === undefined) {
+                return false;
+            }
+        }
     }
-};
+    return true;
+}
 
-// Lifecycle
+const hasAnsweredQuestion = (questionIndex: number) => {
+    const session = APIManager.getInstance().getSession();
+    if (session && session instanceof PlayerSession) {
+        const answers = session.getAnswers();
+        return answers[questionIndex] !== undefined;
+    }
+}
+
+const currentQuestion = computed(() => {
+    return questions.value[props.questionIndex];
+})
+
 onMounted(() => {
-    // Get questions from PlayerSession
     const session = APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         questions.value = session.getQuestions();
-        console.log('Questions loaded from session:', questions.value);
-    } else {
-        console.warn('No PlayerSession found');
     }
-    
-    // Initialize selected order for current question
-    if (currentQuestion.value) {
-        selectedOrder.value = new Map();
-        result.value = null;
+    selectedOrder.value = new Map();
+    result.value = null;
+
+    // Use for testing, remove later. This will create a mock question if we go to a question 0 with no lobby.
+    if (questions.value.length == 0) {
+        questions.value.push(new Question(
+            0,
+            "In order Depth first search",
+            new Node(
+                0,
+                new Node(1, new Node(3), new Node(4)),
+                new Node(2, null, new Node(5))
+            ),
+            new Map([[3, 1], [4, 2], [1, 3], [0, 4], [2, 5], [5, 6]])
+        ));
     }
 });
 
-// Watch for question changes and reset state
-watch(questionIndex, () => {
-    console.log('Question changed to:', questionIndex.value);
+watch(currentQuestion, () => {
     selectedOrder.value = new Map();
     result.value = null;
 });
 
 </script>
-
 <style scoped>
 h2 {
     font-size: 2.5rem;

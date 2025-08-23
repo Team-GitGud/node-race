@@ -53,6 +53,15 @@ export class ApiResponseFactory {
         `);
     }
 
+    static endGamePlayerResponse(questions: string): string {
+        return JSON.stringify(`
+        {
+            "type": "GAME_STARTED",
+            "questions": ${questions} 
+        }
+        `);
+    }
+
     static getAllPlayerResponse(playerArray: string): string {
         return JSON.stringify(`
         {
@@ -76,6 +85,15 @@ export class ApiResponseFactory {
         return JSON.stringify(`
         {
             "players": ${players}
+        }
+        `);
+    }
+
+    static getLeaderboardResponse(leaderboard: string): string {
+        return JSON.stringify(`
+        {
+            "type": "LEADERBOARD",
+            "leaderboard": ${leaderboard} 
         }
         `);
     }

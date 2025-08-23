@@ -29,7 +29,7 @@
 			</ModalPopup>
 	
 			<CustomButton :action="() => handleHostClick()">Host</CustomButton>
-			<CustomButton shrink :action="() => $router.push('/question/1')">?</CustomButton>
+			<CustomButton shrink :action="() => $router.push('/question/0')">?</CustomButton>
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
 	</div>

@@ -7,7 +7,7 @@ on:
     
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, truenas]
 
     steps:
     - name: Check out the repo
