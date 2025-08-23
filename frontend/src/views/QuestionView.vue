@@ -61,20 +61,19 @@ const resetOrder = () => {
     result.value = null;
 };
 
-const checkAnswer = () => {
+const checkAnswer = async () => {
     console.log("Correct Order: ", currentQuestion.value.correctOrder);
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
 
-    const session = APIManager.getInstance().getSession();
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         session.addAnswer(props.questionIndex, result.value ?? false);
     }
 
     // TODO: Send the result to the backend. Make the question not available for the player to answer again.
-    setTimeout(() => {
+    setTimeout(async () => {
         resetOrder();
-
-        if (answeredAllQuestions()) {
+        if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
         }
@@ -96,8 +95,8 @@ const checkAnswer = () => {
     }, 2000);
 };
 
-const answeredAllQuestions = () => {
-    const session = APIManager.getInstance().getSession();
+const answeredAllQuestions = async () => {
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         const answers = session.getAnswers();
         
