@@ -19,28 +19,20 @@ export class GameLogic {
             let tree = new Tree();
             let solver: SolveTree;
             let questionType: string;
-            switch (Math.floor(Math.random() * 6)) {
+            switch (Math.floor(Math.random() * 4)) {
                 case 0:
-                    solver = new inorderBFS();
-                    questionType = "In order Breadth first search";
-                    break;
-                case 1:
                     solver = new inorderDFS();
                     questionType = "In order Depth first search";
                     break;
-                case 2:
-                    solver = new postorderBFS();
-                    questionType = "Post order Breadth first search";
-                    break;
-                case 3:
+                case 1:
                     solver = new postorderDFS();
                     questionType = "Post order Depth first search";
                     break;
-                case 4:
+                case 2:
                     solver = new preorderBFS();
-                    questionType = "Pre order Breadth first search";
+                    questionType = "Breadth first search";
                     break;
-                case 5:
+                case 3:
                     solver = new preorderDFS();
                     questionType = "Pre order Depth first search";
                     break;
@@ -60,28 +52,20 @@ export class GameLogic {
             tree.root = tree.generateTree();
             let solver: SolveTree;
             let questionType: string;
-            switch (Math.floor(Math.random() * 6)) {
+            switch (Math.floor(Math.random() * 4)) {
                 case 0:
-                    solver = new inorderBFS();
-                    questionType = "In order Breadth first search";
-                    break;
-                case 1:
                     solver = new inorderDFS();
                     questionType = "In order Depth first search";
                     break;
-                case 2:
-                    solver = new postorderBFS();
-                    questionType = "Post order Breadth first search";
-                    break;
-                case 3:
+                case 1:
                     solver = new postorderDFS();
                     questionType = "Post order Depth first search";
                     break;
-                case 4:
+                case 2:
                     solver = new preorderBFS();
-                    questionType = "Pre order Breadth first search";
+                    questionType = "Breadth first search";
                     break;
-                case 5:
+                case 3:
                     solver = new preorderDFS();
                     questionType = "Pre order Depth first search";
                     break;

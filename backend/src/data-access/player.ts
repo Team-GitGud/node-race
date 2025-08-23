@@ -10,6 +10,7 @@ export class Player {
     score: number;
     questionStart: number;
     prevQuestionTime: number;
+    questionHistory: Array<Boolean> = [];
 
     constructor(name: string, ws: WebSocket) {
         this.name = name;

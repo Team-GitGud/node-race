@@ -4,6 +4,7 @@ import { WebSocket } from 'ws';
 import { GameLogic } from "../session-logic/gameLogic";
 import { Database } from "./db";
 import { LobbyManager } from "./lobbyManager";
+import { Timer } from "./timer";
 
 /**
  * This class represents a lobby in NodeRace and its purpose is to:
@@ -16,7 +17,7 @@ export class Lobby {
     lobbyID: string = '';
     players: Player[] = [];
     hostToken: string;
-    timer: any = null;
+    timer: Timer = new Timer();
     database: Database = new Database();
     ws: WebSocket;
     gameLogic: GameLogic;
@@ -79,10 +80,12 @@ export class Lobby {
         let correct = this.gameLogic.questions[questionNumber].solution
         for (let key in correct){
             if (correct[key] != answer[key]){
+                p.questionHistory.push(false);
                 p.calculateScore(this.timer, false);
                 return;
             }
         }
+        p.questionHistory.push(true);
         p.calculateScore(this.timer, true);
     }
 
