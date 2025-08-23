@@ -175,6 +175,22 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ---
 
+### Submit an answer (Player only)
+
+```json
+{
+  "action": "SUBMIT_ANSWER",
+  "playerID": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah",
+    "answer": {"0":4,"1":0,"2":3,"3":1,"4":2},
+    "questionNumber": 0
+  }
+}
+```
+
+----
+
 ## Server → Client Events
 
 ### Lobby State (to host) (after AUTH)

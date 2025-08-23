@@ -106,9 +106,25 @@ export class api {
                 this.getAllPlayers(message, ws);
                 break;
 
+            case ("SUBMIT_ANSWER"):
+                this.submitAnswer(message, ws);
+                break;
+
             default:
                 ws.send("Error: no action block found");
         }
+    }
+
+    static submitAnswer(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyID;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        lobby.calculateScore(message.playerID, message.data.answer, message.data.questionNumber);
+
     }
 
     static getAllPlayers(message: any, ws: WebSocket): void {

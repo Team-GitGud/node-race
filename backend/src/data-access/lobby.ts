@@ -60,8 +60,8 @@ export class Lobby {
     /**
     * Calculates the score of a player.
     */
-    calculateScore(playerName: string, answer: { [k: string]: number; }, questionNumber: number ): void {
-        let p: Player | undefined = this.players.find((pl) => pl.name == playerName);
+    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number ): void {
+        let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
         if (p == undefined) { return; }
         let correct = this.gameLogic.questions[questionNumber].solution
         for (let key in correct){
