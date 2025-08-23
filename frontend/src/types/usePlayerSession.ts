@@ -23,6 +23,10 @@ export function usePlayerSession() {
         playerName.value = session.getPlayer().getNickname();
         questions.value = session.getQuestions();
 
+        if (questions.value.length !== 0 && router.currentRoute.value.path === '/lobby') {
+            router.push('/question-navigation');
+        }
+
         session.addEventListener("GAME_STARTED", () => {
             router.push('/question-navigation');
         });
