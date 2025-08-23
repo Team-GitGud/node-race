@@ -1,5 +1,6 @@
 import router from '@/router';
 import APIManager from './APIManager';
+import { AlertService } from './AlertService';
 
 export class InactivityChecker {
     private currentTime = 0;
@@ -48,7 +49,7 @@ export class InactivityChecker {
         if (session && typeof (session as any).leaveSession === 'function') {
             (session as any).leaveSession();
         }
-        alert('You have been inactive for too long and will be removed from the lobby.');
+        AlertService.alert('You have been inactive for too long and will be removed from the lobby.');
         router.push('/');
     }
 
