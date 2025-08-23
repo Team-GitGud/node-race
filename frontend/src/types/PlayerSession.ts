@@ -8,12 +8,14 @@ import APIManager from './APIManager';
 export class PlayerSession extends Session {
     private player: Player;
     private questions: Array<Question>;
+    private answers: Array<boolean>;
     private inactivityChecker: InactivityChecker | null = null;
 
     public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
         super(ws, lobbyCode);
         this.player = new Player(playerId, nickname);
         this.questions = questions;
+        this.answers = new Array(questions.length).fill(undefined); // All questions are incorrect by default.
         
         // Set up event listeners for incoming messages
         this.addEventListener("GAME_STARTED", (data) => {
@@ -55,6 +57,13 @@ export class PlayerSession extends Session {
         return this.questions;
     }
 
+    public getAnswers(): Array<boolean> {
+        return this.answers;
+    }
+
+    public addAnswer(questionIndex: number, answer: boolean) {
+        this.answers[questionIndex] = answer;
+    }
     /**
      * Leaves the session: disconnects the WebSocket and cleans up.
      * TODO: Send a message to the backend to notify leaving the lobby.
