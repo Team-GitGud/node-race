@@ -2,11 +2,14 @@ import { Session } from './Session';
 import { Player } from './Player';
 import { Question } from './Question';
 import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
+import { InactivityChecker } from './InactivityChecker';
+import APIManager from './APIManager';
 
 export class PlayerSession extends Session {
     private player: Player;
     private questions: Array<Question>;
     private answers: Array<boolean>;
+    private inactivityChecker: InactivityChecker | null = null;
 
     public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<Question>) {
         super(ws, lobbyCode);
@@ -30,11 +33,24 @@ export class PlayerSession extends Session {
 
     public handleGameStarted(questions: BackendQuestion[]) {
         this.questions = QuestionAdapter.fromBackendQuestions(questions);
-        console.log("Player session questions:", this.questions);
+        // TODO: Handle game started for Player Session.
+        console.log("Game started with questions:", questions);
+
+        // Start inactivity checker when game starts
+        if (this.inactivityChecker) {
+            this.inactivityChecker.stop();
+        }
+        this.inactivityChecker = new InactivityChecker();
+        this.inactivityChecker.start();
     }
 
     public handlePlayerKicked(reason: string) {
         console.log("Player kicked with reason:", reason);
+        
+        if (this.inactivityChecker) {
+            this.inactivityChecker.stop();
+            this.inactivityChecker = null;
+        }
     }
 
     public getQuestions(): Array<Question> {
@@ -47,5 +63,24 @@ export class PlayerSession extends Session {
 
     public addAnswer(questionIndex: number, answer: boolean) {
         this.answers[questionIndex] = answer;
+    }
+    /**
+     * Leaves the session: disconnects the WebSocket and cleans up.
+     * TODO: Send a message to the backend to notify leaving the lobby.
+     */
+    public leaveSession() {
+        // TODO: Send a "LEAVE_LOBBY" message to the backend if needed
+        // Example: this.ws.send(JSON.stringify({ type: "LEAVE_LOBBY" }));
+
+        if (this.inactivityChecker) {
+            this.inactivityChecker.stop();
+            this.inactivityChecker = null;
+        }
+
+        // Disconnect the WebSocket
+        this.disconnect();
+
+        // Optionally, clean up session in APIManager
+        APIManager.getInstance().clearSession();
     }
 }

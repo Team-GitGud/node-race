@@ -45,6 +45,10 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "playerId": "p_z9y8x7w6",
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+  
 }
 ```
 
@@ -70,7 +74,9 @@ All WebSocket connections must authenticate with their token immediately upon co
 ##### host 
 ```json
 {
-  "players": [players]
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
 }
 
 ```
@@ -169,7 +175,7 @@ nickname, score, questions
 ```json
 {
   "action": "START_GAME",
-  "hostID": "afdkjd",
+  "hostId": "afdkjd",
   "data": {
     "lobbyId": "aslksah"
   }
@@ -182,7 +188,7 @@ nickname, score, questions
 ```json
 {
   "action": "GET_ALL_PLAYERS",
-  "hostID": "afdkjd",
+  "hostId": "afdkjd",
   "data": {
     "lobbyId": "aslksah"
   }
@@ -194,6 +200,25 @@ nickname, score, questions
   "type": "ALL_PLAYERS",
   "players": [
         {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+}
+```
+----
+### Get Leaderboard
+
+#### request
+```json
+{
+  "action": "GET_LEADERBOARD",
+  lobbyId: "ajsdlf"
+}
+```
+#### response
+```json
+{
+  "type": "LEADERBOARD",
+  "leaderboard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
     ]
 }
 ```
@@ -242,6 +267,9 @@ nickname, score, questions
 {
   "type": "PLAYER_LEFT",
   "playerId": "p_z9y8x7w6"
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
 }
 ```
 

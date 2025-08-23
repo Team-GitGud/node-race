@@ -9,6 +9,7 @@
 <script lang="ts" setup>
 import router from '@/router';
 import APIManager from '@/types/APIManager';
+import { AlertService } from '@/types/AlertService';
 import CustomButton from '@/components/CustomButton.vue';
 import { onMounted, ref } from 'vue';
 import { HostSession } from '@/types/HostSession';
@@ -18,7 +19,7 @@ const lobbyCode = ref('');
 onMounted(async () => {
     const lc = APIManager.getInstance().getSession()?.lobbyCode;
     if (!lc) {
-        alert('No lobby code found. Please create a session first.');
+        AlertService.alert('No lobby code found. Please create a session first.');
         router.push('/');
     } else {
         lobbyCode.value = lc;

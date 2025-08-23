@@ -13,5 +13,6 @@ describe("Database", () => {
         for (let i = 0; i < 0; i++){
             db.addData("name "+ i, i );
         }
+        //console.log(db.getLeaderboard());
     })
 });
