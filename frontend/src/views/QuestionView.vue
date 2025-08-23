@@ -130,7 +130,7 @@ onMounted(() => {
     }
     selectedOrder.value = new Map();
     result.value = null;
-
+    console.log("Length: ", questions.value.length);
     // Use for testing, remove later. This will create a mock question if we go to a question 0 with no lobby.
     if (questions.value.length == 0) {
         const start = new Date().getTime();

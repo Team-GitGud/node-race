@@ -1,9 +1,8 @@
 <template>
-    <div class="timer-container border" v-if="gameTimer">
+    <div class="timer-container border" :class="{ 'timer-hidden': !isTimeVisible }" v-if="gameTimer">
         <img @click="toggleTime" class="timer-toggle" :src="isTimeVisible ? timeVisible : timeNotVisible" />
-        <div class="timer-text">
-            <h3 v-if="isTimeVisible">{{ formattedTime }}</h3>
-            <h3 v-else></h3>
+        <div v-if="isTimeVisible" class="timer-text">
+            <h3>{{ formattedTime }}</h3>
         </div>
     </div>
 </template>
@@ -73,14 +72,24 @@ const toggleTime = () => {
     align-items: center;
     justify-content: space-between;
     min-height: 50px;
+    width: 150px; /* Fixed width when visible */
+    transition: width 0.3s ease-in-out; /* Smooth width animation */
+    overflow: hidden; /* Hide content during animation */
 }
+
+.timer-container.timer-hidden {
+    width: 50px; /* Smaller width when timer text is hidden */
+}
+
 .timer-text h3 {
     color: var(--text-color);
     padding-right: 10px;
-    padding-left: 30px;
+    white-space: nowrap; /* Prevent text wrapping during animation */
 }
+
 .timer-toggle {
     padding-left: 10px;
+    padding-right: 10px;
     width: 30px;
     flex-shrink: 0; /* Maintains aspect ratio */
 }
