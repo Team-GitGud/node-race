@@ -42,8 +42,23 @@ export class Database{
         return this.recentRank;
     }
 
-    getLeaderboard(): Array<Entry>{
-        return this.data.slice(0, 10);
+    getLeaderboard(): string{
+        class leaderboardResult{
+            rank: number;
+            name: string;
+            score: number;
+            constructor(rank: number, name: string, score: number){
+                this.rank = rank;
+                this.name = name;
+                this.score = score
+            }
+        };
+        let entryLeaderboard = this.data.slice(0, 10);
+        let modLeaderboard: Array<leaderboardResult> = [];
+        entryLeaderboard.forEach((e)=>{
+            modLeaderboard.push(new leaderboardResult(entryLeaderboard.indexOf(e)+ 1, e.name, e.score));
+        })
+        return JSON.stringify(modLeaderboard);
     }
         
 }
