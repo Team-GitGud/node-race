@@ -48,6 +48,12 @@ export class Player {
         this.prevQuestionTime = time;
     }
 
+    rejoin(ws: WebSocket, questions: string | undefined): void {
+        this.ws.close();
+        this.ws = ws;
+        this.ws.send(ApiResponseFactory.playerRejoinResponse(this.name, this.score.toString(), questions));
+    }
+
     toJsonString(): string {
         return JSON.stringify(`
         {

@@ -26,7 +26,6 @@ export class Lobby {
         this.lobbyID = Lobby.generateKey();
         this.hostToken = this.generateHostToken();
         this.gameLogic = new GameLogic();
-        this.gameLogic.generateQuestions();
     }
 
     /**
@@ -45,6 +44,7 @@ export class Lobby {
     */
     startGame(): void {
         this.gameStarted = true;
+        this.gameLogic.generateQuestions();
         this.ws.send(ApiResponseFactory.startGameHostResponse());
         this.players.forEach((p: Player) => p.startGame(this.gameLogic.getQuestionJSON()));
     }
@@ -104,6 +104,26 @@ export class Lobby {
 
     sendAllPlayers(): void {
         this.ws.send(ApiResponseFactory.getAllPlayerResponse(JSON.stringify(this.players.map((p: Player) => p.toJsonString()))));
+    }
+
+    rejoinLobby(playerId: string, playerWs: WebSocket): void {
+        if (playerId === this.lobbyID) {
+            this.ws.close();
+            this.ws = playerWs;
+            this.ws.send(ApiResponseFactory.hostRejoinResponse(JSON.stringify(this.players.map((p: Player) => p.toJsonString()))));
+            return;
+        }
+        const player = this.getPlayer(playerId);
+        if (player === undefined) {
+            playerWs.send("Rejoin Failed, playerID does not exist");
+            return;
+        }
+
+        player.rejoin(playerWs, this.gameLogic.getQuestionJSON());
+    }
+
+    getPlayer(playerId: string): Player | undefined {
+        return this.players.filter(p => p.ID === playerId)[0];
     }
 
     calculateScore(): void {

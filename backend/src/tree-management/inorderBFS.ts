@@ -1,8 +1,6 @@
 import { SolveTree } from "./solveTree";
 import { Node } from "./node";
 
-
-
 export class inorderBFS implements SolveTree {
     /**
      * This generates the order of explored nodes stored in a map with the node id being the key
