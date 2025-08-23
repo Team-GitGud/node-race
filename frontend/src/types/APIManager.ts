@@ -1,7 +1,6 @@
 import { Session } from './Session';
 import { PlayerSession } from './PlayerSession';
 import { HostSession } from './HostSession';
-import { InactivityChecker } from './InactivityChecker';
 import { ref, Ref } from 'vue';
 
 class APIManager {
@@ -11,7 +10,6 @@ class APIManager {
     private isLoading: Ref<boolean> = ref(false);
     private loadingStartedAt: number | null = null;
     private minLoadingDuration = 500; // milliseconds
-    private inactivityChecker: InactivityChecker | null = null;
 
     private constructor() {
         this.apiAddress = process.env.VUE_APP_BACKEND_URL || '';
@@ -91,12 +89,6 @@ class APIManager {
                     const data = JSON.parse(event.data);
                     if (data.playerId) {
                         this.session = new PlayerSession(ws, lobbyCode, data.playerId, playerName, []);
-                        // Start inactivity checker when player joins a lobby
-                        if (this.inactivityChecker) {
-                            this.inactivityChecker.stop();
-                        }
-                        this.inactivityChecker = new InactivityChecker();
-                        this.inactivityChecker.start();
                         resolve(true);
                     } else {
                         resolve(false);
@@ -126,11 +118,6 @@ class APIManager {
     /** Clears the current session */
     public clearSession() {
         this.session = null;
-        // Optionally: stop inactivity checker, etc.
-        if (this.inactivityChecker) {
-            this.inactivityChecker.stop();
-            this.inactivityChecker = null;
-        }
     }
 }
 

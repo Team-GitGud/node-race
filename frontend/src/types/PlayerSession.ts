@@ -1,11 +1,13 @@
 import { Session } from './Session';
 import { Player } from './Player';
 import { Question } from './Question';
+import { InactivityChecker } from './InactivityChecker';
 import APIManager from './APIManager';
 
 export class PlayerSession extends Session {
     private player: Player;
     private questions: Array<Question>;
+    private inactivityChecker: InactivityChecker | null = null;
 
     // In Java, this would look like: Map<String, List<Runnable>>
     // Each event such as "KICK_PLAYER" will have multiple listeners, maybe one from the View and from the Session.
@@ -43,12 +45,25 @@ export class PlayerSession extends Session {
     public handleGameStarted(questions: Question[]) {
         // TODO: Handle game started for Player Session.
         console.log("Game started with questions:", questions);
+        
+        // Start inactivity checker when game starts
+        if (this.inactivityChecker) {
+            this.inactivityChecker.stop();
+        }
+        this.inactivityChecker = new InactivityChecker();
+        this.inactivityChecker.start();
+        
         this.emitEvent("GAME_STARTED", questions);
     }
 
     public handlePlayerKicked(reason: string) {
         // TODO: Handle player kicked for Player Session.
         console.log("Player kicked with reason:", reason);
+        
+        if (this.inactivityChecker) {
+            this.inactivityChecker.stop();
+            this.inactivityChecker = null;
+        }
         this.emitEvent("PLAYER_KICKED", reason);
     }
 
@@ -110,6 +125,11 @@ export class PlayerSession extends Session {
     public leaveSession() {
         // TODO: Send a "LEAVE_LOBBY" message to the backend if needed
         // Example: this.ws.send(JSON.stringify({ type: "LEAVE_LOBBY" }));
+
+        if (this.inactivityChecker) {
+            this.inactivityChecker.stop();
+            this.inactivityChecker = null;
+        }
 
         // Disconnect the WebSocket
         this.disconnect();
