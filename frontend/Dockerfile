@@ -16,5 +16,8 @@ RUN mkdir -p /var/cache/nginx/client_temp && \
     sed -i 's/listen  \[::]:80;/listen  [::]:8080;/' /etc/nginx/conf.d/default.conf
 
 COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+# Add health check endpoint
+RUN echo '{"status":"ok","service":"frontend"}' > /usr/share/nginx/html/health
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
