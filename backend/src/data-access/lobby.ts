@@ -108,7 +108,7 @@ export class Lobby {
     }
 
     rejoinLobby(playerId: string, playerWs: WebSocket): void {
-        if (playerId === this.lobbyID) {
+        if (playerId === this.hostToken) {
             this.ws.close();
             this.ws = playerWs;
             this.ws.send(ApiResponseFactory.hostRejoinResponse(this.getAllPlayersJson()));
