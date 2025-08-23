@@ -57,7 +57,11 @@ export class Lobby {
     */
     endGame(): void {
         this.gameStarted = false;
-        this.players.forEach((p: Player) => p.endGame());
+        let db = new Database();
+        this.players.forEach((p: Player) => {
+            p.endGame();
+            db.addData(p.getName(), p.getScore());
+        });
     }
 
     /**
