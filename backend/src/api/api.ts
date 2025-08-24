@@ -66,6 +66,7 @@ export class api {
                 this.lobbies.createLobby(ws);
                 break;
 
+
             case (ApiPaths.JOIN_LOBBY):
                 // Parse url urlParameters
                 const playerName: string = urlParameters.name;

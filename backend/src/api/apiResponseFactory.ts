@@ -79,7 +79,7 @@ export class ApiResponseFactory {
     static endGameHostResponse(): string {
         return JSON.stringify(`
         {
-            "type": "GAME_END",
+            "type": "GAME_END"
         }
         `);
     }

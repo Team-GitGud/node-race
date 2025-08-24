@@ -13,7 +13,6 @@ import { Timer } from "./timer";
  *  - Mange GlobalLeaderboard once game has ended
  */
 export class Lobby {
-    gameStarted: boolean = false;
     lobbyID: string = '';
     players: Player[] = [];
     hostToken: string;
@@ -32,6 +31,7 @@ export class Lobby {
         this.hostToken = this.generateHostToken();
         this.gameLogic = new GameLogic();
         this.lobbyManager = lobbyManager;
+        this.startGame();
     }
 
     /**
@@ -50,18 +50,21 @@ export class Lobby {
     * Starts a game by sending the start signal to every player in the lobby
     */
     startGame(): void {
-        this.gameStarted = true;
         this.gameLogic.generateQuestions();
-        this.timer.start(this.endGame);
+        this.timer.start(this.timerEndGame.bind(this), this);
         this.ws.send(ApiResponseFactory.startGameHostResponse());
         this.players.forEach((p: Player) => p.startGame(this.gameLogic.getQuestionJSON()));
+    }
+
+    timerEndGame(): void {
+        this.endGame();
     }
 
     /**
     * Ends a game by sending the end signal to every payer in the lobby
     */
     endGame(): void {
-        this.gameStarted = false;
+        console.log("game end started");
         this.ws.send(ApiResponseFactory.endGameHostResponse());
         this.ws.close()
         let db = new Database();
@@ -69,6 +72,7 @@ export class Lobby {
         this.players.forEach((p: Player): void => p.endGame(this.generateSessionLeaderboardJson(), this.database.getLeaderboard(), this.timer.getTime() + ''));
         this.players = [];
         this.lobbyManager.removeLobby(this.lobbyID);
+        console.log("game end ended");
     }
 
     generateSessionLeaderboardJson(): string {

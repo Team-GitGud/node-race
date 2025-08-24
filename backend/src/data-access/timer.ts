@@ -1,8 +1,10 @@
 import { setTimeout } from "node:timers";
+import { Lobby } from "./lobby";
 
 export class Timer {
     private startTimeStamp: number | null = null;
     private endTimeStamp: number | null = null;
+    fiveMin: number = 300000;
 
     /**
      * @returns The time in seconds since the timer started.
@@ -16,13 +18,14 @@ export class Timer {
     }
 
     /** Starts the timer. */
-    start(callback: () => void): void {
+    start(callback: () => void, lobby: Lobby): void {
         this.startTimeStamp = Date.now();
         this.endTimeStamp = null;
 
         setTimeout(() => {
-            callback();
-        }, 300000);
+            console.log("timer triggered");
+            callback.call(lobby);
+        }, this.fiveMin);
     }
 
     /** Stops the timer. */
