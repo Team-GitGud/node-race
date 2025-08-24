@@ -34,6 +34,16 @@ export class QuestionAdapter {
         }
         return questions;
     }
+    static toBackendAnswer(answer: Map<number, number>): { [key: string]: number } {
+        const result: { [key: string]: number } = {};
+        
+        // Convert Map where key=nodeId, value=order to object where key=order, value=nodeId
+        answer.forEach((order, nodeId) => {
+            result[order.toString()] = nodeId;
+        });
+        
+        return result;
+    }
     
 }
 

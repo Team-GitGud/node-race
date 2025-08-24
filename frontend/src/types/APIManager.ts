@@ -75,7 +75,7 @@ class APIManager {
     }
 
     /** Get WebSocket protocol based on API address */
-    private createWs(endpoint: string, resolve: (value: boolean) => void, role:"host"|"player"): WebSocket {
+    public createWs(endpoint: string, resolve: (value: boolean) => void, role:"host"|"player"): WebSocket {
         const wsProtocol = this.apiAddress.startsWith('https') ? 'wss' : 'ws';
         const wsUrl = `${this.apiAddress.replace(/^https?/, wsProtocol)}/api/v1/${endpoint}`;
         const ws = new WebSocket(wsUrl);
@@ -88,7 +88,7 @@ class APIManager {
     }
 
     /** Parse WebSocket message to JSON */
-    private parseWsMsg(event: MessageEvent<any>, resolve: (value: boolean) => void): any {
+    public parseWsMsg(event: MessageEvent<any>, resolve: (value: boolean) => void): any {
         try {
             let data = JSON.parse(event.data);
             // Parse differently if data is a string.
