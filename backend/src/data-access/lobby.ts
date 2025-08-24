@@ -13,7 +13,6 @@ import { Timer } from "./timer";
  *  - Mange GlobalLeaderboard once game has ended
  */
 export class Lobby {
-    gameStarted: boolean = false;
     lobbyID: string = '';
     players: Player[] = [];
     hostToken: string;
@@ -32,6 +31,7 @@ export class Lobby {
         this.hostToken = this.generateHostToken();
         this.gameLogic = new GameLogic();
         this.lobbyManager = lobbyManager;
+        this.startGame();
     }
 
     /**
@@ -41,45 +41,58 @@ export class Lobby {
         if (this.players.some(p => p.getName() == playerName)) {
             ws.send("Students cannot have the same name");
         }
-        let p: Player = new Player(playerName, ws);
+        let p: Player = new Player(playerName, ws, this);
         this.players.push(p);
-        ws.send(ApiResponseFactory.playerJoinResponse(p.ID, this.getAllPlayersJson()))
+        ws.send(ApiResponseFactory.playerJoinResponse(p.ID, this.getAllPlayersJson()));
     }
 
     /**
     * Starts a game by sending the start signal to every player in the lobby
     */
     startGame(): void {
-        this.gameStarted = true;
         this.gameLogic.generateQuestions();
-        this.timer.start(this.endGame);
+        this.timer.start(this.timerEndGame.bind(this), this);
         this.ws.send(ApiResponseFactory.startGameHostResponse());
         this.players.forEach((p: Player) => p.startGame(this.gameLogic.getQuestionJSON()));
+    }
+
+    timerEndGame(): void {
+        this.endGame();
     }
 
     /**
     * Ends a game by sending the end signal to every payer in the lobby
     */
     endGame(): void {
-        this.gameStarted = false;
+        console.log("game end started");
+        this.ws.send(ApiResponseFactory.endGameHostResponse());
         this.ws.close()
-        this.lobbyManager.removeLobby(this.lobbyID);
         let db = new Database();
-        this.players.forEach((p: Player) => {
-            p.endGame();
-            db.addData(p.getName(), p.getScore());
-        });
+        this.players.forEach((p: Player): number => db.addData(p.getName(), p.getScore()));
+        this.players.forEach((p: Player): void => p.endGame(this.generateSessionLeaderboardJson(), this.database.getLeaderboard(), this.timer.getTime() + ''));
+        this.players = [];
+        this.lobbyManager.removeLobby(this.lobbyID);
+        console.log("game end ended");
+    }
+
+    generateSessionLeaderboardJson(): string {
+        let rank: number = 1;
+        return JSON.stringify(
+            this.players
+                .sort((a: Player, b: Player) => b.score - a.score)
+                .map(p => ApiResponseFactory.sessionLeaderboardGenerator(rank++, p.name, p.score))
+        );
     }
 
     /**
     * Calculates the score of a player.
     */
-    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number ): void {
+    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number): void {
         let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
         if (p == undefined) { return; }
         let correct = this.gameLogic.questions[questionNumber].solution
-        for (let key in correct){
-            if (correct[key] != answer[key]){
+        for (let key in correct) {
+            if (correct[key] != answer[key]) {
                 p.questionHistory.push(false);
                 p.calculateScore(this.timer, false);
                 return;
