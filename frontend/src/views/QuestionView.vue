@@ -51,6 +51,8 @@ import { usePlayerSession } from '@/types/usePlayerSession';
 import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
+import Logo from '@/assets/logo.png';
+import { QuestionAdapter } from '@/types/QuestionAdapter';
 
 const router = useRouter();
 const gameTimer = ref<GameTimer | null>(null);
@@ -83,11 +85,15 @@ const checkAnswer = async () => {
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         session.addAnswer(props.questionIndex, result.value ?? false);
+        session.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
     }
 
     // TODO: Send the result to the backend. Make the question not available for the player to answer again.
     setTimeout(async () => {
         resetOrder();
+        if (!session || !(session instanceof PlayerSession)) {
+            return;
+        }
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
