@@ -32,6 +32,7 @@
 			<CustomButton shrink :action="() => $router.push('/question/0')">?</CustomButton>
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
+		<BuildInfo />
 	</div>
 </template>
 
@@ -41,6 +42,7 @@ import ConnectionStatus from '@/components/ConnectionStatus.vue';
 import CustomButton from '@/components/CustomButton.vue'
 import ModalPopup from '@/components/ModalPopup.vue';
 import TextInput from '@/components/TextInput.vue';
+import BuildInfo from '@/components/BuildInfo.vue';
 import APIManager from '@/types/APIManager';
 import { AlertService } from '@/types/AlertService';
 import router from '@/router';
