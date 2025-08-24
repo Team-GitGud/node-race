@@ -346,6 +346,31 @@ nickname, score, questions
 
 ---
 
+
+### Game End (to players)
+
+```json
+{
+  "type": "GAME_END",
+  "time": "3:14",
+  "numCorrect": "0",
+  "answer": [t,f,t,f],
+  "sessLeaderboard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ],
+  "globalLeaderoard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ]
+}
+```
+---
+### Game End (to host)
+
+```json
+{
+  "type": "GAME_STARTED"
+}
+```
 ## Rationale Summary
 
 - **Single-use Tokens:** WebSocket clients authenticate once; tokens aren't reused in each message.
