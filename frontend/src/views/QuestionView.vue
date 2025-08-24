@@ -2,6 +2,7 @@
     <div class="question-view">
         <CustomButton :action="() => $router.push('/')" style="position: absolute; top: 20px; left: 20px;">Back to Home</CustomButton>
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
+        <img :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
         <div class="tree-container">
             <TreeNode
                 v-if="currentQuestion"
@@ -13,9 +14,19 @@
                 style="margin-top: 0px;"
             />
         </div>
-        <div style="display: flex; justify-content: center; gap: 20px;">
-            <CustomButton :action="() => checkAnswer()" type="positive" :disabled="false">Submit</CustomButton>
-            <CustomButton :action="() => resetOrder()" type="negative" :disabled="false">Reset</CustomButton>
+        <img :src="NavigateRight" alt="Navigate Right" class="navigate-right-icon"/>
+        <div class="bottom-right-buttons">
+            <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
+                <h3>Submit</h3>
+            </CustomButton>
+            <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="false">
+                <img :src="ResetIcon" alt="Reset" class="reset-icon"/>
+            </CustomButton>
+        </div>
+        <div class="bottom-left-buttons">
+            <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')" type="neutral" :disabled="false">
+                <h3>Questions</h3>
+            </CustomButton>
         </div>
         <TimerComponent class="timer-component" :gameTimer="gameTimer" />
     </div>
@@ -33,6 +44,9 @@ import { GameTimer } from '@/types/GameTimer';
 import { PlayerSession } from '@/types/PlayerSession';
 import { Node } from '@/types/tree/Node';
 import { usePlayerSession } from '@/types/usePlayerSession';
+import ResetIcon from '@/assets/reset.svg';
+import NavigateLeft from '@/assets/navigate-left.svg';
+import NavigateRight from '@/assets/navigate-right.svg';
 
 const router = useRouter();
 const session = APIManager.getInstance().getSession();
@@ -65,7 +79,6 @@ const resetOrder = () => {
 };
 
 const checkAnswer = async () => {
-    console.log("Correct Order: ", currentQuestion.value.correctOrder);
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
@@ -130,7 +143,6 @@ onMounted(() => {
     }
     selectedOrder.value = new Map();
     result.value = null;
-    console.log("Length: ", questions.value.length);
     // Use for testing, remove later. This will create a mock question if we go to a question 0 with no lobby.
     if (questions.value.length == 0) {
         const start = new Date().getTime();
@@ -158,18 +170,39 @@ watch(currentQuestion, () => {
 </script>
 <style scoped>
 h2 {
-    font-size: 2.5rem;
+    font-size: 64px;
     margin-top: 40px;
     padding: 0 20px 10px 20px;
     border-bottom: 2px solid var(--text-color);
+}
+
+.tree-container {
+    margin-top: 10vh;
 }
 .question-view {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.tree-container {
-    margin: 2rem 0 3rem 0;
+
+.navigate-left-icon {
+    position: absolute;
+    left: 150px; /* Increased from 20px to move closer to middle */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 88px;
+    flex-shrink: 0;
+}
+
+.navigate-right-icon {
+    position: absolute;
+    right: 150px; /* Increased from 20px to move closer to middle */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 88px;
+    flex-shrink: 0;
 }
 
 .timer-component {
@@ -177,4 +210,34 @@ h2 {
     top: 20px;
     right: 20px;
 }
+
+.submit-button :deep(.btn-inner) {
+    height: 53px;
+}
+
+.reset-button :deep(.btn-inner) {
+    height: 53px;
+    padding: 2px 15px;
+}
+
+.reset-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.bottom-right-buttons {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center; /* Aligns buttons vertically */
+    gap: 10px; /* Consistent spacing between buttons */
+}
+
+.bottom-left-buttons {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+}
+
 </style>

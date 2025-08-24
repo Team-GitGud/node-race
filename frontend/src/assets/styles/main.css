@@ -61,3 +61,7 @@ p {
     border-bottom: 3px solid #FFF;
     border-left: 7px solid #FFF;
 }
+
+.btn-img {
+    width: 30px;
+}

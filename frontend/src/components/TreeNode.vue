@@ -81,11 +81,6 @@ function handleClick() {
         // Node already selected, remove it
         newOrder.delete(props.node.id);
     }
-
-    console.log("Result: ", props.result);
-    
-    console.log("Selected Order: ", newOrder);
-    console.log("Correct Order: ", props.correctOrder);
     emit('select', newOrder);
 }
 
