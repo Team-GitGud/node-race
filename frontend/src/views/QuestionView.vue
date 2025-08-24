@@ -1,6 +1,6 @@
 <template>
     <div class="question-view">
-        <CustomButton :action="() => $router.push('/')" style="position: absolute; top: 20px; left: 20px;">Back to Home</CustomButton>
+        <CustomButton :action="() => $router.push('/')" class="back-to-home-button">Back to Home</CustomButton>
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
         <img :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
         <div class="tree-container">
@@ -20,7 +20,7 @@
                 <h3>Submit</h3>
             </CustomButton>
             <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="false">
-                <img :src="ResetIcon" alt="Reset" class="reset-icon"/>
+                <img :src="ResetIcon" alt="Reset" class="btn-img"/>
             </CustomButton>
         </div>
         <div class="bottom-left-buttons">
@@ -49,7 +49,6 @@ import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
 
 const router = useRouter();
-const session = APIManager.getInstance().getSession();
 const gameTimer = ref<GameTimer | null>(null);
 
 interface Props {
@@ -99,7 +98,7 @@ const checkAnswer = async () => {
 
         // This will cycle through all questions until it finds one that hasn't been answered.
         let i = 1
-        while (hasAnsweredQuestion(props.questionIndex + i)) {
+        while (await hasAnsweredQuestion(props.questionIndex + i)) {
             i++;
             if (props.questionIndex + i >= questions.value.length) {
                 router.push("/question-navigation");
@@ -125,7 +124,8 @@ const answeredAllQuestions = async () => {
     return true;
 }
 
-const hasAnsweredQuestion = (questionIndex: number) => {
+const hasAnsweredQuestion = async (questionIndex: number) => {
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         const answers = session.getAnswers();
         return answers[questionIndex] !== undefined;
@@ -136,30 +136,14 @@ const currentQuestion = computed(() => {
     return questions.value[props.questionIndex];
 })
 
-onMounted(() => {
+onMounted(async () => {
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         questions.value = session.getQuestions();
         gameTimer.value = session.getGameTimer();
     }
     selectedOrder.value = new Map();
     result.value = null;
-    // Use for testing, remove later. This will create a mock question if we go to a question 0 with no lobby.
-    if (questions.value.length == 0) {
-        const start = new Date().getTime();
-        const fiveMinutes = 1000 * 60 * 5;
-        gameTimer.value = new GameTimer(start, start + fiveMinutes);
-        gameTimer.value.start();
-        questions.value.push(new Question(
-            0,
-            "In order Depth first search",
-            new Node(
-                0,
-                new Node(1, new Node(3), new Node(4)),
-                new Node(2, null, new Node(5))
-            ),
-            new Map([[3, 1], [4, 2], [1, 3], [0, 4], [2, 5], [5, 6]])
-        ));
-    }
 });
 
 watch(currentQuestion, () => {
@@ -169,6 +153,14 @@ watch(currentQuestion, () => {
 
 </script>
 <style scoped>
+/* Layout */
+.question-view {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Header */
 h2 {
     font-size: 64px;
     margin-top: 40px;
@@ -176,68 +168,72 @@ h2 {
     border-bottom: 2px solid var(--text-color);
 }
 
+/* Tree Container */
 .tree-container {
-    margin-top: 10vh;
+    margin-top: 5vh;
 }
-.question-view {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+
+/* Navigation Icons */
+.navigate-left-icon,
+.navigate-right-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 88px;
+    flex-shrink: 0;
 }
 
 .navigate-left-icon {
-    position: absolute;
-    left: 150px; /* Increased from 20px to move closer to middle */
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50px;
-    height: 88px;
-    flex-shrink: 0;
+    left: 150px;
 }
 
 .navigate-right-icon {
-    position: absolute;
-    right: 150px; /* Increased from 20px to move closer to middle */
-    top: 50%;
-    transform: translateY(-50%);
-    width: 50px;
-    height: 88px;
-    flex-shrink: 0;
+    right: 150px;
 }
 
-.timer-component {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+
+/* Button Styling */
+.submit-button :deep(.btn-inner),
+.reset-button :deep(.btn-inner),
+.question-navigation-button :deep(.btn-inner) {
+    height: 40px;
 }
 
-.submit-button :deep(.btn-inner) {
-    height: 53px;
+.submit-button :deep(.btn-inner),
+.question-navigation-button :deep(.btn-inner) {
+    padding: 2px 45px;
 }
 
 .reset-button :deep(.btn-inner) {
-    height: 53px;
     padding: 2px 15px;
 }
 
-.reset-icon {
-    width: 30px;
-    height: 30px;
-}
-
+/* Button Positioning */
 .bottom-right-buttons {
     position: absolute;
-    bottom: 20px;
-    right: 20px;
+    bottom: 50px;
+    right: 60px;
     display: flex;
-    align-items: center; /* Aligns buttons vertically */
-    gap: 10px; /* Consistent spacing between buttons */
+    align-items: center;
+    gap: 10px;
 }
 
 .bottom-left-buttons {
     position: absolute;
-    bottom: 20px;
-    left: 20px;
+    bottom: 50px;
+    left: 60px;
 }
 
+.back-to-home-button {
+    position: absolute;
+    top: 50px;
+    left: 60px;
+}
+/* Timer Component */
+.timer-component {
+    position: absolute;
+    top: 50px;
+    right: 60px;
+}
 </style>
