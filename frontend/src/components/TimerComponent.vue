@@ -91,5 +91,6 @@ const toggleTime = () => {
     padding-left: 10px;
     padding-right: 10px;
     flex-shrink: 0; /* Maintains aspect ratio */
+    cursor: pointer;
 }
 </style>

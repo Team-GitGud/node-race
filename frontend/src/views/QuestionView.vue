@@ -1,8 +1,8 @@
 <template>
     <div class="question-view">
-        <CustomButton :action="() => $router.push('/')" class="back-to-home-button">Back to Home</CustomButton>
+        <img @click="() => $router.push('/')" class="logo" :src="Logo" alt="Logo"/>
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
-        <img :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
+        <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
         <div class="tree-container">
             <TreeNode
                 v-if="currentQuestion"
@@ -14,7 +14,7 @@
                 style="margin-top: 0px;"
             />
         </div>
-        <img :src="NavigateRight" alt="Navigate Right" class="navigate-right-icon"/>
+        <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight" alt="Navigate Right" class="navigate-right-icon"/>
         <div class="bottom-right-buttons">
             <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
                 <h3>Submit</h3>
@@ -28,7 +28,10 @@
                 <h3>Questions</h3>
             </CustomButton>
         </div>
-        <TimerComponent class="timer-component" :gameTimer="gameTimer" />
+        <div class="top-right-buttons">
+            <TimerComponent class="timer-component" :gameTimer="gameTimer" />
+            <h3 class="question-number border">{{ props.questionIndex + 1 }}/{{ questions.length }}</h3>
+        </div>
     </div>
 </template>
 
@@ -47,6 +50,7 @@ import { usePlayerSession } from '@/types/usePlayerSession';
 import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
+import Logo from '@/assets/logo.png';
 
 const router = useRouter();
 const gameTimer = ref<GameTimer | null>(null);
@@ -57,9 +61,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
-
-// Convert questionIndex to number
-const questionIndex = computed(() => Number(props.questionIndex));
 // Reactive data
 const { questions } = usePlayerSession();
 const selectedOrder = ref<Map<number, number>>(new Map());
@@ -151,6 +152,14 @@ watch(currentQuestion, () => {
     result.value = null;
 });
 
+const nextQuestion = () => {
+    router.push(`/question/${props.questionIndex + 1}`);
+}
+
+const previousQuestion = () => {
+    router.push(`/question/${props.questionIndex - 1}`);
+}
+
 </script>
 <style scoped>
 /* Layout */
@@ -166,6 +175,11 @@ h2 {
     margin-top: 40px;
     padding: 0 20px 10px 20px;
     border-bottom: 2px solid var(--text-color);
+    white-space: normal; /* Allow text to wrap */
+    word-wrap: break-word; /* Break long words if needed */
+    max-width: 45vw; /* Limit width to prevent overflow */
+    text-align: center; /* Center the text */
+    line-height: 1.2; /* Tighter line height for better wrapping */
 }
 
 /* Tree Container */
@@ -182,6 +196,7 @@ h2 {
     width: 50px;
     height: 88px;
     flex-shrink: 0;
+    cursor: pointer;
 }
 
 .navigate-left-icon {
@@ -216,7 +231,7 @@ h2 {
     right: 60px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 5px;
 }
 
 .bottom-left-buttons {
@@ -230,10 +245,23 @@ h2 {
     top: 50px;
     left: 60px;
 }
-/* Timer Component */
-.timer-component {
+
+.top-right-buttons {
     position: absolute;
     top: 50px;
     right: 60px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
 }
+
+.question-number {
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 </style>
