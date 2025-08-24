@@ -42,7 +42,8 @@ export class Lobby {
         }
         let p: Player = new Player(playerName, ws, this);
         this.players.push(p);
-        ws.send(ApiResponseFactory.playerJoinResponse(p.ID, this.getAllPlayersJson()));
+        this.ws.send(ApiResponseFactory.playerJoinHostResponse(playerName, p.ID));
+        ws.send(ApiResponseFactory.playerJoinPlayerResponse(p.ID, this.getAllPlayersJson()));
     }
 
     /**

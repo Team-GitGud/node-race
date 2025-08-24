@@ -8,11 +8,23 @@ export class ApiResponseFactory {
         `);
     }
 
-    static playerJoinResponse(playerId: string, playerArray: string): String {
+    static playerJoinPlayerResponse(playerId: string, playerArray: string): String {
         return JSON.stringify(`
         {
             "playerId": "${playerId}",
             "players": ${playerArray}
+        }
+        `);
+    }
+
+    static playerJoinHostResponse(playerId: string, userName: string): String {
+        return JSON.stringify(`
+        {
+            "type": "PLAYER_JOINED",
+            "player": {
+                "playerId": "${playerId}",
+                "username": "${userName}"
+            }
         }
         `);
     }
