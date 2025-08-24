@@ -1,5 +1,6 @@
 <template>
     <ScreenBackground blur />
+    <ReturnHomeComponent message="Are you sure you want to return to the home page? <br/> You will not be able to return to this page."/>
     <div class="leaderboard-view">
         <h3 v-if="playerRanks && playerAnswers && playerRank">Your Ranking</h3>
         <h2 v-if="playerRanks && playerAnswers && playerRank">{{ playerRank }}</h2>
@@ -27,6 +28,7 @@
 </template>
 
 <script lang="ts" setup>
+import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import CustomButton from '@/components/CustomButton.vue';
 import { ref, onMounted } from 'vue';
