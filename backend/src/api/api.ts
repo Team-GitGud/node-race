@@ -21,7 +21,7 @@ export class api {
         this.app.use(cors({
             credentials: true
         }));
-
+        
         // health check
         this.app.get('/health', (req, res) => {
             res.status(200).json({ status: 'ok' });
@@ -35,6 +35,7 @@ export class api {
         wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
             // Deal with connection
             this.handleInitialConnection(ws, req);
+
 
             // Deal with requests
             ws.on("message", (data: RawData) => {
@@ -61,12 +62,15 @@ export class api {
         const urlParameters = Object.fromEntries(fullURL.searchParams.entries());
         const path: string = fullURL.pathname;
 
+        console.log(data.url);
+
         switch (path) {
             case (ApiPaths.CREATE_LOBBY):
                 this.lobbies.createLobby(ws);
                 break;
 
             case (ApiPaths.JOIN_LOBBY):
+                console.log("lobby join"); 
                 // Parse url urlParameters
                 const playerName: string = urlParameters.name;
                 const lobbyId: string = urlParameters.lobbyId;
@@ -195,7 +199,7 @@ export class api {
         const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
-            ws.send("LobbyID not found");
+            ws.send("LobbyId not found");
             return;
         }
 
