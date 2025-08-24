@@ -53,11 +53,33 @@ export class ApiResponseFactory {
         `);
     }
 
-    static endGamePlayerResponse(questions: string): string {
+    static endGamePlayerResponse(time: string, numCorrect: string, answer: string, sessLeaderboard: string, globalLeaderoard: string): string {
         return JSON.stringify(`
         {
-            "type": "GAME_STARTED",
-            "questions": ${questions} 
+            "type": "GAME_END",
+            "time": "${time}",
+            "numCorrect": "${numCorrect}",
+            "answer": ${answer},
+            "sessLeaderboard": ${sessLeaderboard},
+            "globalLeaderoard": ${globalLeaderoard}
+        }
+        `);
+    }
+
+    static sessionLeaderboardGenerator(rank: string | number, name: string, score: string | number): string {
+        return JSON.stringify(`
+            { 
+                "rank": "${rank}", 
+                "name": "${name}", 
+                "score": "${score}" 
+            }
+        `);
+    }
+
+    static endGameHostResponse(): string {
+        return JSON.stringify(`
+        {
+            "type": "GAME_END",
         }
         `);
     }
