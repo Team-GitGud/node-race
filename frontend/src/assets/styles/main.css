@@ -61,3 +61,16 @@ p {
     border-bottom: 3px solid #FFF;
     border-left: 7px solid #FFF;
 }
+
+.btn-img {
+    width: 30px;
+}
+
+.logo {
+    position: absolute;
+    top: 50px;
+    left: 60px;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
+}

@@ -1,7 +1,8 @@
 <template>
     <div class="question-view">
-        <CustomButton :action="() => $router.push('/')" style="position: absolute; top: 20px; left: 20px;">Back to Home</CustomButton>
+        <img @click="() => $router.push('/')" class="logo" :src="Logo" alt="Logo"/>
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
+        <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
         <div class="tree-container">
             <TreeNode
                 v-if="currentQuestion"
@@ -13,11 +14,24 @@
                 style="margin-top: 0px;"
             />
         </div>
-        <div style="display: flex; justify-content: center; gap: 20px;">
-            <CustomButton :action="() => checkAnswer()" type="positive" :disabled="false">Submit</CustomButton>
-            <CustomButton :action="() => resetOrder()" type="negative" :disabled="false">Reset</CustomButton>
+        <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight" alt="Navigate Right" class="navigate-right-icon"/>
+        <div class="bottom-right-buttons">
+            <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
+                <h3>Submit</h3>
+            </CustomButton>
+            <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="false">
+                <img :src="ResetIcon" alt="Reset" class="btn-img"/>
+            </CustomButton>
         </div>
-        <TimerComponent class="timer-component" :gameTimer="gameTimer" />
+        <div class="bottom-left-buttons">
+            <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')" type="neutral" :disabled="false">
+                <h3>Questions</h3>
+            </CustomButton>
+        </div>
+        <div class="top-right-buttons">
+            <TimerComponent class="timer-component" :gameTimer="gameTimer" />
+            <h3 class="question-number border">{{ props.questionIndex + 1 }}/{{ questions.length }}</h3>
+        </div>
     </div>
 </template>
 
@@ -33,9 +47,12 @@ import { GameTimer } from '@/types/GameTimer';
 import { PlayerSession } from '@/types/PlayerSession';
 import { Node } from '@/types/tree/Node';
 import { usePlayerSession } from '@/types/usePlayerSession';
+import ResetIcon from '@/assets/reset.svg';
+import NavigateLeft from '@/assets/navigate-left.svg';
+import NavigateRight from '@/assets/navigate-right.svg';
+import Logo from '@/assets/logo.png';
 
 const router = useRouter();
-const session = APIManager.getInstance().getSession();
 const gameTimer = ref<GameTimer | null>(null);
 
 interface Props {
@@ -44,9 +61,6 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
-
-// Convert questionIndex to number
-const questionIndex = computed(() => Number(props.questionIndex));
 // Reactive data
 const { questions } = usePlayerSession();
 const selectedOrder = ref<Map<number, number>>(new Map());
@@ -65,7 +79,6 @@ const resetOrder = () => {
 };
 
 const checkAnswer = async () => {
-    console.log("Correct Order: ", currentQuestion.value.correctOrder);
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
@@ -86,7 +99,7 @@ const checkAnswer = async () => {
 
         // This will cycle through all questions until it finds one that hasn't been answered.
         let i = 1
-        while (hasAnsweredQuestion(props.questionIndex + i)) {
+        while (await hasAnsweredQuestion(props.questionIndex + i)) {
             i++;
             if (props.questionIndex + i >= questions.value.length) {
                 router.push("/question-navigation");
@@ -112,7 +125,8 @@ const answeredAllQuestions = async () => {
     return true;
 }
 
-const hasAnsweredQuestion = (questionIndex: number) => {
+const hasAnsweredQuestion = async (questionIndex: number) => {
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         const answers = session.getAnswers();
         return answers[questionIndex] !== undefined;
@@ -123,31 +137,14 @@ const currentQuestion = computed(() => {
     return questions.value[props.questionIndex];
 })
 
-onMounted(() => {
+onMounted(async () => {
+    const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         questions.value = session.getQuestions();
         gameTimer.value = session.getGameTimer();
     }
     selectedOrder.value = new Map();
     result.value = null;
-    console.log("Length: ", questions.value.length);
-    // Use for testing, remove later. This will create a mock question if we go to a question 0 with no lobby.
-    if (questions.value.length == 0) {
-        const start = new Date().getTime();
-        const fiveMinutes = 1000 * 60 * 5;
-        gameTimer.value = new GameTimer(start, start + fiveMinutes);
-        gameTimer.value.start();
-        questions.value.push(new Question(
-            0,
-            "In order Depth first search",
-            new Node(
-                0,
-                new Node(1, new Node(3), new Node(4)),
-                new Node(2, null, new Node(5))
-            ),
-            new Map([[3, 1], [4, 2], [1, 3], [0, 4], [2, 5], [5, 6]])
-        ));
-    }
 });
 
 watch(currentQuestion, () => {
@@ -155,26 +152,116 @@ watch(currentQuestion, () => {
     result.value = null;
 });
 
+const nextQuestion = () => {
+    router.push(`/question/${props.questionIndex + 1}`);
+}
+
+const previousQuestion = () => {
+    router.push(`/question/${props.questionIndex - 1}`);
+}
+
 </script>
 <style scoped>
-h2 {
-    font-size: 2.5rem;
-    margin-top: 40px;
-    padding: 0 20px 10px 20px;
-    border-bottom: 2px solid var(--text-color);
-}
+/* Layout */
 .question-view {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
-.tree-container {
-    margin: 2rem 0 3rem 0;
+
+/* Header */
+h2 {
+    font-size: 64px;
+    margin-top: 40px;
+    padding: 0 20px 10px 20px;
+    border-bottom: 2px solid var(--text-color);
+    white-space: normal; /* Allow text to wrap */
+    word-wrap: break-word; /* Break long words if needed */
+    max-width: 45vw; /* Limit width to prevent overflow */
+    text-align: center; /* Center the text */
+    line-height: 1.2; /* Tighter line height for better wrapping */
 }
 
-.timer-component {
-    position: absolute;
-    top: 20px;
-    right: 20px;
+/* Tree Container */
+.tree-container {
+    margin-top: 5vh;
 }
+
+/* Navigation Icons */
+.navigate-left-icon,
+.navigate-right-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 88px;
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.navigate-left-icon {
+    left: 150px;
+}
+
+.navigate-right-icon {
+    right: 150px;
+}
+
+
+/* Button Styling */
+.submit-button :deep(.btn-inner),
+.reset-button :deep(.btn-inner),
+.question-navigation-button :deep(.btn-inner) {
+    height: 40px;
+}
+
+.submit-button :deep(.btn-inner),
+.question-navigation-button :deep(.btn-inner) {
+    padding: 2px 45px;
+}
+
+.reset-button :deep(.btn-inner) {
+    padding: 2px 15px;
+}
+
+/* Button Positioning */
+.bottom-right-buttons {
+    position: absolute;
+    bottom: 50px;
+    right: 60px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.bottom-left-buttons {
+    position: absolute;
+    bottom: 50px;
+    left: 60px;
+}
+
+.back-to-home-button {
+    position: absolute;
+    top: 50px;
+    left: 60px;
+}
+
+.top-right-buttons {
+    position: absolute;
+    top: 50px;
+    right: 60px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.question-number {
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 </style>

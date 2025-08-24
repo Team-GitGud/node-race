@@ -30,6 +30,7 @@ export function usePlayerSession() {
         }
 
         session.addEventListener("GAME_STARTED", () => {
+            console.log("Game started");
             const start = new Date().getTime();
             const fiveMinutes = 1000 * 60 * 5;
             const gameTimer = new GameTimer(start, start + fiveMinutes);

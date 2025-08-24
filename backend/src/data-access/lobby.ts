@@ -31,7 +31,6 @@ export class Lobby {
         this.hostToken = this.generateHostToken();
         this.gameLogic = new GameLogic();
         this.lobbyManager = lobbyManager;
-        this.startGame();
     }
 
     /**

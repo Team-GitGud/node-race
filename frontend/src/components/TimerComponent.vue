@@ -1,6 +1,6 @@
 <template>
     <div class="timer-container border" :class="{ 'timer-hidden': !isTimeVisible }" v-if="gameTimer">
-        <img @click="toggleTime" class="timer-toggle" :src="isTimeVisible ? timeVisible : timeNotVisible" />
+        <img @click="toggleTime" class="timer-toggle btn-img" :src="isTimeVisible ? timeVisible : timeNotVisible" />
         <div v-if="isTimeVisible" class="timer-text">
             <h3>{{ formattedTime }}</h3>
         </div>
@@ -71,7 +71,7 @@ const toggleTime = () => {
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    min-height: 50px;
+    height: 40px;
     width: 150px; /* Fixed width when visible */
     transition: width 0.3s ease-in-out; /* Smooth width animation */
     overflow: hidden; /* Hide content during animation */
@@ -90,7 +90,7 @@ const toggleTime = () => {
 .timer-toggle {
     padding-left: 10px;
     padding-right: 10px;
-    width: 30px;
     flex-shrink: 0; /* Maintains aspect ratio */
+    cursor: pointer;
 }
 </style>
