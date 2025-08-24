@@ -93,4 +93,20 @@ export class PlayerSession extends Session {
     public getGameTimer(): GameTimer | null {
         return this.gameTimer;
     }
+
+    public sendAnswer(questionIndex: number, answer: { [key: string]: number }): Promise<boolean> {
+        return new Promise((resolve, reject) => {
+            const message = JSON.stringify({
+                action: "SUBMIT_ANSWER",
+                playerId: this.player.getId(),
+                data: {
+                    lobbyId: this.lobbyCode,
+                    answer: answer,
+                    questionNumber: questionIndex
+                }
+            });
+            this.ws.send(message);
+            resolve(true);
+        });
+    }
 }
