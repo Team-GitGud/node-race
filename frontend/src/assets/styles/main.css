@@ -24,8 +24,9 @@ html {
     background-color: #00081A;
 }
 
-h1, h2, h3, h4 {
+h1, h2, h3, h4, h5 {
     font-weight: normal;
+    margin: 0;
 }
 
 h1 {
@@ -42,10 +43,34 @@ h3 {
 
 h4 {
     font-size: 30px;
+}
+
+h5 {
+    font-size: 25px;
     text-decoration: underline;
     text-decoration-thickness: 2px;
 }
 
 p {
     font-size: 25px;
+}
+
+.border {
+    border-top: 7px solid #FFF;
+    border-right: 3px solid #FFF;
+    border-bottom: 3px solid #FFF;
+    border-left: 7px solid #FFF;
+}
+
+.btn-img {
+    width: 30px;
+}
+
+.logo {
+    position: absolute;
+    top: 50px;
+    left: 60px;
+    width: 70px;
+    height: 70px;
+    cursor: pointer;
 }

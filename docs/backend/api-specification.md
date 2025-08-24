@@ -20,7 +20,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ### 1. Create a New Lobby
 
-- **Method:** `POST /api/v1/lobbies`
+- **Method:** `POST /api/v1/lobby/create`
 - **Request Body:** _(Empty)_
 - **Response:**
 ```json
@@ -39,42 +39,56 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ### 2. Join a Lobby
 
-- **Method:** `POST /api/v1/lobbies/{lobbyCode}/join`
-- **Request Body:**
-```json
-{
-  "username": "PlayerTwo"
-}
-```
+- **Method:** `POST /api/v1/lobby/join?name=<username>&lobbyID=<lobbyID>`
+- **Request Body:** (Empty) - parameters are passed throught the url
 - **Response:**
 ```json
 {
   "playerId": "p_z9y8x7w6",
-  "playerToken": "p_sess_f6e5d4c3b2a1"
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+  
 }
 ```
 
 - **Errors:**
   - `404 Not Found`: Invalid or expired lobby code.
 
----
+--- 
+### 3. Rejoin Lobby
 
-### 3. Start the Game
+- **Method:** `POST /api/v1/lobby/rejoin?id=<playerId>&lobbyId=<lobbyId>`
+- **Request Body:** (Empty) - parameters are passed throught the url
+- **Response:** score and questions may be null/blank if game hasn't started yet
 
-- **Method:** `POST /api/v1/lobbies/{lobbyCode}/start`
-- **Request Body:** _(Empty)_
-- **Authentication:** Verified through WebSocket session (not HTTP headers).
-- **Response:**
-  - `202 Accepted` — Game start is handled asynchronously over WebSocket.
----
+##### player
+```json
+{
+  "name": "Joe",
+  "score": "100",
+  "questions": [questions]
+}
 
+```
+##### host 
+```json
+{
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+}
+
+```
+
+nickname, score, questions
 
 ## WebSocket API
 
 ### Connection
 
 - **URL Format:**  
-  `wss://server/ws/v1/lobbies/{lobbyCode}`
+  `wss://server/ws/v1/lobby/create`
 
 - **Expected Workflow:**  
   1. Client opens WebSocket connection to the above URL.  
@@ -131,6 +145,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "UPDATE_SETTINGS",
+  "hostId": "afdkjd",
   "data": {
     "algorithm": "dfs",
     "treeCount": 5
@@ -145,13 +160,86 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "action": "KICK_PLAYER",
+  "hostId": "afdkjd",
   "data": {
+    "lobbyId": XADIE
     "playerId": "p_z9y8x7w6"
   }
 }
 ```
 
 ---
+
+### Start the game (host only)
+
+```json
+{
+  "action": "START_GAME",
+  "hostId": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah"
+  }
+}
+```
+----
+### Get all players (host only)
+
+#### request
+```json
+{
+  "action": "GET_ALL_PLAYERS",
+  "hostId": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah"
+  }
+}
+```
+#### response
+```json
+{
+  "type": "ALL_PLAYERS",
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+}
+```
+----
+### Get Leaderboard
+
+#### request
+```json
+{
+  "action": "GET_LEADERBOARD",
+  lobbyId: "ajsdlf"
+}
+```
+#### response
+```json
+{
+  "type": "LEADERBOARD",
+  "leaderboard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ]
+}
+```
+
+---
+
+### Submit an answer (Player only)
+
+```json
+{
+  "action": "SUBMIT_ANSWER",
+  "playerId": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah",
+    "answer": {"0":4,"1":0,"2":3,"3":1,"4":2},
+    "questionNumber": 0
+  }
+}
+```
+
+----
 
 ## Server → Client Events
 
@@ -195,6 +283,9 @@ All WebSocket connections must authenticate with their token immediately upon co
 {
   "type": "PLAYER_LEFT",
   "playerId": "p_z9y8x7w6"
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
 }
 ```
 
@@ -230,7 +321,6 @@ All WebSocket connections must authenticate with their token immediately upon co
 ```json
 {
   "type": "GAME_STARTED",
-  "date": "2025-08-08T16:35:00Z",
   "questions": [
     {
       "id": "q1",
@@ -256,6 +346,31 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ---
 
+
+### Game End (to players)
+
+```json
+{
+  "type": "GAME_END",
+  "time": "3:14",
+  "numCorrect": "0",
+  "answer": [t,f,t,f],
+  "sessLeaderboard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ],
+  "globalLeaderoard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ]
+}
+```
+---
+### Game End (to host)
+
+```json
+{
+  "type": "GAME_STARTED"
+}
+```
 ## Rationale Summary
 
 - **Single-use Tokens:** WebSocket clients authenticate once; tokens aren't reused in each message.

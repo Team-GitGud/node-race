@@ -1,15 +1,42 @@
 <template>
-  <!-- Example on how to create a router-link
-  <router-link to="/">Home</router-link> -->
-
-  <router-view/>
+	<AlertComponent />
+	<Transition name="fade">
+		<LoadingScreen v-if="isLoading" />
+	</Transition>
+	<router-view/>
 </template>
+
+<script lang="ts" setup>
+import LoadingScreen from './components/LoadingScreen.vue';
+import APIManager from './types/APIManager';
+import AlertComponent from './components/AlertComponent.vue';
+
+const isLoading = APIManager.getInstance().getIsLoading();
+</script>
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
+}
+
+.fade-enter-active {
+  transition: none !important; /* No transition on enter */
+}
+.fade-enter-from {
+  opacity: 1 !important;       /* Instantly visible */
+}
+.fade-enter-to {
+  opacity: 1;
+}
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+.fade-leave-from {
+  opacity: 1;
+}
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

@@ -23,14 +23,14 @@
             ref="nodeBtn"
             @click="handleClick"
             :class="{ 
-                'selected': selectedOrder[node.id] !== -1, 
-                'duplicate': Object.values(selectedOrder).filter(v => v === selectedOrder[node.id]).length > 1,
-                'incorrect': result === false,
-                'correct': result === true
+                'selected': selectedOrder.has(node.id), 
+                'duplicate': Array.from(selectedOrder.values()).filter(v => v === selectedOrder.get(node.id)).length > 1,
+                'incorrect': result !== null && selectedOrder.get(node.id) != correctOrder.get(node.id),
+                'correct': result !== null && selectedOrder.get(node.id) == correctOrder.get(node.id)
             }"
         >
-            <span v-if="selectedOrder[node.id] !== -1">
-                {{ selectedOrder[node.id] }}
+            <span v-if="selectedOrder.has(node.id)">
+                {{ Number(selectedOrder.get(node.id)) + 1 }} <!-- +1 because the backend is 0-indexed -->
             </span>
         </button>
         <div class="children" ref="childrenContainer">
@@ -38,6 +38,7 @@
                 v-if="node.leftChild"
                 :node="node.leftChild"
                 :selectedOrder="selectedOrder"
+                :correctOrder="correctOrder"
                 :result="result"
                 @select="emitSelect"
             />
@@ -45,6 +46,7 @@
                 v-if="node.rightChild"
                 :node="node.rightChild"
                 :selectedOrder="selectedOrder"
+                :correctOrder="correctOrder"
                 :result="result"
                 @select="emitSelect"
             />
@@ -54,33 +56,35 @@
 
 <script lang="ts" setup>
 import { defineProps, defineEmits, ref, onMounted, watch, nextTick } from 'vue';
-import { Node } from '@/types/Node';
+import { Node } from '@/types/tree/Node';
 
 const props = defineProps<{
     node: Node;
-    selectedOrder: Record<string, number>;
+    selectedOrder: Map<number, number>;
+    correctOrder: Map<number, number>;
     result: boolean | null;
 }>();
 
 const emit = defineEmits<{
-    (e: 'select', newOrder: Record<string, number>): void;
+    (e: 'select', newOrder: Map<number, number>): void;
 }>();
 
 function handleClick() {
-    let newOrder = { ...props.selectedOrder };
-    const current = newOrder[props.node.id];
-    if (current === -1) {
-        const max = Math.max(...Object.values(newOrder), 0);
-        newOrder[props.node.id] = max + 1;
-    } else if (current >= Object.keys(newOrder).length) {
-        newOrder[props.node.id] = 1;
+    const newOrder = new Map(props.selectedOrder);
+    const current = newOrder.get(props.node.id);
+    
+    if (current === undefined) {
+        // Node hasn't been selected yet, add it to the next position
+        const nextPosition = newOrder.size;
+        newOrder.set(props.node.id, nextPosition);
     } else {
-        newOrder[props.node.id] = current + 1;
+        // Node already selected, remove it
+        newOrder.delete(props.node.id);
     }
     emit('select', newOrder);
 }
 
-function emitSelect(newOrder: Record<string, number>) {
+function emitSelect(newOrder: Map<number, number>) {
     emit('select', newOrder);
 }
 

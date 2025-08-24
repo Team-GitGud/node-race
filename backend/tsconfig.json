@@ -5,11 +5,11 @@
         "outDir": "./dist", // Output directory for compiled JavaScript
         "rootDir": "./src",  // Root directory for TypeScript source files
         "strict": true,
-        "noEmit": true, // required for following line
-        "allowImportingTsExtensions": true, // Allows us to use typescript modules which is mildly important
+        "noEmit": false, // Allow TypeScript to emit compiled JavaScript files
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "forceConsistentCasingInFileNames": true
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true
     },
       "include": ["src/**/*.ts"], // Include all .ts files in the src directory
       "exclude": ["node_modules"]
