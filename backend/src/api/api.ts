@@ -123,7 +123,7 @@ export class api {
                 break;
 
             case ("GET_LEADERBOARD"):
-                this.getAllPlayers(message, ws);
+                this.getLeaderboard(message, ws);
                 break;
 
             case ("SUBMIT_ANSWER"):
