@@ -1,30 +1,27 @@
 <template>
     <div class="question-view">
-        <img @click="() => $router.push('/')" class="logo" :src="Logo" alt="Logo"/>
+        <Logo />
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
-        <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
+        <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
+            class="navigate-left-icon" />
         <div class="tree-container">
-            <TreeNode
-                v-if="currentQuestion"
-                :node="currentQuestion.root"
-                :selectedOrder="selectedOrder"
-                :correctOrder="currentQuestion.correctOrder"
-                :result="result"
-                @select="handleSelect"
-                style="margin-top: 0px;"
-            />
+            <TreeNode v-if="currentQuestion" :node="currentQuestion.root" :selectedOrder="selectedOrder"
+                :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect"
+                style="margin-top: 0px;" />
         </div>
-        <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight" alt="Navigate Right" class="navigate-right-icon"/>
+        <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight"
+            alt="Navigate Right" class="navigate-right-icon" />
         <div class="bottom-right-buttons">
             <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
                 <h3>Submit</h3>
             </CustomButton>
             <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="false">
-                <img :src="ResetIcon" alt="Reset" class="btn-img"/>
+                <img :src="ResetIcon" alt="Reset" class="btn-img" />
             </CustomButton>
         </div>
         <div class="bottom-left-buttons">
-            <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')" type="neutral" :disabled="false">
+            <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')"
+                type="neutral" :disabled="false">
                 <h3>Questions</h3>
             </CustomButton>
         </div>
@@ -50,8 +47,8 @@ import { usePlayerSession } from '@/types/usePlayerSession';
 import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
-import Logo from '@/assets/logo.png';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
+import Logo from '@/components/LogoComponent.vue';
 
 const router = useRouter();
 const gameTimer = ref<GameTimer | null>(null);
@@ -68,7 +65,7 @@ const selectedOrder = ref<Map<number, number>>(new Map());
 
 // We make this null to indicate the result hasn't been checked yet.
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
-const result = ref<boolean|null>(null);
+const result = ref<boolean | null>(null);
 
 const handleSelect = (newOrder: Map<number, number>) => {
     selectedOrder.value = newOrder;
@@ -119,7 +116,7 @@ const answeredAllQuestions = async () => {
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         const answers = session.getAnswers();
-        
+
         // Check if all previous questions (0 to currentIndex-1) have been answered
         for (let i = 0; i < questions.value.length; i++) {
             if (answers[i] === undefined) {
@@ -180,11 +177,16 @@ h2 {
     margin-top: 40px;
     padding: 0 20px 10px 20px;
     border-bottom: 2px solid var(--text-color);
-    white-space: normal; /* Allow text to wrap */
-    word-wrap: break-word; /* Break long words if needed */
-    max-width: 45vw; /* Limit width to prevent overflow */
-    text-align: center; /* Center the text */
-    line-height: 1.2; /* Tighter line height for better wrapping */
+    white-space: normal;
+    /* Allow text to wrap */
+    word-wrap: break-word;
+    /* Break long words if needed */
+    max-width: 45vw;
+    /* Limit width to prevent overflow */
+    text-align: center;
+    /* Center the text */
+    line-height: 1.2;
+    /* Tighter line height for better wrapping */
 }
 
 /* Tree Container */
@@ -268,5 +270,4 @@ h2 {
     align-items: center;
     justify-content: center;
 }
-
 </style>
