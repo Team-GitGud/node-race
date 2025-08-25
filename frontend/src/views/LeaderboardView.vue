@@ -88,8 +88,8 @@ onMounted(() => {
 }
 
 .left {
-    width: 35%;
-    height: 60vh;
+    width: 450px;
+    height: 520px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -98,22 +98,17 @@ onMounted(() => {
 }
 
 .right {
-    width: 35%;
-    height: 60vh;
+    width: 450px;
+    height: 520px;
     box-sizing: border-box;
 }
 
-/*
-    Left has 60vh, so I'll assign 20vh to this, and 40vh to the answers.
-*/
 .player-rank {
-    flex: 2;
     width: 100%;
-    min-height: 0;
+    padding: 1% 6%;
 }
 
 .player-answers {
-    flex: 4;
     display: flex;
     flex-direction: column;
     width: 100%;

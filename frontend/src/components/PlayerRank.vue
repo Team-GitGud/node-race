@@ -24,15 +24,13 @@
 
 <style scoped>
 .player-rank {
-    width: 100%;
-    height: 100%;
-
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    padding: 5% 10%;
     box-sizing: border-box;
+    width: 100%;
+    height: 160px;
 }
 
 
