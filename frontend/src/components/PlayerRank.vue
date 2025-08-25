@@ -1,24 +1,45 @@
 <template>
-    <div class="player-rank">
+    <div class="player-rank" v-if="session && session instanceof PlayerSession">
         <div class="row-one">
             <div class="rank">
                 <span class="rank-number">1.</span>
-                <span>Alan</span>
+                <span>{{ session.getPlayer().getNickname() }}</span>
             </div>
             <span>5000</span>
         </div>
         <div class="row-two">
-            <span>Total Time:</span>
-            <span>00:00</span>
+            <span>Total Time Spent:</span>
+            <span>{{ formattedTime }}</span>
         </div>
         <div class="row-three">
             <span>Number Correct:</span>
-            <span>5/5</span>
+            <span>{{session.getAnswers().filter(answer => answer).length}}/{{ session.getQuestions().length }}</span>
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
+import { defineProps, computed, ref, onMounted } from "vue";
+import { Session } from "@/types/Session";
+import { PlayerSession } from "@/types/PlayerSession";
+
+const timeSpent = ref();
+
+const props = defineProps<{
+    session: Session;
+}>();
+
+const formattedTime = computed(() => {
+    const minutes = Math.floor(timeSpent.value / 60);
+    const seconds = timeSpent.value % 60;
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+});
+
+onMounted(() => {
+    if (props.session instanceof PlayerSession) {
+        timeSpent.value = (60 * 5) - (props.session.getGameTimer()?.getTimeLeft() ?? 0);
+    }
+});
 
 </script>
 

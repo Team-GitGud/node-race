@@ -210,7 +210,9 @@ nickname, score, questions
 ```json
 {
   "action": "GET_LEADERBOARD",
-  lobbyId: "ajsdlf"
+  data: {
+    lobbyId: "ajsdlf"
+  }
 }
 ```
 #### response
@@ -238,6 +240,28 @@ nickname, score, questions
   }
 }
 ```
+
+### Get a player score (Player only) 
+```json
+{
+    "action": "GET_SCORE",
+    "data": {
+        "playerId": "asdfgh"
+    }
+}
+```
+#### Response
+
+```json
+{
+    "type": "SCORE",
+    "data": {
+        "score": 12345
+        "rank": 2
+    }
+}
+```
+
 
 ----
 

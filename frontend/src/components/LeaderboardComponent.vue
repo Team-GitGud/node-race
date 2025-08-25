@@ -19,8 +19,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, defineProps } from 'vue';
 import { Player } from '@/types/Player';
+
+const props = defineProps<{
+    players: Player[];
+}>();
 
 const currentPlayers = ref<Player[]>([]);
 const localPlayers = ref<Player[]>([]);
@@ -28,49 +32,16 @@ const globalPlayers = ref<Player[]>([]);
 const viewLocal = ref(true);
 
 onMounted(() => {
-    currentPlayers.value = [
-        new Player("1", "John Doe", 100),
-        new Player("2", "Jane Smith", 90),
-        new Player("3", "Jim Beam", 80),
-        new Player("4", "John Doe", 70),
-        new Player("5", "Jane Smith", 60),
-        new Player("6", "Jim Beam", 50),
-        new Player("7", "John Doe", 40),
-        new Player("8", "Jane Smith", 30),
-        new Player("9", "Jim Beam", 20),
-        new Player("10", "John Doe", 10),
-    ]
-    localPlayers.value = [
-        new Player("1", "John Doe", 100),
-        new Player("2", "Jane Smith", 70),
-        new Player("3", "Jim Beam", 60),
-        new Player("4", "John Doe", 70),
-        new Player("5", "Jane Smith", 40),
-        new Player("6", "Jim Beam", 30),
-        new Player("7", "John Doe", 20),
-        new Player("8", "Jane Smith", 10),
-        new Player("9", "Jim Beam", 0),
-        new Player("10", "John Doe", 10),
-    ]
-    globalPlayers.value = [
-        new Player("1", "John Doe", 100),
-        new Player("2", "Jane Smith", 90),
-        new Player("3", "Jim Beam", 80),
-        new Player("4", "John Doe", 70),
-        new Player("5", "Jane Smith", 60),
-        new Player("6", "Jim Beam", 50),
-        new Player("7", "John Doe", 40),
-        new Player("8", "Jane Smith", 30),
-        new Player("9", "Jim Beam", 20),
-        new Player("10", "John Doe", 10),
-    ]
-    currentPlayers.value.sort((a, b) => b.score - a.score);
+    // TODO: Actually get the local and global.
+    currentPlayers.value = props.players;
+    localPlayers.value = props.players;
+    globalPlayers.value = props.players;
 });
 
 const setCurrentPlayers = (players: Player[]) => {
     currentPlayers.value = players;
     currentPlayers.value.sort((a, b) => b.score - a.score);
-    viewLocal.value = players === localPlayers.value;
+    viewLocal.value = !viewLocal.value;
 }
 
 const chooseColour = (index: number) => {

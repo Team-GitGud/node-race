@@ -1,23 +1,23 @@
 <template>
     <ScreenBackground blur />
     <Logo />
-    <div class="leaderboard-view">
+    <div class="leaderboard-view" v-if="session && !isLoading">
         <h1 class="leaderboard-title">Leaderboard</h1>
         <div class="leaderboard-info">
             <div class="left">
                 <div class="player-rank border">
-                    <PlayerRank />
+                    <PlayerRank :session="session" />
                 </div>
-                <div class="player-answers">
+                <div class="player-answers" v-if="playerAnswers && questions">
                     <h2>Your Answers:</h2>
-                    <div v-if="session" class="answer-cards">
-                        <LeaderboardQuestionCard v-for="question in session.getQuestions()" :key="question.id"
-                            :question="question" />
+                    <div class="answer-cards">
+                        <LeaderboardQuestionCard v-for="question in questions" :key="question.id" :question="question"
+                            :answerTime="session.getAnswerTimes(question.id)" />
                     </div>
                 </div>
             </div>
-            <div class="right border">
-                <LeaderboardComponent />
+            <div class="right border" v-if="players">
+                <LeaderboardComponent :players="players" />
             </div>
         </div>
     </div>
@@ -33,32 +33,36 @@ import { HostSession } from "@/types/HostSession";
 import Logo from "@/components/LogoComponent.vue";
 import LeaderboardQuestionCard from "@/components/LeaderboardQuestionCard.vue";
 import LeaderboardComponent from "@/components/LeaderboardComponent.vue";
+import APIManager from "@/types/APIManager";
+import { Session } from "@/types/Session";
+import { Question } from "@/types/Question";
+import { Player } from "@/types/Player";
+import { useRouter } from "vue-router";
 
-const playerRank = ref();
-const playerRanks = ref();
-const playerAnswers = ref();
-const session = ref<PlayerSession>();
+const router = useRouter();
+const session = ref<any>(null); // Kinda risky, but it works.
+const playerRank = ref<number>();
+const players = ref<Player[]>();
+const playerAnswers = ref<boolean[]>();
+const questions = ref<Question[]>();
+const isLoading = ref(true);
 
-onMounted(() => {
-    const mockSession = {
-        getQuestions: () => [
-            { id: 0, title: "Question 1", answerStatus: true },
-            { id: 1, title: "Question 2", answerStatus: false },
-            { id: 2, title: "Question 3", answerStatus: true },
-            { id: 3, title: "Question 3", answerStatus: true },
-            { id: 4, title: "Question 3", answerStatus: true },
-            { id: 4, title: "Question 3", answerStatus: true },
-            { id: 3, title: "Question 3", answerStatus: true },
-            { id: 4, title: "Question 3", answerStatus: true },
-            { id: 4, title: "Question 3", answerStatus: true },
-        ],
-        getAnswers: () => [true, false, true],
-        getPlayer: () => ({
-            getId: () => "player123",
-            getNickname: () => "TestPlayer",
-        }),
-    };
-    session.value = mockSession as any;
+onMounted(async () => {
+    const sessionData: Session | null = await APIManager.getInstance().getSession();
+    if (sessionData === null) {
+        alert("No session found");
+        router.push("/");
+        return;
+    }
+    console.log("Sending leaderboard")
+    await sessionData.fetchLeaderboard();
+    session.value = sessionData;
+    players.value = sessionData.getLeaderboard();
+    if (sessionData instanceof PlayerSession) {
+        playerAnswers.value = sessionData.getAnswers();
+        questions.value = sessionData.getQuestions();
+    }
+    isLoading.value = false;
 });
 </script>
 

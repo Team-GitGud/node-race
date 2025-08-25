@@ -34,7 +34,7 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { ref, computed, onMounted, watch, withDefaults, defineProps } from 'vue';
+import { ref, computed, onMounted, watch, withDefaults, defineProps, onUnmounted } from 'vue';
 import { Question } from '@/types/Question';
 import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
@@ -62,6 +62,7 @@ const props = withDefaults(defineProps<Props>(), {
 // Reactive data
 const { questions } = usePlayerSession();
 const selectedOrder = ref<Map<number, number>>(new Map());
+const startTime = ref(0);
 
 // We make this null to indicate the result hasn't been checked yet.
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
@@ -69,6 +70,7 @@ const result = ref<boolean | null>(null);
 
 const handleSelect = (newOrder: Map<number, number>) => {
     selectedOrder.value = newOrder;
+    console.log("New Order", selectedOrder.value);
 };
 
 const resetOrder = () => {
@@ -81,6 +83,7 @@ const checkAnswer = async () => {
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         session.addAnswer(props.questionIndex, result.value ?? false);
+        console.log("Order", selectedOrder.value);
         session.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
     }
 
@@ -90,6 +93,9 @@ const checkAnswer = async () => {
         if (!session || !(session instanceof PlayerSession)) {
             return;
         }
+        console.log("Setting answer time", startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
+        session.setAnswerTime(props.questionIndex, startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
+        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
@@ -144,6 +150,7 @@ onMounted(async () => {
     if (session && session instanceof PlayerSession) {
         questions.value = session.getQuestions();
         gameTimer.value = session.getGameTimer();
+        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
     }
     selectedOrder.value = new Map();
     result.value = null;
@@ -152,6 +159,10 @@ onMounted(async () => {
 watch(currentQuestion, () => {
     selectedOrder.value = new Map();
     result.value = null;
+});
+
+watch(selectedOrder, () => {
+    console.log("Selected Order", selectedOrder.value);
 });
 
 const nextQuestion = () => {
