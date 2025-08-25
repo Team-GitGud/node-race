@@ -9,7 +9,7 @@
                     <PlayerRank />
                 </div>
                 <div class="player-answers">
-                    <h2>Your Answer</h2>
+                    <h2>Your Answers:</h2>
                     <div v-if="session" class="answer-cards">
                         <LeaderboardQuestionCard v-for="question in session.getQuestions()" :key="question.id"
                             :question="question" />
@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div class="right border">
-
+                <LeaderboardComponent />
             </div>
         </div>
     </div>

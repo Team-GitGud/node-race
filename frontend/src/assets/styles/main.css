@@ -9,6 +9,12 @@
   --background-color: #00081a;
   --text-color: #ffff;
   --disabled: #666666;
+
+  /* Rank Colours */
+  --gold-color: #ffd700;
+  --silver-color: #c0c0c0;
+  --bronze-color: #cd7f32;
+  --participation-color: #fff;
 }
 
 * {

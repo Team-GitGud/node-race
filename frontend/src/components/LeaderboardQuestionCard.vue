@@ -6,9 +6,8 @@
             <span class="timer">
                 <h3>00:00</h3>
             </span>
-            <span>
-                Tick
-            </span>
+            <img class="icon" :src="CorrectIcon" alt="Correct" v-if="question.answerStatus === true" />
+            <img class="icon" :src="IncorrectIcon" alt="Incorrect" v-if="question.answerStatus === false" />
         </div>
     </div>
 </template>
@@ -16,6 +15,8 @@
 <script lang="ts" setup>
 import { Question } from '@/types/Question';
 import { defineProps } from 'vue';
+import CorrectIcon from '@/assets/correct.svg';
+import IncorrectIcon from '@/assets/incorrect.svg';
 
 const props = defineProps<{
     question: Question;
@@ -38,6 +39,7 @@ h3 {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: flex-end;
     gap: 30px;
 }
 
@@ -47,5 +49,9 @@ h3 {
 
 .incorrect {
     border-color: var(--negative-color);
+}
+
+.icon {
+    width: 20px;
 }
 </style>

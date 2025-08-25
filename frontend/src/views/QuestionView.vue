@@ -164,37 +164,29 @@ const previousQuestion = () => {
 
 </script>
 <style scoped>
-/* Layout */
 .question-view {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Header */
 h2 {
     font-size: 64px;
     margin-top: 40px;
     padding: 0 20px 10px 20px;
     border-bottom: 2px solid var(--text-color);
     white-space: normal;
-    /* Allow text to wrap */
     word-wrap: break-word;
-    /* Break long words if needed */
+    /* Change this to make text wrap earlier or later. */
     max-width: 45vw;
-    /* Limit width to prevent overflow */
     text-align: center;
-    /* Center the text */
     line-height: 1.2;
-    /* Tighter line height for better wrapping */
 }
 
-/* Tree Container */
 .tree-container {
     margin-top: 5vh;
 }
 
-/* Navigation Icons */
 .navigate-left-icon,
 .navigate-right-icon {
     position: absolute;
@@ -214,8 +206,6 @@ h2 {
     right: 150px;
 }
 
-
-/* Button Styling */
 .submit-button :deep(.btn-inner),
 .reset-button :deep(.btn-inner),
 .question-navigation-button :deep(.btn-inner) {
@@ -231,7 +221,6 @@ h2 {
     padding: 2px 15px;
 }
 
-/* Button Positioning */
 .bottom-right-buttons {
     position: absolute;
     bottom: 50px;
