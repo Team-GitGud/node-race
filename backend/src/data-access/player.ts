@@ -67,13 +67,11 @@ export class Player {
     }
 
     toJsonString(): string {
-        return JSON.stringify(`
-        {
+        return `{
             "name": "${this.name}",
             "id": "${this.ID}",
             "score": "${this.score}"
-        }
-        `);
+        }`;
     }
 
 }
