@@ -1,6 +1,8 @@
 <template>
+    <ScreenBackground blur />
     <!-- Host View -->
     <div class="host-view">
+        
 
         <!-- Logo -->
         <LogoComponent />
@@ -76,6 +78,7 @@ import router from '@/router';
 import CustomButton from '@/components/CustomButton.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
+import ScreenBackground from '@/components/ScreenBackground.vue';
 
 // Types & Services
 import APIManager from '@/types/APIManager';
