@@ -17,7 +17,7 @@
                     <p class="game-code-label">Game Code:</p>
                     <CustomButton 
                         :action="copyLobbyCode" 
-                        :width="320" 
+                        :width="copyButtonWidth" 
                         :type="copyButtonType" 
                         class="copy-button"
                     >
@@ -28,13 +28,13 @@
                 <!-- Buttons -->
                 <div class="buttons">
                     <!-- Cancel/End Game button -->
-                    <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="100">
+                    <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="110">
                         {{ cancelButtonText }}
                     </CustomButton>
 
                     <!-- Start Game Button -->
                     <CustomButton :action="startGame" :type="startButtonType" class="start-button"
-                        :width="100" :disabled="startButtonDisabled">
+                        :width="110" :disabled="startButtonDisabled">
                         {{ startButtonText }}
                     </CustomButton>
                 </div>
@@ -71,7 +71,7 @@
 <script lang="ts" setup>
 
 // Vue & Core Imports
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import router from '@/router';
 
 // Components
@@ -95,6 +95,9 @@ const { lobbyCode, players, gameStarted } = useHostSession();
 // Copy Status Tracking
 type CopyStatus = 'idle' | 'success' | 'error';
 const copyStatus = ref<CopyStatus>('idle');
+
+// Screen Width Tracking for Responsive Design
+const screenWidth = ref(window.innerWidth);
 
 // ===== COMPUTED PROPERTIES =====
 
@@ -139,6 +142,16 @@ const startButtonDisabled = computed(() => {
 // Cancel button text based on game state
 const cancelButtonText = computed(() => {
     return gameStarted.value ? 'End Game' : 'Cancel';
+});
+
+// Responsive button width based on screen size
+const copyButtonWidth = computed(() => {
+    if (screenWidth.value < 550) {
+        return 230;
+    }
+    else {
+        return 410;
+    }
 });
 
 // ===== METHODS =====
@@ -201,6 +214,21 @@ const kickPlayer = async (playerId: string) => {
     }
 };
 
+// ===== LIFECYCLE HOOKS =====
+
+// Window resize listener for responsive design
+const handleResize = () => {
+    screenWidth.value = window.innerWidth;
+};
+
+onMounted(() => {
+    window.addEventListener('resize', handleResize);
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+});
+
 </script>
 
 <style scoped>
@@ -235,6 +263,8 @@ const kickPlayer = async (playerId: string) => {
     padding: 1rem;
 }
 
+
+
 .lobby-content {
     width: 100%;
     max-width: 30rem;
@@ -258,20 +288,62 @@ const kickPlayer = async (playerId: string) => {
     color: #ffffff;
 }
 
+@media (max-width: 1055px) {
+    .lobby-right {
+        max-height: 50%;
+    }
+
+    .lobby-left {
+        max-height: 50%;
+    }
+
+    .game-code-container {
+        margin-bottom: 1rem;
+    }
+}
+
+
+
 /* Copy Button */
+
 .copy-button :deep(.btn-inner) {
-    font-size: 4rem;
+    font-size: 5rem;
     padding: 1rem 2rem;
 }
 
 /* Copy Button Icon */
 .copy-button :deep(.btn-inner svg) {
-    width: 4rem;
+    width: 5rem;
     height: 4rem;
+}
+
+@media (max-width: 550px) {
+    .copy-button :deep(.btn-inner) {
+        font-size: 3rem;
+    }
+
+    .copy-button :deep(.btn-inner svg) {
+        font-size: 3rem;
+    }
+}
+
+.start-button :deep(.btn-inner) {
+    padding: 0.5rem 0.1rem;
+}
+
+.cancel-button :deep(.btn-inner) {
+    padding: 0.5rem 0.1rem;
 }
 
 .player-list-title-container {
     padding-right: 1.5rem;
+}
+
+.buttons {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 1rem;
 }
 
 
