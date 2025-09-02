@@ -65,6 +65,7 @@ export class PlayerSession extends Session {
       this.inactivityChecker.stop();
       this.inactivityChecker = null;
     }
+    this.leaveSession();
   }
 
   public handleLeaderboard(

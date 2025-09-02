@@ -207,6 +207,9 @@ export class api {
 
         const playerId: string = message.data.playerId;
         lobby.removePlayer(playerId)
+        if (!lobby.players.some(player => player.ID === playerId)) {
+            console.log("Kicked player:", playerId);
+        }
     }
 }
 

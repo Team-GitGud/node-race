@@ -2,15 +2,16 @@ import { Session } from './Session';
 import { Player } from './Player';
 import { Question } from './Question';
 import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
+import { Ref, ref } from 'vue';
 
 export class HostSession extends Session {
     hostId: string;
-    players: Player[];
+    players: Ref<Player[]>;
 
     constructor(ws: WebSocket, lobbyCode: string, hostId: string) {
         super(ws, lobbyCode);
         this.hostId = hostId;
-        this.players = [];
+        this.players = ref([]);
 
         // Set up event listeners for incoming messages
         this.addEventListener("GAME_STARTED_HOST", (data) => {
@@ -19,6 +20,31 @@ export class HostSession extends Session {
         
         this.addEventListener("SESSION_ENDED", (data) => {
             this.handleSessionEnded(data.reason);
+        });
+
+        this.addEventListener("PLAYER_JOINED", (data) => {
+            const newPlayer = new Player(data.player.playerId, data.player.username);
+            this.players.value.push(newPlayer);
+        });
+        
+        this.addEventListener("PLAYER_LEFT", (data) => {
+            this.players.value = this.players.value.filter(player => player.id !== data.playerId);
+            console.log("Player left:", data.playerId);
+        });
+
+        this.addEventListener("ALL_PLAYERS", (data) => {
+            if (data.players) {
+                const playerObjects = data.players.map((serverPlayer: any) => 
+                    new Player(serverPlayer.id, serverPlayer.name, parseInt(serverPlayer.score) || 0)
+                );
+                this.players.value = playerObjects;
+                console.log("Players updated from server:", playerObjects);
+            }
+        });
+
+        // Listen for server error messages
+        this.addEventListener("SERVER_ERROR", (data) => {
+            console.error("Server error received:", data.message);
         });
     }
 
@@ -36,46 +62,55 @@ export class HostSession extends Session {
 
     /**
      * Get the players in the session.
-     * NOT IMPLEMENTED YET.
-     * @returns Promise<Player[]>
      */
-    public getPlayers(): Promise<Player[]> {
-        return new Promise((resolve, reject) => {
-            this.ws.send(JSON.stringify({
-                type: "getPlayers",
-                hostToken: this.hostId
-            }));
-        });
+    public getPlayers(): void {
+        this.ws.send(JSON.stringify({
+            action: "GET_ALL_PLAYERS",
+            hostId: this.hostId,
+            data: {
+                lobbyId: this.lobbyCode
+            }
+        }));
     }
 
     /**
      * Start the game for all players.
-     * @returns Promise<boolean> True if the game was started successfully, false otherwise.
      */
-    public startGame(): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            this.ws.send(JSON.stringify({
-                action: "START_GAME",
-                hostId: this.hostId,
-                data: {
-                    lobbyId: this.lobbyCode,
-                }
-            }));
-            resolve(true);
-        });
+    public startGame(): void {
+        this.ws.send(JSON.stringify({
+            action: "START_GAME",
+            hostId: this.hostId,
+            data: {
+                lobbyId: this.lobbyCode,
+            }
+        }));
+        console.log("Start game request sent");
     }
 
     /**
      * Ends the game session for all players.
-     * @returns Promise<boolean> True if the session was ended successfully, false otherwise.
      */
-    public endSession(): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            this.ws.send(JSON.stringify({
-                action: "END_SESSION",
-                hostId: this.hostId,
-            }));
-            resolve(true);
-        });
+    public endSession(): void {
+        this.ws.send(JSON.stringify({
+            action: "END_SESSION",
+            hostId: this.hostId,
+        }));
+        console.log("End session request sent");
+    }
+
+    /**
+     * Kick a player from the lobby.
+     * @param playerId The ID of the player to kick
+     */
+    public kickPlayer(playerId: string): void {
+        this.ws.send(JSON.stringify({
+            action: "KICK_PLAYER",
+            hostId: this.hostId,
+            data: {
+                lobbyId: this.lobbyCode,
+                playerId: playerId
+            }
+        }));
+        console.log("Kick player request sent for:", playerId);
     }
 }

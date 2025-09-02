@@ -42,7 +42,7 @@ export class Lobby {
         }
         let p: Player = new Player(playerName, ws, this);
         this.players.push(p);
-        this.ws.send(ApiResponseFactory.playerJoinHostResponse(playerName, p.ID));
+        this.ws.send(ApiResponseFactory.playerJoinHostResponse(p.ID, playerName));
         ws.send(ApiResponseFactory.playerJoinPlayerResponse(p.ID, this.getAllPlayersJson()));
     }
 
@@ -162,7 +162,7 @@ export class Lobby {
     }
 
     getAllPlayersJson(): string {
-        return JSON.stringify(this.players.map((p: Player) => p.toJsonString()));
+        return `[${this.players.map((p: Player) => p.toJsonString()).join(',')}]`;
     }
 
     getLeaderboard() {
