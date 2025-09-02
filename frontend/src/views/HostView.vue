@@ -2,7 +2,8 @@
     <ScreenBackground blur />
     <!-- Host View -->
     <div class="host-view">
-        <ReturnHomeComponent message="Are you sure you want to return to the home page? <br/> The session will continue, but you will not be able to reconnect to it."/>
+        <ReturnHomeComponent
+            message="Are you sure you want to return to the home page? <br/> The session will continue, but you will not be able to reconnect to it." />
         <!-- Logo -->
         <LogoComponent />
 
@@ -14,13 +15,10 @@
                 <!-- Game Code Section --><!-- Game Code Section -->
                 <div class="game-code-container">
                     <p class="game-code-label">Game Code:</p>
-                    <CustomButton 
-                        :action="copyLobbyCode" 
-                        :width="copyButtonWidth" 
-                        :type="copyButtonType" 
-                        class="copy-button"
-                    >
-                        {{ lobbyCode }} &nbsp; <FontAwesomeIcon :icon="faCopy" />
+                    <CustomButton :action="copyLobbyCode" :width="copyButtonWidth" :type="copyButtonType"
+                        class="copy-button">
+                        {{ lobbyCode }} &nbsp;
+                        <FontAwesomeIcon :icon="faCopy" />
                     </CustomButton>
                 </div>
 
@@ -32,8 +30,8 @@
                     </CustomButton>
 
                     <!-- Start Game Button -->
-                    <CustomButton :action="startGame" :type="startButtonType" class="start-button"
-                        :width="110" :disabled="startButtonDisabled">
+                    <CustomButton :action="startGame" :type="startButtonType" class="start-button" :width="110"
+                        :disabled="startButtonDisabled">
                         {{ startButtonText }}
                     </CustomButton>
                 </div>
@@ -47,21 +45,13 @@
                     <h2 class="player-list-title">Players ({{ players.length }})</h2>
                 </div>
                 <div class="player-list">
-                    <div 
-                        v-for="player in players" 
-                        :key="player.id"
-                        class="player-item"
-                    >
+                    <div v-for="player in players" :key="player.id" class="player-item">
                         <span class="player-name">{{ player.nickname }}</span>
-                        <CustomButton 
-                            :action="() => kickPlayer(player.id)" 
-                            type="negative" 
-                            class="kick-button"
-                        >
+                        <CustomButton :action="() => kickPlayer(player.id)" type="negative" class="kick-button">
                             X
                         </CustomButton>
                     </div>
-                </div>  
+                </div>
             </div>
         </div>
     </div>
@@ -84,7 +74,6 @@ import ScreenBackground from '@/components/ScreenBackground.vue';
 import APIManager from '@/types/APIManager';
 import { HostSession } from '@/types/HostSession';
 import { useHostSession } from '@/types/useHostSession';
-import LogoComponent from '@/components/LogoComponent.vue';
 
 
 // ===== DATA & STATE =====

@@ -1,6 +1,5 @@
 <template>
-    <ReturnHomeComponent/>
-    <Logo />
+    <ReturnHomeComponent />
     <div class="question-view">
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
         <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
@@ -50,7 +49,6 @@ import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
-import Logo from '@/components/LogoComponent.vue';
 
 const router = useRouter();
 const gameTimer = ref<GameTimer | null>(null);

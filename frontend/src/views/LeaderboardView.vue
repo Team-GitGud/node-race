@@ -1,8 +1,7 @@
 <template>
     <ScreenBackground blur />
-    <ReturnHomeComponent message="Are you sure you want to return to the home page? <br/> You will not be able to return to this page."/>
-    <div class="leaderboard-view">
-    <Logo />
+    <ReturnHomeComponent
+        message="Are you sure you want to return to the home page? <br/> You will not be able to return to this page." />
     <div class="leaderboard-view" v-if="session && !isLoading">
         <h1 class="leaderboard-title">Leaderboard</h1>
         <div class="leaderboard-info">
