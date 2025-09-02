@@ -1,112 +1,151 @@
-import { Session } from './Session';
-import { Player } from './Player';
-import { Question } from './Question';
-import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
-import { InactivityChecker } from './InactivityChecker';
-import APIManager from './APIManager';
-import { GameTimer } from './GameTimer';
+import { Session } from "./Session";
+import { Player } from "./Player";
+import { Question } from "./Question";
+import { QuestionAdapter, BackendQuestion } from "./QuestionAdapter";
+import { InactivityChecker } from "./InactivityChecker";
+import APIManager from "./APIManager";
+import { GameTimer } from "./GameTimer";
 
 export class PlayerSession extends Session {
-    private player: Player;
-    private questions: Array<Question>;
-    private answers: Array<boolean>;
-    private gameTimer: GameTimer | null = null;
-    private inactivityChecker: InactivityChecker | null = null;
+  private player: Player;
+  private questions: Array<Question>;
+  private answers: Array<boolean>;
+  private answerTimes: Array<number>;
+  private gameTimer: GameTimer | null = null;
+  private inactivityChecker: InactivityChecker | null = null;
 
-    public constructor(ws: WebSocket, lobbyCode: string, playerId: string, nickname: string, questions: Array<BackendQuestion>) {
-        super(ws, lobbyCode);
-        this.player = new Player(playerId, nickname);
-        this.questions = QuestionAdapter.fromBackendQuestions(questions);
-        this.answers = new Array(questions.length).fill(undefined); // All questions are incorrect by default.
-        
-        // Set up event listeners for incoming messages
-        this.addEventListener("GAME_STARTED", (data) => {
-            this.handleGameStarted(data.questions);
-        });
-        
-        this.addEventListener("PLAYER_KICKED", (data) => {
-            this.handlePlayerKicked(data.reason);
-        });
+  public constructor(
+    ws: WebSocket,
+    lobbyCode: string,
+    playerId: string,
+    nickname: string,
+    questions: Array<BackendQuestion>
+  ) {
+    super(ws, lobbyCode);
+    this.player = new Player(playerId, nickname);
+    this.questions = QuestionAdapter.fromBackendQuestions(questions);
+    this.answers = new Array(questions.length).fill(undefined); // All questions are incorrect by default.
+    this.answerTimes = new Array(questions.length).fill(0);
+
+    // Set up event listeners for incoming messages
+    this.addEventListener("GAME_STARTED", (data) => {
+      this.handleGameStarted(data.questions);
+    });
+
+    this.addEventListener("PLAYER_KICKED", (data) => {
+      this.handlePlayerKicked(data.reason);
+    });
+
+    this.addEventListener("LEADERBOARD", (data) => {
+      this.handleLeaderboard(data.leaderboard);
+    });
+  }
+
+  public getPlayer(): Player {
+    return this.player;
+  }
+
+  public handleGameStarted(questions: BackendQuestion[]) {
+    this.questions = QuestionAdapter.fromBackendQuestions(questions);
+    // TODO: Handle game started for Player Session.
+    console.log("Game started with questions:", questions);
+
+    // Start inactivity checker when game starts
+    if (this.inactivityChecker) {
+      this.inactivityChecker.stop();
+    }
+    this.inactivityChecker = new InactivityChecker();
+    this.inactivityChecker.start();
+  }
+
+  public handlePlayerKicked(reason: string) {
+    console.log("Player kicked with reason:", reason);
+
+    if (this.inactivityChecker) {
+      this.inactivityChecker.stop();
+      this.inactivityChecker = null;
+    }
+    this.leaveSession();
+  }
+
+  public handleLeaderboard(
+    leaderboard: Array<{
+      rank: number;
+      name: string;
+      score: number;
+    }>
+  ) {
+    console.log("Received leaderboard", leaderboard);
+    this.leaderboard = leaderboard.map((player) => {
+      return new Player(player.rank.toString(), player.name, player.score);
+    });
+    console.log("Leaderboard", this.leaderboard);
+  }
+
+  public getQuestions(): Array<Question> {
+    return this.questions;
+  }
+
+  public getAnswers(): Array<boolean> {
+    return this.answers;
+  }
+
+  public addAnswer(questionIndex: number, answer: boolean) {
+    this.answers[questionIndex] = answer;
+  }
+  /**
+   * Leaves the session: disconnects the WebSocket and cleans up.
+   * TODO: Send a message to the backend to notify leaving the lobby.
+   */
+  public leaveSession() {
+    // TODO: Send a "LEAVE_LOBBY" message to the backend if needed
+    // Example: this.ws.send(JSON.stringify({ type: "LEAVE_LOBBY" }));
+
+    if (this.inactivityChecker) {
+      this.inactivityChecker.stop();
+      this.inactivityChecker = null;
     }
 
-    public getPlayer(): Player {
-        return this.player;
-    }
+    // Disconnect the WebSocket
+    this.disconnect();
 
-    public handleGameStarted(questions: BackendQuestion[]) {
-        this.questions = QuestionAdapter.fromBackendQuestions(questions);
-        // TODO: Handle game started for Player Session.
-        console.log("Game started with questions:", questions);
+    // Optionally, clean up session in APIManager
+    APIManager.getInstance().clearSession();
+  }
 
-        // Start inactivity checker when game starts
-        if (this.inactivityChecker) {
-            this.inactivityChecker.stop();
-        }
-        this.inactivityChecker = new InactivityChecker();
-        this.inactivityChecker.start();
-    }
+  public setGameTimer(gameTimer: GameTimer) {
+    this.gameTimer = gameTimer;
+  }
 
-    public handlePlayerKicked(reason: string) {
-        console.log("Player kicked with reason:", reason);
-        
-        if (this.inactivityChecker) {
-            this.inactivityChecker.stop();
-            this.inactivityChecker = null;
-        }
-    }
+  public getGameTimer(): GameTimer | null {
+    return this.gameTimer;
+  }
 
-    public getQuestions(): Array<Question> {
-        return this.questions;
-    }
+  public sendAnswer(
+    questionIndex: number,
+    answer: { [key: string]: number }
+  ): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      const message = JSON.stringify({
+        action: "SUBMIT_ANSWER",
+        playerId: this.player.getId(),
+        data: {
+          lobbyId: this.lobbyCode,
+          answer: answer,
+          questionNumber: questionIndex,
+        },
+      });
+      console.log(answer);
+      this.ws.send(message);
+      resolve(true);
+    });
+  }
 
-    public getAnswers(): Array<boolean> {
-        return this.answers;
-    }
+  public setAnswerTime(questionIndex: number, time: number) {
+    this.answerTimes[questionIndex] = time;
+  }
 
-    public addAnswer(questionIndex: number, answer: boolean) {
-        this.answers[questionIndex] = answer;
-    }
-    /**
-     * Leaves the session: disconnects the WebSocket and cleans up.
-     * TODO: Send a message to the backend to notify leaving the lobby.
-     */
-    public leaveSession() {
-        // TODO: Send a "LEAVE_LOBBY" message to the backend if needed
-        // Example: this.ws.send(JSON.stringify({ type: "LEAVE_LOBBY" }));
-
-        if (this.inactivityChecker) {
-            this.inactivityChecker.stop();
-            this.inactivityChecker = null;
-        }
-
-        // Disconnect the WebSocket
-        this.disconnect();
-
-        // Optionally, clean up session in APIManager
-        APIManager.getInstance().clearSession();
-    }
-
-    public setGameTimer(gameTimer: GameTimer) {
-        this.gameTimer = gameTimer;
-    }
-
-    public getGameTimer(): GameTimer | null {
-        return this.gameTimer;
-    }
-
-    public sendAnswer(questionIndex: number, answer: { [key: string]: number }): Promise<boolean> {
-        return new Promise((resolve, reject) => {
-            const message = JSON.stringify({
-                action: "SUBMIT_ANSWER",
-                playerId: this.player.getId(),
-                data: {
-                    lobbyId: this.lobbyCode,
-                    answer: answer,
-                    questionNumber: questionIndex
-                }
-            });
-            this.ws.send(message);
-            resolve(true);
-        });
-    }
+  public getAnswerTimes(questionIndex: number): number {
+    return this.answerTimes[questionIndex];
+  }
 }

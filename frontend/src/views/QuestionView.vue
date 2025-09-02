@@ -1,30 +1,28 @@
 <template>
     <ReturnHomeComponent/>
+    <Logo />
     <div class="question-view">
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
-        <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
+        <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
+            class="navigate-left-icon" />
         <div class="tree-container">
-            <TreeNode
-                v-if="currentQuestion"
-                :node="currentQuestion.root"
-                :selectedOrder="selectedOrder"
-                :correctOrder="currentQuestion.correctOrder"
-                :result="result"
-                @select="handleSelect"
-                style="margin-top: 0px;"
-            />
+            <TreeNode v-if="currentQuestion" :node="currentQuestion.root" :selectedOrder="selectedOrder"
+                :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect"
+                style="margin-top: 0px;" />
         </div>
-        <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight" alt="Navigate Right" class="navigate-right-icon"/>
+        <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight"
+            alt="Navigate Right" class="navigate-right-icon" />
         <div class="bottom-right-buttons">
             <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
                 <h3>Submit</h3>
             </CustomButton>
             <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="false">
-                <img :src="ResetIcon" alt="Reset" class="btn-img"/>
+                <img :src="ResetIcon" alt="Reset" class="btn-img" />
             </CustomButton>
         </div>
         <div class="bottom-left-buttons">
-            <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')" type="neutral" :disabled="false">
+            <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')"
+                type="neutral" :disabled="false">
                 <h3>Questions</h3>
             </CustomButton>
         </div>
@@ -37,7 +35,7 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { ref, computed, onMounted, watch, withDefaults, defineProps } from 'vue';
+import { ref, computed, onMounted, watch, withDefaults, defineProps, onUnmounted } from 'vue';
 import { Question } from '@/types/Question';
 import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
@@ -51,8 +49,8 @@ import { usePlayerSession } from '@/types/usePlayerSession';
 import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
-import Logo from '@/assets/logo.png';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
+import Logo from '@/components/LogoComponent.vue';
 
 const router = useRouter();
 const gameTimer = ref<GameTimer | null>(null);
@@ -66,13 +64,15 @@ const props = withDefaults(defineProps<Props>(), {
 // Reactive data
 const { questions } = usePlayerSession();
 const selectedOrder = ref<Map<number, number>>(new Map());
+const startTime = ref(0);
 
 // We make this null to indicate the result hasn't been checked yet.
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
-const result = ref<boolean|null>(null);
+const result = ref<boolean | null>(null);
 
 const handleSelect = (newOrder: Map<number, number>) => {
     selectedOrder.value = newOrder;
+    console.log("New Order", selectedOrder.value);
 };
 
 const resetOrder = () => {
@@ -85,6 +85,7 @@ const checkAnswer = async () => {
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         session.addAnswer(props.questionIndex, result.value ?? false);
+        console.log("Order", selectedOrder.value);
         session.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
     }
 
@@ -94,6 +95,9 @@ const checkAnswer = async () => {
         if (!session || !(session instanceof PlayerSession)) {
             return;
         }
+        console.log("Setting answer time", startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
+        session.setAnswerTime(props.questionIndex, startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
+        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
@@ -120,7 +124,7 @@ const answeredAllQuestions = async () => {
     const session = await APIManager.getInstance().getSession();
     if (session && session instanceof PlayerSession) {
         const answers = session.getAnswers();
-        
+
         // Check if all previous questions (0 to currentIndex-1) have been answered
         for (let i = 0; i < questions.value.length; i++) {
             if (answers[i] === undefined) {
@@ -148,6 +152,7 @@ onMounted(async () => {
     if (session && session instanceof PlayerSession) {
         questions.value = session.getQuestions();
         gameTimer.value = session.getGameTimer();
+        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
     }
     selectedOrder.value = new Map();
     result.value = null;
@@ -156,6 +161,10 @@ onMounted(async () => {
 watch(currentQuestion, () => {
     selectedOrder.value = new Map();
     result.value = null;
+});
+
+watch(selectedOrder, () => {
+    console.log("Selected Order", selectedOrder.value);
 });
 
 const nextQuestion = () => {
@@ -168,32 +177,29 @@ const previousQuestion = () => {
 
 </script>
 <style scoped>
-/* Layout */
 .question-view {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-/* Header */
 h2 {
     font-size: 64px;
     margin-top: 40px;
     padding: 0 20px 10px 20px;
     border-bottom: 2px solid var(--text-color);
-    white-space: normal; /* Allow text to wrap */
-    word-wrap: break-word; /* Break long words if needed */
-    max-width: 45vw; /* Limit width to prevent overflow */
-    text-align: center; /* Center the text */
-    line-height: 1.2; /* Tighter line height for better wrapping */
+    white-space: normal;
+    word-wrap: break-word;
+    /* Change this to make text wrap earlier or later. */
+    max-width: 45vw;
+    text-align: center;
+    line-height: 1.2;
 }
 
-/* Tree Container */
 .tree-container {
     margin-top: 5vh;
 }
 
-/* Navigation Icons */
 .navigate-left-icon,
 .navigate-right-icon {
     position: absolute;
@@ -213,8 +219,6 @@ h2 {
     right: 150px;
 }
 
-
-/* Button Styling */
 .submit-button :deep(.btn-inner),
 .reset-button :deep(.btn-inner),
 .question-navigation-button :deep(.btn-inner) {
@@ -230,7 +234,6 @@ h2 {
     padding: 2px 15px;
 }
 
-/* Button Positioning */
 .bottom-right-buttons {
     position: absolute;
     bottom: 50px;
@@ -269,5 +272,4 @@ h2 {
     align-items: center;
     justify-content: center;
 }
-
 </style>

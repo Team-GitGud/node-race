@@ -123,7 +123,7 @@ export class api {
                 break;
 
             case ("GET_LEADERBOARD"):
-                this.getAllPlayers(message, ws);
+                this.getLeaderboard(message, ws);
                 break;
 
             case ("SUBMIT_ANSWER"):
@@ -207,6 +207,9 @@ export class api {
 
         const playerId: string = message.data.playerId;
         lobby.removePlayer(playerId)
+        if (!lobby.players.some(player => player.ID === playerId)) {
+            console.log("Kicked player:", playerId);
+        }
     }
 }
 

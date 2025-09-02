@@ -1,76 +1,83 @@
 :root {
-    /* Colours */
-    --primary-color: #4F95D8;
-    --secondary-color: #235F9B;
-    --tertiary-color: #1C4A78;
-    --accent-color: #ffff;
-    --positive-color: #139705;
-    --negative-color: #AA0707;
-    --background-color: #00081A;
-    --text-color: #ffff;
-    --disabled: #666666;
+  /* Colours */
+  --primary-color: #4f95d8;
+  --secondary-color: #235f9b;
+  --tertiary-color: #1c4a78;
+  --accent-color: #ffff;
+  --positive-color: #139705;
+  --negative-color: #aa0707;
+  --background-color: #00081a;
+  --text-color: #ffff;
+  --disabled: #666666;
+
+  /* Rank Colours */
+  --gold-color: #ffd700;
+  --silver-color: #c0c0c0;
+  --bronze-color: #cd7f32;
+  --participation-color: #fff;
 }
 
 * {
-    /* Font */
-    font-family: "Jersey 10", sans-serif;
-    padding: 0;
-    margin: 0;
+  /* Font */
+  font-family: "Jersey 10", sans-serif;
+  padding: 0;
+  margin: 0;
 }
 
 /* General text styling */
 html {
-    color: #ffff;
-    background-color: #00081A;
+  color: #ffff;
+  background-color: #00081a;
+}
+html,
+body {
+  margin: 0;
+  padding: 0;
 }
 
-h1, h2, h3, h4, h5 {
-    font-weight: normal;
-    margin: 0;
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-weight: normal;
+  margin: 0;
 }
 
 h1 {
-    font-size: 100px;
+  font-size: 100px;
 }
 
 h2 {
-    font-size: 60px;
+  font-size: 60px;
 }
 
 h3 {
-    font-size: 40px;
+  font-size: 40px;
 }
 
 h4 {
-    font-size: 30px;
+  font-size: 30px;
 }
 
 h5 {
-    font-size: 25px;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
+  font-size: 25px;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 p {
-    font-size: 25px;
+  font-size: 25px;
 }
 
 .border {
-    border-top: 7px solid #FFF;
-    border-right: 3px solid #FFF;
-    border-bottom: 3px solid #FFF;
-    border-left: 7px solid #FFF;
+  box-sizing: border-box;
+  border-top: 7px solid #fff;
+  border-right: 3px solid #fff;
+  border-bottom: 3px solid #fff;
+  border-left: 7px solid #fff;
 }
 
 .btn-img {
-    width: 30px;
-}
-
-.logo {
-    position: absolute;
-    top: 50px;
-    left: 60px;
-    width: 70px;
-    height: 70px;
-    cursor: pointer;
+  width: 30px;
 }
