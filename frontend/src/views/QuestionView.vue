@@ -1,6 +1,6 @@
 <template>
+    <ReturnHomeComponent />
     <div class="question-view">
-        <Logo />
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
         <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
             class="navigate-left-icon" />
@@ -40,6 +40,7 @@ import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
 import TimerComponent from '@/components/TimerComponent.vue';
+import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import { GameTimer } from '@/types/GameTimer';
 import { PlayerSession } from '@/types/PlayerSession';
 import { Node } from '@/types/tree/Node';
@@ -48,7 +49,6 @@ import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
-import Logo from '@/components/LogoComponent.vue';
 
 const router = useRouter();
 const gameTimer = ref<GameTimer | null>(null);

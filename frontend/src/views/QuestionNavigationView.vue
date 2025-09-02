@@ -1,11 +1,7 @@
 <template>
+    <ScreenBackground blur/>
+    <ReturnHomeComponent/>
     <div class="question-navigation-view">
-        <CustomButton 
-            :action="() => $router.push('/')" 
-            text="Back to Home" 
-            type="neutral"
-            style="position: absolute; top: 20px; left: 20px;" 
-        />
         <h2 class="page-title">Question Navigation</h2>
         <div class="questions-container">
             <div class="question-wrapper" v-for="question in questions" :key="question.id">
@@ -17,7 +13,8 @@
 
 <script lang="ts" setup>
 import QuestionCard from '@/components/QuestionCard.vue';
-import CustomButton from '@/components/CustomButton.vue';
+import ScreenBackground from '@/components/ScreenBackground.vue';
+import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
 import { watch } from 'vue';
 
