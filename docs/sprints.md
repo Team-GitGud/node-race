@@ -83,3 +83,19 @@
   - Write progress report and prepare for presentation.
   - Polish and refine anything necessary for the report and presentation.
   - Prepare issues for next sprint, and reference in report and presentation as future work.
+- **Results:**
+  - Progress report written and submitted.
+  - Presentation prepared and delivered.
+  - Issues created for next sprint to continue development.
+
+## Sprint 8
+- **Start Date:** 03/09/2025
+- **End Date:** 10/09/2025
+- **Goals:**
+  - Finalize the tutorial popup in the frontend.
+  - Improve testing and stability of the application.
+- **Tasks:**
+  - [ ] Finishing implementation necessary APIs for the leaderboard.
+  - [ ] Implement the tutorial popup in the frontend.
+  - [ ] Prepare testing framework for the frontend and backend and start testing.
+  - [ ] Thoroughly test the entire application, create and resolve issues as necessary.
