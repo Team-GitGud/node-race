@@ -1,8 +1,6 @@
 <a id="readme-top"></a>
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Issues][issues-shield]][issues-url]
-[![Unlicense License][license-shield]][license-url]
+
 
 <!-- PROJECT LOGO -->
 <br />
@@ -21,14 +19,20 @@
     <a href="https://noderace.online">View Website</a>
   </p>
 </div>
-
 </br>
+
+<div align=center>
+  
+  [![Contributors][contributors-shield]][contributors-url] [![Issues][issues-shield]][issues-url] [![Unlicense License][license-shield]][license-url]
+  
+</div>
 
 <!-- ABOUT THE PROJECT -->
 <div align="center">
    <img src="./docs/images/question-answering.gif" alt="Demo Gif" width="720" height="480">
 </div>
 
+</br>
 </br>
 
 ## About The Project  
@@ -85,7 +89,7 @@ npm run serve
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-### Top contributors:
+### Contributors:
 
 <a href="https://github.com/othneildrew/Best-README-Template/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=Team-GitGud/node-race" alt="contrib.rocks image" />
