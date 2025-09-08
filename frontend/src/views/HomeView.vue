@@ -41,6 +41,8 @@
 				</template>
 			</ModalPopup>
 
+			<TutorialPopup />
+
 			<CustomButton shrink :action="() => $router.push('/question/0')">?</CustomButton>
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
@@ -59,6 +61,7 @@ import APIManager from '@/types/APIManager';
 import { AlertService } from '@/types/AlertService';
 import router from '@/router';
 import { ref } from 'vue';
+import TutorialPopup from '@/components/TutorialPopup.vue';
 
 async function handleHostClick() {
 	if (await APIManager.getInstance().createSession()) {
