@@ -49,7 +49,7 @@
   - [X] Setup hosting and joining backend endpoints.
   - [X] Prepared question navigation view in the frontend.
   - [X] Finalize question generation and work on the game logic in the backend.
-  - [ ] Finalize frontend and backend hosting.
+  - [X] Finalize frontend and backend hosting.
   - [X] Applying general styles and themes across the frontend.
 
 ## Sprint 5
@@ -60,7 +60,42 @@
   - Progressing with frontend pages and polishing/refining backend.
   - Start preparing database connection to backend.
 - **Tasks:**
-  - [ ] Create API Manager to handle API requests and responses from the frontend to the backend.
-  - [ ] Create the Host and Join pages in the frontend.
-  - [ ] Refine/polish backend code and ensure endpoints are functional and ready.
-  - [ ] Start working on the database logic for storing global leaderboard.
+  - [X] Create API Manager to handle API requests and responses from the frontend to the backend.
+  - [X] Create the Host and Join pages in the frontend.
+  - [X] Refine/polish backend code and ensure endpoints are functional and ready.
+  - [X] Start working on the database logic for storing global leaderboard.
+
+## Sprint 6
+- **Start Date:** 22/08/2025
+- **End Date:** 25/08/2025
+- **Goals:**
+  - Hackathon style weekend to finalize an MVP for the project.
+- **Results:**
+  - See list of 30+ issues resolved during the weekend.
+  - Fully playable game from start to finish.
+  - Deployed and hosted on a self-hosted server.
+  - Majority of must-have features implemented.
+
+## Sprint 7
+- **Start Date:** 25/08/2025
+- **End Date:** 2/09/2025
+- **Goals:**
+  - Write progress report and prepare for presentation.
+  - Polish and refine anything necessary for the report and presentation.
+  - Prepare issues for next sprint, and reference in report and presentation as future work.
+- **Results:**
+  - Progress report written and submitted.
+  - Presentation prepared and delivered.
+  - Issues created for next sprint to continue development.
+
+## Sprint 8
+- **Start Date:** 03/09/2025
+- **End Date:** 10/09/2025
+- **Goals:**
+  - Finalize the tutorial popup in the frontend.
+  - Improve testing and stability of the application.
+- **Tasks:**
+  - [ ] Finishing implementation necessary APIs for the leaderboard.
+  - [ ] Implement the tutorial popup in the frontend.
+  - [ ] Prepare testing framework for the frontend and backend and start testing.
+  - [ ] Thoroughly test the entire application, create and resolve issues as necessary.

@@ -23,15 +23,28 @@
 					</div>
 				</template>
 				<template #footer>
-					<CustomButton :action="() => handleJoinGame()" type="positive">Connect</CustomButton>
 					<CustomButton :action="() => joinIsOpen = false" type="negative">Close</CustomButton>
+					<CustomButton :action="() => handleJoinGame()" type="positive">Connect</CustomButton>
 				</template>
 			</ModalPopup>
 	
-			<CustomButton :action="() => handleHostClick()">Host</CustomButton>
+			<CustomButton :action="() => HostisOpen = true">Host</CustomButton>
+
+			<ModalPopup title="Host a Game" v-if="HostisOpen" @close="HostisOpen = false">
+				<template #body>
+					<h4> Would you like to create a game lobby? </h4>
+				</template>
+
+				<template #footer>
+					<CustomButton :action="() => HostisOpen = false" type="negative">Close</CustomButton>
+					<CustomButton :action="() => handleHostClick()" type="positive">Host</CustomButton>
+				</template>
+			</ModalPopup>
+
 			<CustomButton shrink :action="() => $router.push('/question/0')">?</CustomButton>
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
+		<BuildInfo />
 	</div>
 </template>
 
@@ -41,6 +54,7 @@ import ConnectionStatus from '@/components/ConnectionStatus.vue';
 import CustomButton from '@/components/CustomButton.vue'
 import ModalPopup from '@/components/ModalPopup.vue';
 import TextInput from '@/components/TextInput.vue';
+import BuildInfo from '@/components/BuildInfo.vue';
 import APIManager from '@/types/APIManager';
 import { AlertService } from '@/types/AlertService';
 import router from '@/router';
@@ -55,6 +69,7 @@ async function handleHostClick() {
 }
 
 const joinIsOpen = ref<boolean>(false);
+const HostisOpen = ref<boolean>(false);
 const nicknameInput = ref<InstanceType<typeof TextInput> | null>(null);
 const codeInput = ref<InstanceType<typeof TextInput> | null>(null);
 

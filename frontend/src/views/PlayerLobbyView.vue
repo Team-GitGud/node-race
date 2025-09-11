@@ -1,7 +1,6 @@
 <template>
     <ScreenBackground blur/>
-
-    <CustomButton :action="() => $router.push('/')" style="position: absolute; top: 20px; left: 20px;">Back to Home</CustomButton>
+    <ReturnHomeComponent/>
     <h1>Lobby - {{ lobbyCode }}</h1>
     <h3>Welcome: {{ playerName }}</h3>
 
@@ -18,6 +17,12 @@
 <script lang="ts" setup>
 import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
+import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
+import router from '@/router';
+import APIManager from '@/types/APIManager';
+import { GameTimer } from '@/types/GameTimer';
+import { PlayerSession } from '@/types/PlayerSession';
+import { AlertService } from '@/types/AlertService';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
 

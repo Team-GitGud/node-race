@@ -210,7 +210,9 @@ nickname, score, questions
 ```json
 {
   "action": "GET_LEADERBOARD",
-  lobbyId: "ajsdlf"
+  data: {
+    lobbyId: "ajsdlf"
+  }
 }
 ```
 #### response
@@ -238,6 +240,28 @@ nickname, score, questions
   }
 }
 ```
+
+### Get a player score (Player only) 
+```json
+{
+    "action": "GET_SCORE",
+    "data": {
+        "playerId": "asdfgh"
+    }
+}
+```
+#### Response
+
+```json
+{
+    "type": "SCORE",
+    "data": {
+        "score": 12345
+        "rank": 2
+    }
+}
+```
+
 
 ----
 
@@ -346,6 +370,31 @@ nickname, score, questions
 
 ---
 
+
+### Game End (to players)
+
+```json
+{
+  "type": "GAME_END",
+  "time": "3:14",
+  "numCorrect": "0",
+  "answer": [t,f,t,f],
+  "sessLeaderboard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ],
+  "globalLeaderoard": [
+        {"rank": "1", "name": "Donald", "score": "10"}
+    ]
+}
+```
+---
+### Game End (to host)
+
+```json
+{
+  "type": "GAME_STARTED"
+}
+```
 ## Rationale Summary
 
 - **Single-use Tokens:** WebSocket clients authenticate once; tokens aren't reused in each message.

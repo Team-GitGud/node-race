@@ -4,12 +4,14 @@ import APIManager from './APIManager';
 import { PlayerSession } from './PlayerSession';
 import { AlertService } from './AlertService';
 import { Question } from './Question';
+import { GameTimer } from './GameTimer';
 
 export function usePlayerSession() {
     const lobbyCode = ref('');
     const playerName = ref('');
     const questions = ref<Question[]>([]);
     const router = useRouter();
+
 
     onMounted(async () => {
         const apiManager = APIManager.getInstance();
@@ -28,6 +30,12 @@ export function usePlayerSession() {
         }
 
         session.addEventListener("GAME_STARTED", () => {
+            console.log("Game started");
+            const start = new Date().getTime();
+            const fiveMinutes = 1000 * 60 * 5;
+            const gameTimer = new GameTimer(start, start + fiveMinutes);
+            session.setGameTimer(gameTimer);
+            gameTimer.start();
             router.push('/question-navigation');
         });
     });

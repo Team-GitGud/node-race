@@ -1,7 +1,7 @@
 import { WebSocket } from 'ws';
 import { Lobby } from './lobby';
 import { ApiResponseFactory } from '../api/apiResponseFactory';
-import {Timer} from "./timer";
+import { Timer } from "./timer";
 
 export class Player {
     name: string;
@@ -12,7 +12,7 @@ export class Player {
     prevQuestionTime: number;
     questionHistory: Array<Boolean> = [];
 
-    constructor(name: string, ws: WebSocket) {
+    constructor(name: string, ws: WebSocket, lobby: Lobby) {
         this.name = name;
         this.ws = ws;
         this.score = 0;
@@ -30,9 +30,9 @@ export class Player {
      * 
      * @param score 
      */
-    calculateScore(timer: Timer, correct: boolean ): void {
-        if (correct){
-            this.score = this.score + 100 + (900 * ((timer.getTime() - this.prevQuestionTime)/100));
+    calculateScore(timer: Timer, correct: boolean): void {
+        if (correct) {
+            this.score = this.score + 100 + (900 * ((timer.getTime() - this.prevQuestionTime) / 100));
         }
         this.prevQuestionTime = timer.getTime();
     }
@@ -45,10 +45,12 @@ export class Player {
         this.ws.send(ApiResponseFactory.startGamePlayerResponse(questions));
     }
 
-    endGame(): void {
-        //this.ws.send(ApiResponseFactory.endGamePlayerResponse());
+    endGame(sessionLeaderboard: string, globalLeaderoard: string, time: string): void {
+        let numCorrect: number = this.questionHistory.reduce((count, value) => value ? count + 1 : count, 0);
+        this.ws.send(ApiResponseFactory.endGamePlayerResponse(time, numCorrect + '', JSON.stringify(this.questionHistory), sessionLeaderboard, globalLeaderoard));
         this.ws.close();
     }
+    //static endGamePlayerResponse(time: string, numCorrect: string, answer: string, sessLeaderboard: string, globalLeaderoard: string): string {
 
     getPrevQuestionTime(): number {
         return this.prevQuestionTime;
@@ -65,13 +67,11 @@ export class Player {
     }
 
     toJsonString(): string {
-        return JSON.stringify(`
-        {
+        return `{
             "name": "${this.name}",
             "id": "${this.ID}",
             "score": "${this.score}"
-        }
-        `);
+        }`;
     }
 
 }

@@ -69,6 +69,7 @@ export class api {
                 this.lobbies.createLobby(ws);
                 break;
 
+
             case (ApiPaths.JOIN_LOBBY):
                 console.log("lobby join"); 
                 // Parse url urlParameters
@@ -126,7 +127,7 @@ export class api {
                 break;
 
             case ("GET_LEADERBOARD"):
-                this.getAllPlayers(message, ws);
+                this.getLeaderboard(message, ws);
                 break;
 
             case ("SUBMIT_ANSWER"):
@@ -152,7 +153,7 @@ export class api {
 
 
     static submitAnswer(message: any, ws: WebSocket): void {
-        const lobbyId = message.data.lobbyID;
+        const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
             ws.send("LobbyID not found");
@@ -210,6 +211,9 @@ export class api {
 
         const playerId: string = message.data.playerId;
         lobby.removePlayer(playerId)
+        if (!lobby.players.some(player => player.ID === playerId)) {
+            console.log("Kicked player:", playerId);
+        }
     }
 }
 
