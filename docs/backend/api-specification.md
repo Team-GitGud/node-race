@@ -225,6 +225,28 @@ nickname, score, questions
 }
 ```
 
+----
+### Get Rank
+
+#### request
+```json
+{
+  "action": "GET_RANK",
+  "playerId": "afdkjd",
+  data: {
+    lobbyId: "ajsdlf"
+  }
+}
+```
+#### response
+```json
+{
+  "type": "RANK",
+  "rank": 4
+}
+```
+
+
 ---
 
 ### Submit an answer (Player only)
