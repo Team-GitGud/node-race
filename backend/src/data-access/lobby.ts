@@ -21,6 +21,7 @@ export class Lobby {
     ws: WebSocket;
     gameLogic: GameLogic;
     lobbyManager: LobbyManager;
+    gameStarted: boolean = false;
 
     /**
      * This WebSocket is communicating with the lobby host
@@ -50,6 +51,8 @@ export class Lobby {
     * Starts a game by sending the start signal to every player in the lobby
     */
     startGame(): void {
+        if (this.gameStarted) return;
+        this.gameStarted = true;
         this.gameLogic.generateQuestions();
         this.timer.start(this.timerEndGame.bind(this), this);
         this.ws.send(ApiResponseFactory.startGameHostResponse());
@@ -114,7 +117,7 @@ export class Lobby {
     */
     static generateKey(): string {
         const length: number = 5;
-        const characters: String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const characters: String = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
         const charactersLength = characters.length;
 
         let result = '';
