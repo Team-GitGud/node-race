@@ -128,6 +128,15 @@ export class ApiResponseFactory {
         `;
     }
 
+    static getRankResponse(rank: number): string {
+        return `
+        {
+            "type:": "RANK",
+            "rank": ${rank}
+        }
+        `;
+    }
+
     static getLeaderboardResponse(leaderboard: string): string {
         return `
         {
