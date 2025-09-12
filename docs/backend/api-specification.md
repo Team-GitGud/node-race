@@ -39,7 +39,7 @@ All WebSocket connections must authenticate with their token immediately upon co
 
 ### 2. Join a Lobby
 
-- **Method:** `POST /api/v1/lobby/join?name=<username>&lobbyID=<lobbyID>`
+- **Method:** `POST /api/v1/lobby/join?name=<username>&lobbyId=<lobbyId>`
 - **Request Body:** (Empty) - parameters are passed throught the url
 - **Response:**
 ```json

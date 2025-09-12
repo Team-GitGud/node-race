@@ -2,6 +2,7 @@ export class ApiResponseFactory {
     static createLobbyResponse(lobbyCode: string, hostToken: string): String {
         return `
         {
+            "type:": "LOBBY_CREATE",
             "lobbyCode": "${lobbyCode}",
             "hostToken": "${hostToken}"
         }
@@ -11,6 +12,7 @@ export class ApiResponseFactory {
     static playerJoinPlayerResponse(playerId: string, playerArray: string): String {
         return `
         {
+            "type:": "PLAYER_JOIN_PLAYER_RESPONSE",
             "playerId": "${playerId}",
             "players": ${playerArray}
         }
@@ -81,6 +83,7 @@ export class ApiResponseFactory {
     static sessionLeaderboardGenerator(rank: string | number, name: string, score: string | number): string {
         return `
             { 
+                "type:": "SESSON_LEADERBOARD",
                 "rank": "${rank}", 
                 "name": "${name}", 
                 "score": "${score}" 
@@ -108,6 +111,7 @@ export class ApiResponseFactory {
     static playerRejoinResponse(name: string, score: string, questions: string | undefined): string {
         return `
         {
+            "type:": "PLAYER_REJOIN",
             "name": "${name}",
             "score": "${score}",
             "questions": ${questions}
@@ -118,6 +122,7 @@ export class ApiResponseFactory {
     static hostRejoinResponse(players: string): string {
         return `
         {
+            "type:": "HOST_REJOIN",
             "players": ${players}
         }
         `;
