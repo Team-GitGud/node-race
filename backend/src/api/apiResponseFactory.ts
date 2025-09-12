@@ -128,11 +128,12 @@ export class ApiResponseFactory {
         `;
     }
 
-    static getRankResponse(rank: number): string {
+    static getRankResponse(rank: number, lobbyRank: number): string {
         return `
         {
             "type:": "RANK",
-            "rank": ${rank}
+            "rank": ${rank},
+            "lobbyRank": ${lobbyRank}
         }
         `;
     }

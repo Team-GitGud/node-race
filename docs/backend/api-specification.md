@@ -242,7 +242,8 @@ nickname, score, questions
 ```json
 {
   "type": "RANK",
-  "rank": 4
+  "rank": 4,
+  "lobbyRank": 2
 }
 ```
 
