@@ -84,18 +84,16 @@ export class HostSession extends Session {
                 lobbyId: this.lobbyCode,
             }
         }));
-        console.log("Start game request sent");
     }
 
     /**
      * Ends the game session for all players.
      */
-    public endSession(): void {
+    public endGame(): void {
         this.ws.send(JSON.stringify({
-            action: "END_SESSION",
+            action: "END_GAME",
             hostId: this.hostId,
         }));
-        console.log("End session request sent");
     }
 
     /**
