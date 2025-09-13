@@ -18,7 +18,7 @@ describe('Question', () => {
 
   describe('constructor', () => {
     it('should create question with all properties', () => {
-      expect(question.id).toBe('q1');
+      expect(question.id).toBe(1);
       expect(question.title).toBe('Test Question');
       expect(question.root).toBe(rootNode);
       expect(question.correctOrder).toBe(correctOrder);
