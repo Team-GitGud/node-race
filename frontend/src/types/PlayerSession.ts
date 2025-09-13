@@ -65,7 +65,7 @@ export class PlayerSession extends Session {
       this.inactivityChecker.stop();
       this.inactivityChecker = null;
     }
-    this.leaveSession();
+    this.leaveSession(reason);
   }
 
   public handleLeaderboard(
@@ -93,11 +93,17 @@ export class PlayerSession extends Session {
   public addAnswer(questionIndex: number, answer: boolean) {
     this.answers[questionIndex] = answer;
   }
+
+  private onLeaveCallback?: (reason: string) => void;
+
+  public setOnLeaveCallback(callback: () => void) {
+    this.onLeaveCallback = callback;
+  }
   /**
    * Leaves the session: disconnects the WebSocket and cleans up.
    * TODO: Send a message to the backend to notify leaving the lobby.
    */
-  public leaveSession() {
+  public leaveSession(reason: string) {
     // TODO: Send a "LEAVE_LOBBY" message to the backend if needed
     // Example: this.ws.send(JSON.stringify({ type: "LEAVE_LOBBY" }));
 
@@ -111,6 +117,10 @@ export class PlayerSession extends Session {
 
     // Optionally, clean up session in APIManager
     APIManager.getInstance().clearSession();
+
+    if (this.onLeaveCallback) {
+      this.onLeaveCallback(reason);
+    }
   }
 
   public setGameTimer(gameTimer: GameTimer) {
