@@ -1,6 +1,7 @@
 <template>
     <ScreenBackground blur/>
-    <ReturnHomeComponent/>
+    <ReturnHomeComponent
+        :onConfirm="handleReturnHome"/>
     <h1>Lobby - {{ lobbyCode }}</h1>
     <h3>Welcome: {{ playerName }}</h3>
 
@@ -45,6 +46,14 @@ onUnmounted(() => {
         clearInterval(intervalId);
     }
 });
+
+const handleReturnHome = async () => {
+    const session: PlayerSession | null = await APIManager.getInstance().getSession() as PlayerSession;
+    if (session) {
+        session.leaveSession();
+    }
+    router.push('/');
+}
 </script>
 
 <style>

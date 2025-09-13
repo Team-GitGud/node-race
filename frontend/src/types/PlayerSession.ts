@@ -106,6 +106,11 @@ export class PlayerSession extends Session {
       this.inactivityChecker = null;
     }
 
+    this.ws.send(JSON.stringify({
+      action: "PLAYER_LEAVE",
+      playerId: this.player.getId(),
+    }));
+
     // Disconnect the WebSocket
     this.disconnect();
 

@@ -1,5 +1,6 @@
 <template>
-    <ReturnHomeComponent />
+    <ReturnHomeComponent 
+        :onConfirm="handleReturnHome"/>
     <div class="question-view">
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
         <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
@@ -171,6 +172,14 @@ const nextQuestion = () => {
 
 const previousQuestion = () => {
     router.push(`/question/${props.questionIndex - 1}`);
+}
+
+const handleReturnHome = async () => {
+    const session: PlayerSession | null = await APIManager.getInstance().getSession() as PlayerSession;
+    if (session) {
+        session.leaveSession();
+    }
+    router.push('/');
 }
 
 </script>
