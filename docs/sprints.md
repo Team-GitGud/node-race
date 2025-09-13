@@ -90,12 +90,17 @@
 
 ## Sprint 8
 - **Start Date:** 03/09/2025
-- **End Date:** 10/09/2025
+- **End Date:** 12/09/2025
 - **Goals:**
   - Finalize the tutorial popup in the frontend.
   - Improve testing and stability of the application.
-- **Tasks:**
-  - [ ] Finishing implementation necessary APIs for the leaderboard.
-  - [ ] Implement the tutorial popup in the frontend.
-  - [ ] Prepare testing framework for the frontend and backend and start testing.
-  - [ ] Thoroughly test the entire application, create and resolve issues as necessary.
+- **Results**:
+  - Tutorial popup implemented and functional.
+  - Testing framework setup the backend.
+
+## Sprint 9
+- **Start Date:** 12/09/2025
+- **End Date:** 19/09/2025
+- **Goals:**
+  - Finalize leaderboard implementation.
+  - Continue testing and improving stability of the application.
