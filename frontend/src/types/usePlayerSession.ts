@@ -36,7 +36,7 @@ export function usePlayerSession() {
             const gameTimer = new GameTimer(start, start + fiveMinutes);
             session.setGameTimer(gameTimer);
             gameTimer.start();
-            router.push('/question-navigation');
+            router.push('/question/0');
         });
     });
 
