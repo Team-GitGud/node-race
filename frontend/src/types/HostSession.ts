@@ -93,6 +93,9 @@ export class HostSession extends Session {
         this.ws.send(JSON.stringify({
             action: "END_GAME",
             hostId: this.hostId,
+            data: {
+                lobbyId: this.lobbyCode,
+            }
         }));
     }
 
