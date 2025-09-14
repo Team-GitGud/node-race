@@ -42,6 +42,22 @@ export class Database{
         return this.recentRank;
     }
 
+    /**
+     * Returns the rank of the score
+     * 
+     */
+    getPos(score: number): number{
+        for (let i = 0; i < this.data.length; i++){
+            if (this.data[i].score < score){
+                return i + 1;
+            }
+
+        }
+
+        return this.data.length +1;
+    }
+
+
     getLeaderboard(): string{
         class leaderboardResult{
             rank: number;

@@ -69,7 +69,7 @@ export class Lobby {
         this.ws.close()
         let db = new Database();
         this.players.forEach((p: Player): number => db.addData(p.getName(), p.getScore()));
-        this.players.forEach((p: Player): void => p.endGame(this.generateSessionLeaderboardJson(), this.database.getLeaderboard(), this.timer.getTime() + ''));
+        this.players.forEach((p: Player): void => p.endGame(this.generateSessionLeaderboardJson(), this.database.getLeaderboard(), this.timer.getTime() + '', this.database.getPos(p.score), this.getRank(p.ID)));
         this.players = [];
         this.lobbyManager.removeLobby(this.lobbyID);
         console.log("game end ended");
@@ -165,7 +165,24 @@ export class Lobby {
     }
 
     getLeaderboard() {
-        //TODO: implement with leaderboard
+        // Sort players first based on score
+        this.players.sort((a, b) => a.getScore() - b.getScore());
+        let playerStringArray:  string[] = [];
+        for (let index = 0; index < this.players.length; index++) {
+            playerStringArray.push(`{"rank": "${index + 1 }", "name": "${this.players[index].getName()}", "score": "${this.players[index].getScore()}"}`);
+        }
+        return JSON.stringify(playerStringArray);
+        
+    }
+
+    getRank(playerId : string){
+        this.players.sort((a, b) => a.getScore() - b.getScore());
+        let p = this.players.find((p)=> p.ID == playerId)
+        if (p != undefined){
+            return this.players.indexOf(p);
+        }
+        return -1;
+
     }
 
     updateGlobalLeaderboard(): void {
