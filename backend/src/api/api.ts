@@ -154,9 +154,9 @@ export class api {
 
         let player = lobby.getPlayer(message.playerId);
         if (player != undefined){
-            ws.send(ApiResponseFactory.getRankResponse(lobby.database.getPos(player.score)));
+            ws.send(ApiResponseFactory.getRankResponse(lobby.database.getPos(player.score), lobby.getRank(player.ID)));
         } else {
-            ws.send(ApiResponseFactory.getRankResponse(-1));
+            ws.send(ApiResponseFactory.getRankResponse(-1, -1));
         }
 
     }
@@ -169,7 +169,7 @@ export class api {
             return;
         }
 
-        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard()));
+        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard(), lobby.getLeaderboard()));
 
     }
 

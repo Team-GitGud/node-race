@@ -175,6 +175,16 @@ export class Lobby {
         
     }
 
+    getRank(playerId : string){
+        this.players.sort((a, b) => a.getScore() - b.getScore());
+        let p = this.players.find((p)=> p.ID == playerId)
+        if (p != undefined){
+            return this.players.indexOf(p);
+        }
+        return -1;
+
+    }
+
     updateGlobalLeaderboard(): void {
         //TODO: implement with leaderboard
     }
