@@ -9,13 +9,30 @@ on:
       - '.github/workflows/docker.yml'
   workflow_dispatch:
 
-concurrency:
-  group: docker-deploy-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend: ${{ steps.filter.outputs.frontend }}
+      backend: ${{ steps.filter.outputs.backend }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'frontend/**'
+              - '.github/workflows/docker.yml'
+            backend:
+              - 'backend/**'
+              - '.github/workflows/docker.yml'
+
   build-frontend:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    needs: changes
+    if: needs.changes.outputs.frontend == 'true'
+    concurrency:
+      group: docker-deploy-${{ github.ref }}-frontend
+      cancel-in-progress: true
     runs-on: [self-hosted, truenas]
     name: Build and push frontend Docker image
     steps:
@@ -43,7 +60,11 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-backend:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
+    needs: changes
+    if: needs.changes.outputs.backend == 'true'
+    concurrency:
+      group: docker-deploy-${{ github.ref }}-backend
+      cancel-in-progress: true
     runs-on: [self-hosted, truenas]
     name: Build and push backend Docker image
     steps:
