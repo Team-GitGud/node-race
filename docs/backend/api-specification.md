@@ -181,6 +181,20 @@ nickname, score, questions
   }
 }
 ```
+
+---
+
+### End the game (host only)
+
+```json
+{
+  "action": "END_GAME",
+  "hostId": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah"
+  }
+}
+```
 ----
 ### Get all players (host only)
 
@@ -236,8 +250,8 @@ nickname, score, questions
 {
   "action": "GET_RANK",
   "playerId": "afdkjd",
-  data: {
-    lobbyId: "ajsdlf"
+  "data": {
+    "lobbyId": "ajsdlf"
   }
 }
 ```
@@ -282,7 +296,7 @@ nickname, score, questions
 {
     "type": "SCORE",
     "data": {
-        "score": 12345
+        "score": 12345,
         "rank": 2
     }
 }
@@ -404,13 +418,15 @@ nickname, score, questions
   "type": "GAME_END",
   "time": "3:14",
   "numCorrect": "0",
-  "answer": [t,f,t,f],
+  "answer": [true,false,true,false],
   "sessLeaderboard": [
         {"rank": "1", "name": "Donald", "score": "10"}
     ],
   "globalLeaderoard": [
         {"rank": "1", "name": "Donald", "score": "10"}
-    ]
+    ],
+  "rank": 4,
+  "lobbyRank": 2
 }
 ```
 ---
