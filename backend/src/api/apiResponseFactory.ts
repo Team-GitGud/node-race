@@ -114,7 +114,7 @@ export class ApiResponseFactory {
             "type": "PLAYER_REJOIN",
             "name": "${name}",
             "score": "${score}",
-            "questions": ${questions}
+            "questions": ${questions == undefined ? "\"undefined\"" : questions}
         }
         `;
     }

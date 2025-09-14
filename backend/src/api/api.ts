@@ -21,7 +21,7 @@ export class api {
         this.app.use(cors({
             credentials: true
         }));
-        
+
         // health check
         this.app.get('/health', (req, res) => {
             res.status(200).json({ status: 'ok' });
@@ -35,7 +35,6 @@ export class api {
         wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
             // Deal with connection
             this.handleInitialConnection(ws, req);
-
 
             // Deal with requests
             ws.on("message", (data: RawData) => {
@@ -71,7 +70,7 @@ export class api {
 
 
             case (ApiPaths.JOIN_LOBBY):
-                console.log("lobby join"); 
+                console.log("lobby join");
                 // Parse url urlParameters
                 const playerName: string = urlParameters.name;
                 const lobbyId: string = urlParameters.lobbyId;
