@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   build-frontend:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'frontend/') || contains(github.event.head_commit.modified, '.github/workflows/docker.yml')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: [self-hosted, truenas]
     name: Build and push frontend Docker image
     steps:
@@ -43,7 +43,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   build-backend:
-    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.modified, 'backend/') || contains(github.event.head_commit.modified, '.github/workflows/docker.yml')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
     runs-on: [self-hosted, truenas]
     name: Build and push backend Docker image
     steps:
