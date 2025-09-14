@@ -168,7 +168,24 @@ export class Lobby {
     }
 
     getLeaderboard() {
-        //TODO: implement with leaderboard
+        // Sort players first based on score
+        this.players.sort((a, b) => a.getScore() - b.getScore());
+        let playerStringArray:  string[] = [];
+        for (let index = 0; index < this.players.length; index++) {
+            playerStringArray.push(`{"rank": "${index + 1 }", "name": "${this.players[index].getName()}", "score": "${this.players[index].getScore()}"}`);
+        }
+        return JSON.stringify(playerStringArray);
+        
+    }
+
+    getRank(playerId : string){
+        this.players.sort((a, b) => a.getScore() - b.getScore());
+        let p = this.players.find((p)=> p.ID == playerId)
+        if (p != undefined){
+            return this.players.indexOf(p);
+        }
+        return -1;
+
     }
 
     updateGlobalLeaderboard(): void {

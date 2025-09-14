@@ -7,6 +7,7 @@ import { LobbyManager } from '../data-access/lobbyManager';
 import { url } from 'node:inspector';
 import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
+import { Player } from '../data-access/player';
 
 
 export class api {
@@ -132,10 +133,31 @@ export class api {
             case ("SUBMIT_ANSWER"):
                 this.submitAnswer(message, ws);
                 break;
+            
+            case ("GET_RANK"):
+                this.getRank(message, ws);
+                break;
 
             default:
                 ws.send("Error: no action block found");
         }
+    }
+
+    static getRank(message: any, ws: WebSocket){
+        const lobbyId = message.data.lobbyId;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+
+        let player = lobby.getPlayer(message.playerId);
+        if (player != undefined){
+            ws.send(ApiResponseFactory.getRankResponse(lobby.database.getPos(player.score), lobby.getRank(player.ID)));
+        } else {
+            ws.send(ApiResponseFactory.getRankResponse(-1, -1));
+        }
+
     }
 
     static getLeaderboard(message: any, ws: WebSocket): void {
@@ -146,7 +168,7 @@ export class api {
             return;
         }
 
-        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard()));
+        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard(), lobby.getLeaderboard()));
 
     }
 
