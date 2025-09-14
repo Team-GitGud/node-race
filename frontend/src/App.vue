@@ -4,7 +4,7 @@
 		<LoadingScreen v-if="isLoading" />
 	</Transition>
 	<router-view/>
-</template>
+</template> 
 
 <script lang="ts" setup>
 import LoadingScreen from './components/LoadingScreen.vue';
