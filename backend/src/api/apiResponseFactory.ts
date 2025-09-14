@@ -1,25 +1,25 @@
 export class ApiResponseFactory {
-    static createLobbyResponse(lobbyCode: string, hostToken: string): String {
+    static createLobbyResponse(lobbyCode: string, hostToken: string): string {
         return `
         {
-            "type:": "LOBBY_CREATE",
+            "type": "LOBBY_CREATE",
             "lobbyCode": "${lobbyCode}",
             "hostToken": "${hostToken}"
         }
         `;
     }
 
-    static playerJoinPlayerResponse(playerId: string, playerArray: string): String {
+    static playerJoinPlayerResponse(playerId: string, playerArray: string): string {
         return `
         {
-            "type:": "PLAYER_JOIN_PLAYER_RESPONSE",
+            "type": "PLAYER_JOIN_PLAYER_RESPONSE",
             "playerId": "${playerId}",
             "players": ${playerArray}
         }
         `;
     }
 
-    static playerJoinHostResponse(playerId: string, userName: string): String {
+    static playerJoinHostResponse(playerId: string, userName: string): string {
         return `
         {
             "type": "PLAYER_JOINED",
@@ -31,7 +31,7 @@ export class ApiResponseFactory {
         `;
     }
 
-    static kickPlayerResponse(type: string, reason: string): String {
+    static kickPlayerResponse(type: string, reason: string): string {
         return `
         {
             "type": "${type}",
@@ -40,7 +40,7 @@ export class ApiResponseFactory {
         `;
     }
 
-    static playerLeftResponse(type: string, playerId: string, playerArray: string): String {
+    static playerLeftResponse(type: string, playerId: string, playerArray: string): string {
         return `
         {
             "type": "${type}",
@@ -85,7 +85,7 @@ export class ApiResponseFactory {
     static sessionLeaderboardGenerator(rank: string | number, name: string, score: string | number): string {
         return `
             { 
-                "type:": "SESSON_LEADERBOARD",
+                "type": "SESSION_LEADERBOARD",
                 "rank": "${rank}", 
                 "name": "${name}", 
                 "score": "${score}" 
@@ -113,10 +113,10 @@ export class ApiResponseFactory {
     static playerRejoinResponse(name: string, score: string, questions: string | undefined): string {
         return `
         {
-            "type:": "PLAYER_REJOIN",
+            "type": "PLAYER_REJOIN",
             "name": "${name}",
             "score": "${score}",
-            "questions": ${questions}
+            "questions": ${questions == undefined ? "\"undefined\"" : questions}
         }
         `;
     }
@@ -124,7 +124,7 @@ export class ApiResponseFactory {
     static hostRejoinResponse(players: string): string {
         return `
         {
-            "type:": "HOST_REJOIN",
+            "type": "HOST_REJOIN",
             "players": ${players}
         }
         `;
@@ -144,8 +144,7 @@ export class ApiResponseFactory {
         return `
         {
             "type": "LEADERBOARD",
-            "leaderboard": ${leaderboard},
-            "lobbyLeaderboard": ${lobbyLeaderboard} 
+            "leaderboard": ${leaderboard ?? "\"[]\""} 
         }
         `;
     }
