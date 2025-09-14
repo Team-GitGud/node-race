@@ -250,8 +250,8 @@ nickname, score, questions
 {
   "action": "GET_RANK",
   "playerId": "afdkjd",
-  data: {
-    lobbyId: "ajsdlf"
+  "data": {
+    "lobbyId": "ajsdlf"
   }
 }
 ```
@@ -296,7 +296,7 @@ nickname, score, questions
 {
     "type": "SCORE",
     "data": {
-        "score": 12345
+        "score": 12345,
         "rank": 2
     }
 }
