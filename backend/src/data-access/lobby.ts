@@ -69,7 +69,7 @@ export class Lobby {
         this.ws.close()
         let db = new Database();
         this.players.forEach((p: Player): number => db.addData(p.getName(), p.getScore()));
-        this.players.forEach((p: Player): void => p.endGame(this.generateSessionLeaderboardJson(), this.database.getLeaderboard(), this.timer.getTime() + ''));
+        this.players.forEach((p: Player): void => p.endGame(this.generateSessionLeaderboardJson(), this.database.getLeaderboard(), this.timer.getTime() + '', this.database.getPos(p.score), this.getRank(p.ID)));
         this.players = [];
         this.lobbyManager.removeLobby(this.lobbyID);
         console.log("game end ended");
