@@ -392,13 +392,15 @@ nickname, score, questions
   "type": "GAME_END",
   "time": "3:14",
   "numCorrect": "0",
-  "answer": [t,f,t,f],
+  "answer": [true,false,true,false],
   "sessLeaderboard": [
         {"rank": "1", "name": "Donald", "score": "10"}
     ],
   "globalLeaderoard": [
         {"rank": "1", "name": "Donald", "score": "10"}
-    ]
+    ],
+  "rank": 4,
+  "lobbyRank": 2
 }
 ```
 ---
