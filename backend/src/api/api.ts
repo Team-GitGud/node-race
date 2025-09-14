@@ -139,9 +139,30 @@ export class api {
                 this.getRank(message, ws);
                 break;
 
+            case ("END_GAME"):
+                this.endGame(message, ws);
+                break;            
+
             default:
                 ws.send("Error: no action block found");
         }
+    }
+
+    static endGame(message: any, ws: WebSocket){
+        const lobbyId = message.data.lobbyId;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+        
+        if (lobby.validateHost(message.hostId)){
+            lobby.endGame();
+        } else{
+            ws.send("Invalid host token");
+            return;
+        }
+
     }
 
     static getRank(message: any, ws: WebSocket){
