@@ -181,6 +181,20 @@ nickname, score, questions
   }
 }
 ```
+
+---
+
+### End the game (host only)
+
+```json
+{
+  "action": "END_GAME",
+  "hostId": "afdkjd",
+  "data": {
+    "lobbyId": "aslksah"
+  }
+}
+```
 ----
 ### Get all players (host only)
 
