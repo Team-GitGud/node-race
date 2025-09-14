@@ -132,7 +132,7 @@ export class ApiResponseFactory {
         return `
         {
             "type": "LEADERBOARD",
-            "leaderboard": ${leaderboard} 
+            "leaderboard": ${leaderboard ?? "\"[]\""} 
         }
         `;
     }
