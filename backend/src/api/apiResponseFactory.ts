@@ -128,11 +128,22 @@ export class ApiResponseFactory {
         `;
     }
 
-    static getLeaderboardResponse(leaderboard: string): string {
+    static getRankResponse(rank: number, lobbyRank: number): string {
+        return `
+        {
+            "type:": "RANK",
+            "rank": ${rank},
+            "lobbyRank": ${lobbyRank}
+        }
+        `;
+    }
+
+    static getLeaderboardResponse(leaderboard: string, lobbyLeaderboard: string): string {
         return `
         {
             "type": "LEADERBOARD",
-            "leaderboard": ${leaderboard} 
+            "leaderboard": ${leaderboard},
+            "lobbyLeaderboard": ${lobbyLeaderboard} 
         }
         `;
     }

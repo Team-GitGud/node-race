@@ -235,9 +235,35 @@ nickname, score, questions
   "type": "LEADERBOARD",
   "leaderboard": [
         {"rank": "1", "name": "Donald", "score": "10"}
+    ],
+    "lobbyLeaderboard": [
+      {"rank": "1", "name": "Ronald", "score": "9"}
     ]
 }
 ```
+
+----
+### Get Rank
+
+#### request
+```json
+{
+  "action": "GET_RANK",
+  "playerId": "afdkjd",
+  data: {
+    lobbyId: "ajsdlf"
+  }
+}
+```
+#### response
+```json
+{
+  "type": "RANK",
+  "rank": 4,
+  "lobbyRank": 2
+}
+```
+
 
 ---
 
