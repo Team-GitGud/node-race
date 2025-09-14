@@ -221,6 +221,9 @@ nickname, score, questions
   "type": "LEADERBOARD",
   "leaderboard": [
         {"rank": "1", "name": "Donald", "score": "10"}
+    ],
+    "lobbyLeaderboard": [
+      {"rank": "1", "name": "Ronald", "score": "9"}
     ]
 }
 ```
