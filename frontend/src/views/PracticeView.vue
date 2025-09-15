@@ -91,17 +91,21 @@
 <script lang="ts" setup>
 // --- Vue ---
 import { ref, type Ref } from 'vue';
+import { useRouter } from 'vue-router';
 // --- Components ---
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import CustomButton from '@/components/CustomButton.vue';
 import ModalPopup from '@/components/ModalPopup.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import { Question } from '@/types/Question';
+import { AlertService } from '@/types/AlertService';
 // --- Types and Adapters ---
 import { QuestionAdapter, BackendQuestion } from '@/types/QuestionAdapter';
 import APIManager from '@/types/APIManager';
 // --- Assets ---
 import ResetIcon from '@/assets/reset.svg';
+
+const router = useRouter();
 
 // --- State ---
 const question: Ref<Question | null> = ref(null);
@@ -145,6 +149,8 @@ function fetchQuestion() {
             }
         } catch (err) {
             console.error("Error parsing practice question:", err);
+            AlertService.alert("Failed to load practice question.");
+            router.push('/');
         } finally {
             APIManager.getInstance().setIsLoading(false);
             ws.close();
@@ -154,7 +160,9 @@ function fetchQuestion() {
     ws.onerror = () => {
         console.error("WebSocket error while fetching practice question");
         APIManager.getInstance().setIsLoading(false);
-        ws.close();
+        AlertService.alert("Failed to load practice question.");
+        router.push('/');
+        ws.close();       
     };
 }
 
