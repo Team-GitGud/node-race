@@ -140,7 +140,7 @@ export class ApiResponseFactory {
         `;
     }
 
-    static getLeaderboardResponse(leaderboard: string, lobbyLeaderboard: string): string {
+    static getLeaderboardResponse(leaderboard: string): string {
         return `
         {
             "type": "LEADERBOARD",
