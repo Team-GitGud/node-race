@@ -202,7 +202,9 @@ export class api {
             return;
         }
 
-        lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber);
+        if (!lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber)){
+            ws.send("Error processing answer either player does not exist or question already submitted");
+        }
 
     }
 
