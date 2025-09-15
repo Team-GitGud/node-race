@@ -2,6 +2,7 @@
 	<div class="home">
 		<ScreenBackground />
 		<div class="button-container">
+			<CustomButton :action="() => $router.push('/practice')">Practice</CustomButton>
 			<CustomButton :action="() => joinIsOpen = true">Join</CustomButton>
 			<ModalPopup title="Join a Game" v-if="joinIsOpen" @close="joinIsOpen = false">
 				<template #body>
