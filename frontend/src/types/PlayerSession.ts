@@ -103,7 +103,7 @@ export class PlayerSession extends Session {
    * Leaves the session: disconnects the WebSocket and cleans up.
    * TODO: Send a message to the backend to notify leaving the lobby.
    */
-  public leaveSession(reason: string) {
+  public leaveSession(reason?: string) {
     // TODO: Send a "LEAVE_LOBBY" message to the backend if needed
     // Example: this.ws.send(JSON.stringify({ type: "LEAVE_LOBBY" }));
 
@@ -113,8 +113,11 @@ export class PlayerSession extends Session {
     }
 
     this.ws.send(JSON.stringify({
-      action: "PLAYER_LEAVE",
-      playerId: this.player.getId(),
+      action: "PLAYER_LEFT",
+      data: { 
+        playerId: this.player.getId(),
+        lobbyId: this.lobbyCode,
+      }
     }));
 
     // Disconnect the WebSocket
@@ -123,7 +126,7 @@ export class PlayerSession extends Session {
     // Optionally, clean up session in APIManager
     APIManager.getInstance().clearSession();
 
-    if (this.onLeaveCallback) {
+    if (this.onLeaveCallback && reason) {
       this.onLeaveCallback(reason);
     }
   }
