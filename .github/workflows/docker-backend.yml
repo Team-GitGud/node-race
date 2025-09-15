@@ -1,11 +1,10 @@
 name: Build and push Backend Docker image
 
 on:
-  push:
-    branches: [ "main", "alexanderheffernan/docker-ci" ]
-    paths:
-      - 'backend/**'
-      - '.github/workflows/docker-backend.yml'
+  workflow_run:
+    workflows: ["Test Backend"]
+    types:
+      - completed
   workflow_dispatch:
 
 concurrency:
@@ -14,6 +13,7 @@ concurrency:
 
 jobs:
   build-backend:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: [self-hosted, truenas]
     steps:
       - name: Check out the repo
