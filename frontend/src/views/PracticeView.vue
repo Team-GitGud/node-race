@@ -52,6 +52,7 @@ import { ref, type Ref } from 'vue';
 import { Question } from '@/types/Question';
 import { Node } from '@/types/tree/Node';
 import TreeNode from '@/components/TreeNode.vue';
+import { QuestionAdapter, BackendQuestion } from '@/types/QuestionAdapter';
 import ResetIcon from '@/assets/reset.svg';
 
 const question: Ref<Question | null> = ref(null);
@@ -69,25 +70,34 @@ function fetchQuestion() {
     question.value = null;
     selectedOrder.value.clear();
     result.value = null;
-    // Create nodes
-    const node2 = new Node(2);
-    const node3 = new Node(3);
-    const node1 = new Node(1, node2, node3); // node1 is root, node2 is left, node3 is right
+    
+    const backendUrl = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000';
+    const wsProtocol = backendUrl.startsWith('https') ? 'wss' : 'ws';
+    const wsUrl = `${backendUrl.replace(/^https?/, wsProtocol)}/api/v1/practice`;
+    const ws = new WebSocket(wsUrl);
 
-    // Create correct order map
-    const correctOrder = new Map<number, number>([
-        [1, 0],
-        [2, 1],
-        [3, 2]
-    ]);
+    ws.onmessage = (event) => {
+        try {
+            let data = JSON.parse(event.data);
+            if (typeof data === 'string') {
+                data = JSON.parse(data);
+            }
+            if (data.type === 'PRACTICE_QUESTION' && data.question) {
+                // Use QuestionAdapter to convert backend question to frontend Question
+                const backendQ: BackendQuestion = data.question;
+                const questions = QuestionAdapter.fromBackendQuestions([backendQ]);
+                question.value = questions[0];
+            }
+        } catch (err) {
+            console.error("Error parsing practice question:", err);
+        }
+        ws.close();
+    };
 
-    // Create question instance
-    question.value = new Question(
-        1,
-        "Sample Question",
-        node1,
-        correctOrder
-    );
+    ws.onerror = () => {
+        console.error("WebSocket error while fetching practice question");
+        ws.close();
+    };
 }
 
 const checkAnswer = async () => {
