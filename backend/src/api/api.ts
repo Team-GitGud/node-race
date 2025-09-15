@@ -142,8 +142,27 @@ export class api {
                 this.endGame(message, ws);
                 break;
 
+            case ("PLAYER_LEFT"):
+                this.playerLeft(message, ws);
+                break;
+
             default:
                 ws.send("Error: no action block found");
+        }
+    }
+
+    static playerLeft(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyId;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyId not found");
+            return;
+        }
+
+        const playerId: string = message.data.playerId;
+        lobby.removePlayer(playerId)
+        if (!lobby.players.some(player => player.ID === playerId)) {
+            console.log("Kicked player:", playerId);
         }
     }
 
