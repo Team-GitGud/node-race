@@ -160,6 +160,8 @@ const handleCancel = async () => {
             session.endSession();
         }
     }
+    // Clear persisted game state when navigating home
+    localStorage.removeItem('host-game-started');
     // Navigate home regardless of game state
     goHome();
 };
