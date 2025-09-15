@@ -1,29 +1,23 @@
 <template>
     <!-- needs image and title & optional subtitle these should be passed as props -->
     <!-- in rectangular box -->
-    <CustomButton :shrink="true">
-        <slot>
-            <div class="tutorial-card">
-                <div class="text-content" style="padding: 10px;">
-                    <h4>{{ title }}</h4>
-                    <p v-if="subtitle">{{ subtitle }}</p>
-                </div>
-                <img v-if="image" :src="image" alt="Tutorial Preview" class="tutorial-preview"/>
-            </div>
-        </slot>
-    </CustomButton>
+    <div class="tutorial-card">
+        <div class="text-content" style="padding: 10px;">
+            <h4>{{ title }}</h4>
+            <p v-if="subtitle">{{ subtitle }}</p>
+        </div>
+        <img v-if="image" :src="image" alt="Tutorial Preview" class="tutorial-preview"/>
+    </div>
 </template>
 
 <script setup lang="ts">
 import { defineProps } from 'vue';
-import CustomButton from './CustomButton.vue';
 
 defineProps<{
     image?: string;
     title: string;
     subtitle?: string;
 }>();
-
 </script>
 
 <style scoped>
