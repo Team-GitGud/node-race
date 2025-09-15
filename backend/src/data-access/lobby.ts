@@ -21,6 +21,7 @@ export class Lobby {
     ws: WebSocket;
     gameLogic: GameLogic;
     lobbyManager: LobbyManager;
+    gameStarted: boolean = false;
 
     /**
      * This WebSocket is communicating with the lobby host
@@ -50,6 +51,8 @@ export class Lobby {
     * Starts a game by sending the start signal to every player in the lobby
     */
     startGame(): void {
+        if (this.gameStarted) return;
+        this.gameStarted = true;
         this.gameLogic.generateQuestions();
         this.timer.start(this.timerEndGame.bind(this), this);
         this.ws.send(ApiResponseFactory.startGameHostResponse());
@@ -114,7 +117,7 @@ export class Lobby {
     */
     static generateKey(): string {
         const length: number = 5;
-        const characters: String = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+        const characters: String = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
         const charactersLength = characters.length;
 
         let result = '';
@@ -124,11 +127,17 @@ export class Lobby {
         return result;
     }
 
-    removePlayer(playerID: string): void {
-        const removedPlayer: Player = this.players.filter(p => p.ID === playerID)[0];
-        this.players = this.players.filter(p => p.ID !== playerID);
+    removePlayer(playerId: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
+        this.players = this.players.filter(p => p.ID !== playerId);
 
         removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
+    }
+
+    playerLeft(playerId: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
+        this.players = this.players.filter(p => p.ID !== playerId);
         this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
@@ -167,18 +176,18 @@ export class Lobby {
     getLeaderboard() {
         // Sort players first based on score
         this.players.sort((a, b) => a.getScore() - b.getScore());
-        let playerStringArray:  string[] = [];
+        let playerStringArray: string[] = [];
         for (let index = 0; index < this.players.length; index++) {
-            playerStringArray.push(`{"rank": "${index + 1 }", "name": "${this.players[index].getName()}", "score": "${this.players[index].getScore()}"}`);
+            playerStringArray.push(`{"rank": "${index + 1}", "name": "${this.players[index].getName()}", "score": "${this.players[index].getScore()}"}`);
         }
         return JSON.stringify(playerStringArray);
-        
+
     }
 
-    getRank(playerId : string){
+    getRank(playerId: string) {
         this.players.sort((a, b) => a.getScore() - b.getScore());
-        let p = this.players.find((p)=> p.ID == playerId)
-        if (p != undefined){
+        let p = this.players.find((p) => p.ID == playerId)
+        if (p != undefined) {
             return this.players.indexOf(p);
         }
         return -1;
