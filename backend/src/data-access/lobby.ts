@@ -90,19 +90,24 @@ export class Lobby {
     /**
     * Calculates the score of a player.
     */
-    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number): void {
+    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number): boolean {
         let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
-        if (p == undefined) { return; }
+        if (p == undefined) { return false; }
+        // Just does nothing if a question 
+        if (p.questionHistory[questionNumber] != undefined){
+            return false;
+        }
         let correct = this.gameLogic.questions[questionNumber].solution
         for (let key in correct) {
             if (correct[key] != answer[key]) {
-                p.questionHistory.push(false);
+                p.questionHistory[questionNumber] = false;
                 p.calculateScore(this.timer, false);
-                return;
+                return true;
             }
         }
-        p.questionHistory.push(true);
+        p.questionHistory[questionNumber];
         p.calculateScore(this.timer, true);
+        return true;
     }
 
     /**
