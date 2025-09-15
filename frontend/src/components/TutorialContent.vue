@@ -1,29 +1,87 @@
 <template>
-    <ModalPopup :title="title" @close="$emit('close')">
-        <template #body>
-            <img class="static-example" :src="static" alt="Tutorial Static Example"/>
-        </template>
-        <template #footer>
-            <CustomButton :action="() => $emit('back')" type="neutral">Back</CustomButton>
-            <CustomButton :action="() => $emit('close')" type="negative">Close</CustomButton>
-        </template>
-    </ModalPopup>
+    <div v-if="pageIndex === 0">
+        <ModalPopup :title="title" @close="$emit('close')">
+            <template #body>
+                <div class="tutorial-body">
+                    <div class="tutorial-content">
+                        <slot />
+                        <div class="example-container">
+                            <img class="static-example" :src="static" alt="Tutorial Static Example"/>
+                        </div>
+                    </div>
+                    <img @click="pageIndex = 1" :src="NavigateRight" alt="Navigate Right" class="navigate-right-icon" />
+                </div>
+            </template>
+            <template #footer>
+                <CustomButton :action="() => $emit('back')" type="neutral">Back</CustomButton>
+                <CustomButton :action="() => $emit('close')" type="negative">Close</CustomButton>
+            </template>
+        </ModalPopup>
+    </div>
+    <div v-if="pageIndex === 1">
+        <ModalPopup :title="title" @close="$emit('close')">
+            <template #body>
+                <div class="tutorial-body">
+                    <img @click="pageIndex = 0" :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
+                    <div class="tutorial-content">
+                        <h4>Interactive Example</h4>
+                        <div class="example-container">
+                            <img class="static-example" :src="static" alt="Tutorial Static Example"/>
+                        </div>
+                    </div>
+                </div>
+            </template>
+            <template #footer>
+                <CustomButton :action="() => $emit('back')" type="neutral">Back</CustomButton>
+                <CustomButton :action="() => $emit('close')" type="negative">Close</CustomButton>
+            </template>
+        </ModalPopup>
+
+    </div>
 </template>
 
 <script setup lang="ts">
 import ModalPopup from './ModalPopup.vue';
 import CustomButton from './CustomButton.vue';
-import { defineProps } from 'vue';
+import NavigateLeft from '@/assets/navigate-left.svg';
+import NavigateRight from '@/assets/navigate-right.svg';
+import { defineProps, ref } from 'vue';
 
 defineProps<{
     title: string;
     static: string;
 }>();
 
+let pageIndex = ref(0);
 </script>
 
 <style scoped>
-.static-example {
-    width: 100%; height: auto;
+.tutorial-body {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+}
+
+.tutorial-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.example-container {
+    display: flex;
+    justify-content: center;;
+}
+
+.static-example { 
+    height: 150px;
+}
+
+.navigate-left-icon,
+.navigate-right-icon {
+    position: relative;
+    height: 40px;
+    margin-top: auto;
+    margin-bottom: auto;
+    cursor: pointer;
 }
 </style>

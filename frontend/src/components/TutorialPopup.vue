@@ -25,7 +25,11 @@
             <CustomButton :action="() => isOpen = false" type="negative">Close</CustomButton>
         </template>
     </ModalPopup>
-    <TutorialContent v-if="currentTutorial === 'DFS: Pre-order'" title="DFS: Pre-order" :static="staticDFSPre" @close="handleClose" @back="handleBack"/>
+    <TutorialContent v-if="currentTutorial === 'DFS: Pre-order'" title="DFS: Pre-order" :static="staticDFSPre" @close="handleClose" @back="handleBack">
+        <p>
+            For Pre-order Depth First Search, you follow a simple pattern. <br/>‘Visit’ the initial root/center node, then visit the left child,<br/>and finally the right child. Follow this pattern through the<br/>entire tree.
+        </p>
+    </TutorialContent>
     <TutorialContent v-if="currentTutorial === 'DFS: In-order'" title="DFS: In-order" :static="staticDFSIn" @close="handleClose" @back="handleBack"/>
     <TutorialContent v-if="currentTutorial === 'DFS: Post-order'" title="DFS: Post-order" :static="staticDFSPost" @close="handleClose" @back="handleBack"/>
     <TutorialContent v-if="currentTutorial === 'BFS'" title="BFS" :static="staticBFS" @close="handleClose" @back="handleBack"/>
@@ -60,6 +64,7 @@ function handleClose() {
 function handleBack() {
     currentTutorial.value = null;
 }
+
 </script>
 
 
