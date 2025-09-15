@@ -8,7 +8,6 @@ on:
       - '.github/workflows/docker-backend.yml'
     branches:
       - main
-      - alexanderheffernan/docker-ci
   pull_request:
     paths:
       - 'backend/**'
@@ -16,7 +15,6 @@ on:
       - '.github/workflows/docker-backend.yml'
     branches:
       - main
-      - alexanderheffernan/docker-ci
 
 jobs:
   test:
