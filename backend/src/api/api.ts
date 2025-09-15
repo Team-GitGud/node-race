@@ -133,38 +133,38 @@ export class api {
             case ("SUBMIT_ANSWER"):
                 this.submitAnswer(message, ws);
                 break;
-            
+
             case ("GET_RANK"):
                 this.getRank(message, ws);
                 break;
 
             case ("END_GAME"):
                 this.endGame(message, ws);
-                break;            
+                break;
 
             default:
                 ws.send("Error: no action block found");
         }
     }
 
-    static endGame(message: any, ws: WebSocket){
+    static endGame(message: any, ws: WebSocket) {
         const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
             ws.send("LobbyID not found");
             return;
         }
-        
-        if (lobby.validateHost(message.hostId)){
+
+        if (lobby.validateHost(message.hostId)) {
             lobby.endGame();
-        } else{
+        } else {
             ws.send("Invalid host token");
             return;
         }
 
     }
 
-    static getRank(message: any, ws: WebSocket){
+    static getRank(message: any, ws: WebSocket) {
         const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
@@ -173,7 +173,7 @@ export class api {
         }
 
         let player = lobby.getPlayer(message.playerId);
-        if (player != undefined){
+        if (player != undefined) {
             ws.send(ApiResponseFactory.getRankResponse(lobby.database.getPos(player.score), lobby.getRank(player.ID)));
         } else {
             ws.send(ApiResponseFactory.getRankResponse(-1, -1));
@@ -189,7 +189,7 @@ export class api {
             return;
         }
 
-        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard(), lobby.getLeaderboard()));
+        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard()));
 
     }
 
