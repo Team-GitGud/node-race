@@ -2,25 +2,64 @@
     <ReturnHomeComponent skipConfirm />
     <div class="question-view">
         <h2 v-if="question">{{ question.title }}</h2>
+
+        <!-- Render the question's tree structure -->
         <div class="tree-container">
-            <TreeNode v-if="question" :node="question.root" :selectedOrder="selectedOrder"
-                :correctOrder="question.correctOrder" :result="result" @select="handleSelect"
-                style="margin-top: 0px;" />
+            <TreeNode 
+                v-if="question"
+                :node="question.root"
+                :selectedOrder="selectedOrder"
+                :correctOrder="question.correctOrder"
+                :result="result"
+                @select="handleSelect"
+            />
         </div>
+
+        <!-- Action Buttons -->
         <div class="bottom-right-buttons">
-            <CustomButton class="submit-button" :action="() => handleSeeAnswer()" type="neutral" v-if="!(result === null || result === true)">
+            <!-- See Answers Button -->
+            <CustomButton 
+                class="submit-button" 
+                :action="() => handleSeeAnswer()" 
+                type="neutral" 
+                v-if="!(result === null || result === true)"
+            >
                 <h3>See Answer</h3>
             </CustomButton>
-            <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="selectedOrder.size !== question?.correctOrder.size" v-if="result === null">
+
+            <!-- Submit Button -->
+            <CustomButton 
+                class="submit-button" 
+                :action="() => checkAnswer()" 
+                type="positive" 
+                :disabled="selectedOrder.size !== question?.correctOrder.size" 
+                v-if="result === null"
+            >
                 <h3>Submit</h3>
             </CustomButton>
-            <CustomButton class="submit-button" :action="() => fetchQuestion()" type="positive" v-else>
+
+            <!-- Next Button -->
+            <CustomButton 
+                class="submit-button" 
+                :action="() => fetchQuestion()" 
+                type="positive" 
+                v-else
+            >
                 <h3>Next</h3>
             </CustomButton>
-            <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="result !== null || selectedOrder.size === 0">
+
+            <!-- Reset Button-->
+            <CustomButton 
+                class="reset-button" 
+                :action="() => resetOrder()" 
+                type="negative" 
+                :disabled="result !== null || selectedOrder.size === 0"
+            >
                 <img :src="ResetIcon" alt="Reset" class="btn-img" />
             </CustomButton>
         </div>
+
+        <!-- Modal for showing the correct answer -->
         <ModalPopup
             title="Correct Answer"
             v-if="showAnswerModal"
@@ -38,39 +77,59 @@
                 </div>
             </template>
             <template #footer>
-                <CustomButton :action="() => showAnswerModal = false" type="negative">Close</CustomButton>
+                <CustomButton 
+                    :action="() => showAnswerModal = false"
+                    type="negative"
+                >
+                    Close
+                </CustomButton>
             </template>
         </ModalPopup>
     </div>
 </template>
 
 <script lang="ts" setup>
+// --- Vue ---
+import { ref, type Ref } from 'vue';
+// --- Components ---
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import CustomButton from '@/components/CustomButton.vue';
 import ModalPopup from '@/components/ModalPopup.vue';
-import { ref, type Ref } from 'vue';
-import { Question } from '@/types/Question';
-import { Node } from '@/types/tree/Node';
 import TreeNode from '@/components/TreeNode.vue';
+import { Question } from '@/types/Question';
+// --- Types and Adapters ---
 import { QuestionAdapter, BackendQuestion } from '@/types/QuestionAdapter';
+import APIManager from '@/types/APIManager';
+// --- Assets ---
 import ResetIcon from '@/assets/reset.svg';
 
+// --- State ---
 const question: Ref<Question | null> = ref(null);
 const selectedOrder = ref<Map<number, number>>(new Map());
 const result = ref<boolean | null>(null);
-
 const showAnswerModal = ref(false);
 
+// --- Handlers ---
+/**
+ * Handles node selection in the tree.
+ * @param newOrder - Updated selection order map.
+ */
 const handleSelect = (newOrder: Map<number, number>) => {
     selectedOrder.value = newOrder;
-    console.log("New Order", selectedOrder.value);
 };
 
+/**
+ * Fetches a new practice question from the backend.
+ */
 function fetchQuestion() {
+    // Show loading screen
+    APIManager.getInstance().setIsLoading(true);
+    // Reset state
     question.value = null;
     selectedOrder.value.clear();
     result.value = null;
     
+    // Build WebSocket URL
     const backendUrl = process.env.VUE_APP_BACKEND_URL || 'http://localhost:3000';
     const wsProtocol = backendUrl.startsWith('https') ? 'wss' : 'ws';
     const wsUrl = `${backendUrl.replace(/^https?/, wsProtocol)}/api/v1/practice`;
@@ -79,41 +138,50 @@ function fetchQuestion() {
     ws.onmessage = (event) => {
         try {
             let data = JSON.parse(event.data);
-            if (typeof data === 'string') {
-                data = JSON.parse(data);
-            }
             if (data.type === 'PRACTICE_QUESTION' && data.question) {
-                // Use QuestionAdapter to convert backend question to frontend Question
+                // Convert backend question to frontend Question object
                 const backendQ: BackendQuestion = data.question;
-                const questions = QuestionAdapter.fromBackendQuestions([backendQ]);
-                question.value = questions[0];
+                question.value = QuestionAdapter.fromBackendQuestions([backendQ])[0];
             }
         } catch (err) {
             console.error("Error parsing practice question:", err);
+        } finally {
+            APIManager.getInstance().setIsLoading(false);
+            ws.close();
         }
-        ws.close();
     };
 
     ws.onerror = () => {
         console.error("WebSocket error while fetching practice question");
+        APIManager.getInstance().setIsLoading(false);
         ws.close();
     };
 }
 
+/**
+ * Checks if the selected order is correct for the current question.
+ */
 const checkAnswer = async () => {
     if (!question.value) { return; }
     result.value = question.value.isCorrect(selectedOrder.value);
 };
 
+/**
+ * Resets the selected order and result.
+ */
 const resetOrder = () => {
     selectedOrder.value.clear();
     result.value = null;
 };
 
+/**
+ * Shows the modal with the correct answer.
+ */
 const handleSeeAnswer = () => {
     showAnswerModal.value = true;
 };
 
+// Fetch the first question on mount
 fetchQuestion();
 </script>
 
