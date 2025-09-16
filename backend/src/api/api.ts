@@ -8,6 +8,7 @@ import { url } from 'node:inspector';
 import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
 import { Player } from '../data-access/player';
+import {GameLogic} from '../session-logic/gameLogic';
 
 
 export class api {
@@ -99,6 +100,11 @@ export class api {
                 } else {
                     lobbyJoin.rejoinLobby(playerId, ws);
                 }
+                break;
+
+            case (ApiPaths.PRACTICE):
+                console.log("practice");
+                ws.send(ApiResponseFactory.practiceQuestionResponse(JSON.stringify(new GameLogic().generateQuestion(false))))
                 break;
 
             default:
@@ -221,7 +227,9 @@ export class api {
             return;
         }
 
-        lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber);
+        if (!lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber)){
+            ws.send("Error processing answer either player does not exist or question already submitted");
+        }
 
     }
 
@@ -282,4 +290,5 @@ class ApiPaths {
     static CREATE_LOBBY = '/api/v1/lobby/create';
     static JOIN_LOBBY = '/api/v1/lobby/join';
     static REJOIN_LOBBY = '/api/v1/lobby/rejoin';
+    static PRACTICE = '/api/v1/practice';
 }

@@ -377,7 +377,28 @@ nickname, score, questions
   }
 }
 ```
+
 ---
+
+### Practice question (single player)
+
+```json
+{
+  "type": "PRACTICE_QUESTION",
+  "question": 
+    {
+      "tree": {
+        // Tree data structure here
+      },
+	    "solution": {
+        // solution is here
+      },
+      "questionType": "In oder BFS"
+    }
+  
+}
+```
+
 ### Player Leaves by themselves and sends a signal to the host
 
 ```json
