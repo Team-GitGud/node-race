@@ -11,7 +11,7 @@
     </div>
 
     <div class="cancel-container">
-        <CustomButton :action="() => $router.push('/')" type="negative">Cancel</CustomButton>
+        <CustomButton :action="() => handleReturnHome()" type="negative">Cancel</CustomButton>
     </div>
 </template>
 

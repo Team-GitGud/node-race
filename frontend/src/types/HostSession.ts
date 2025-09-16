@@ -42,6 +42,11 @@ export class HostSession extends Session {
             }
         });
 
+        this.addEventListener("PLAYER_LEAVE", (data) => {
+            this.players.value = this.players.value.filter(player => player.id !== data.playerId);
+            console.log("Player left via PLAYER_LEAVE:", data.playerId);
+        });
+
         // Listen for server error messages
         this.addEventListener("SERVER_ERROR", (data) => {
             console.error("Server error received:", data.message);
