@@ -132,13 +132,13 @@ export class Lobby {
         this.players = this.players.filter(p => p.ID !== playerId);
 
         removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
-        this.ws.send(ApiResponseFactory.playerLeftResponse(removedPlayer.ID, this.getAllPlayersJson()));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
-    playerLeft(playerId: string): void {
+    playerLeave(playerId: string): void {
         const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
         this.players = this.players.filter(p => p.ID !== playerId);
-        this.ws.send(ApiResponseFactory.playerLeftResponse(removedPlayer.ID, this.getAllPlayersJson()));
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEAVE", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
     validateHost(id: string): boolean {

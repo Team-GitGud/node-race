@@ -160,7 +160,7 @@ export class api {
         }
 
         const playerId: string = message.data.playerId;
-        lobby.playerLeft(playerId)
+        lobby.playerLeave(playerId)
         if (!lobby.players.some(player => player.ID === playerId)) {
             console.log("Kicked player:", playerId);
         }
