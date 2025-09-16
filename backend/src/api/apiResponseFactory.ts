@@ -45,7 +45,7 @@ export class ApiResponseFactory {
         {
             "type": "${type}",
             "playerId": "${playerId}",
-            "players": ${playerArray}
+            "players": ${playerArray.trim().length === 0 ? "[]" : playerArray}
         }
         `;
     }
