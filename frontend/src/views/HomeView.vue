@@ -42,8 +42,6 @@
 			</ModalPopup>
 
 			<TutorialPopup />
-
-			<CustomButton shrink :action="() => $router.push('/question/0')">?</CustomButton>
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
 		<BuildInfo />

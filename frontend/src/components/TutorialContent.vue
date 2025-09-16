@@ -18,15 +18,16 @@
             </template>
         </ModalPopup>
     </div>
+
     <div v-if="pageIndex === 1">
         <ModalPopup :title="title" @close="$emit('close')">
             <template #body>
                 <div class="tutorial-body">
                     <img @click="pageIndex = 0" :src="NavigateLeft" alt="Navigate Left" class="navigate-left-icon"/>
                     <div class="tutorial-content">
-                        <h4>Interactive Example</h4>
+                        <h4 style="padding: 0 45px 20px 0">Here is an animated example with a larger tree:</h4>
                         <div class="example-container">
-                            <img class="static-example" :src="static" alt="Tutorial Static Example"/>
+                            <AnimationComponent :title="title" />
                         </div>
                     </div>
                 </div>
@@ -36,13 +37,13 @@
                 <CustomButton :action="() => $emit('close')" type="negative">Close</CustomButton>
             </template>
         </ModalPopup>
-
     </div>
 </template>
 
 <script setup lang="ts">
 import ModalPopup from './ModalPopup.vue';
 import CustomButton from './CustomButton.vue';
+import AnimationComponent from './AnimationsComponent.vue';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
 import { defineProps, ref } from 'vue';
@@ -74,6 +75,7 @@ let pageIndex = ref(0);
 
 .static-example { 
     height: 150px;
+    padding-top: 10px;
 }
 
 .navigate-left-icon,

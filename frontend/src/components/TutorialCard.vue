@@ -1,6 +1,4 @@
 <template>
-    <!-- needs image and title & optional subtitle these should be passed as props -->
-    <!-- in rectangular box -->
     <div class="tutorial-card">
         <div class="text-content" style="padding: 10px;">
             <h4>{{ title }}</h4>
