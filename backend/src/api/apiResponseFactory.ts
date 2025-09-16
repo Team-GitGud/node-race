@@ -40,10 +40,10 @@ export class ApiResponseFactory {
         `;
     }
 
-    static playerLeftResponse(playerId: string, playerArray: string): string {
+    static playerLeftResponse(type: string, playerId: string, playerArray: string): string {
         return `
         {
-            "type": "PLAYER_LEFT",
+            "type": "${type}",
             "playerId": "${playerId}",
             "players": ${playerArray.trim().length === 0 ? "[]" : playerArray}
         }

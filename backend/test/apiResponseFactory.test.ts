@@ -105,7 +105,7 @@ describe("ApiResponseFactory Tests", () => {
             const playerId = "player-123";
             const playerArray = '["player1", "player2"]';
 
-            const response = ApiResponseFactory.playerLeftResponse(playerId, playerArray);
+            const response = ApiResponseFactory.playerLeftResponse(type, playerId, playerArray);
             const parsed = JSON.parse(response.trim());
 
             expect(parsed.type).toBe(type);
@@ -336,7 +336,7 @@ describe("ApiResponseFactory Tests", () => {
                 () => ApiResponseFactory.playerJoinPlayerResponse("player1", "[]"),
                 () => ApiResponseFactory.playerJoinHostResponse("player1", "user1"),
                 () => ApiResponseFactory.kickPlayerResponse("KICK", "reason"),
-                () => ApiResponseFactory.playerLeftResponse("player1", "[]"),
+                () => ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", "player1", "[]"),
                 () => ApiResponseFactory.startGamePlayerResponse("[]"),
                 () => ApiResponseFactory.startGameHostResponse(),
                 () => ApiResponseFactory.endGamePlayerResponse("0", "0", "{}", "[]", "[]", 0, 0),
