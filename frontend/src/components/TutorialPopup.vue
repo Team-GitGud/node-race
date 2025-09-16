@@ -1,5 +1,17 @@
+<!-- 
+    TutorialPopup.vue
+    A popup component that displays the tutorial used to teach users about tree traversal algorithms.
+
+    Usage: 
+    <TutorialPopup />
+
+    No props required.
+ -->
 <template>
-    <CustomButton shrink :action="() => isOpen = true">?</CustomButton>
+    <!-- Button to open the tutorial -->
+    <CustomButton shrink :action="() => isOpen = true">?</CustomButton> 
+
+    <!-- Initial tutorial selection popup -->
     <ModalPopup title="Tutorial" v-if="isOpen && currentTutorial === null" @close="isOpen = false">
         <template #body>
             <p style="padding-bottom: 15px">What do you want to learn?</p>
@@ -26,6 +38,7 @@
         </template>
     </ModalPopup>
 
+    <!-- The tutorials that are opened through clicking the cards -->
     <TutorialContent v-if="currentTutorial === 'DFS: Pre-order'" title="DFS: Pre-order" :static="staticDFSPre" @close="handleClose" @back="handleBack">
         <p>
             For Pre-order Depth First Search, you follow a simple pattern. <br/>
@@ -65,11 +78,11 @@ import ModalPopup from './ModalPopup.vue';
 import TutorialCard from './TutorialCard.vue';
 import TutorialContent from './TutorialContent.vue';
 
+// Import preview and static images for each tutorial
 import previewDFSPre from '@/assets/tutorial/DFS_pre-order_preview.png';
 import previewDFSIn from '@/assets/tutorial/DFS_in-order_preview.png';
 import previewDFSPost from '@/assets/tutorial/DFS_post-order_preview.png';
 import previewBFS from '@/assets/tutorial/BFS_preview.png';
-
 import staticDFSPre from '@/assets/tutorial/DFS_pre-order_example_static.png';
 import staticDFSIn from '@/assets/tutorial/DFS_in-order_example_static.png';
 import staticDFSPost from '@/assets/tutorial/DFS_post-order_example_static.png';
@@ -79,6 +92,7 @@ const isOpen = ref(false);
 
 const currentTutorial = ref<string | null>(null);
 
+// Functions to handle closing and going back in the tutorial
 function handleClose() {
     isOpen.value = false;
     currentTutorial.value = null;

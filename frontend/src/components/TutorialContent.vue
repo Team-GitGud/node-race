@@ -1,4 +1,17 @@
+<!-- 
+    A component to display tutorial content with navigation between two pages:
+    - Page 1: Text explanation and static image
+    - Page 2: Animated example using AnimationComponent
+
+    Usage:
+    <TutorialContent title="DFS: Pre-order" :static="staticImagePath" @close="handleClose" @back="handleBack">
+        <p>Your tutorial text here.</p>
+    </TutorialContent>
+
+    Note: The static prop should contain the imported static example image path.
+-->
 <template>
+    <!-- This contain the first page with the text and static image example -->
     <div v-if="pageIndex === 0">
         <ModalPopup :title="title" @close="$emit('close')">
             <template #body>
@@ -19,6 +32,7 @@
         </ModalPopup>
     </div>
 
+    <!-- This contain the second page with the animated example -->
     <div v-if="pageIndex === 1">
         <ModalPopup :title="title" @close="$emit('close')">
             <template #body>
