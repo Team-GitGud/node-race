@@ -67,6 +67,15 @@ export class ApiResponseFactory {
         `;
     }
 
+    static practiceQuestionResponse(question: string): string {
+        return `
+        {
+            "type": "PRACTICE_QUESTION",
+            "question": ${question}
+            
+        }`
+    }
+
     static endGamePlayerResponse(time: string, numCorrect: string, answer: string, sessLeaderboard: string, globalLeaderoard: string, rank: number, lobbyRank: number): string {
         return `
         {

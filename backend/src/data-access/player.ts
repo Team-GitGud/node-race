@@ -46,6 +46,11 @@ export class Player {
     }
 
     endGame(sessionLeaderboard: string, globalLeaderoard: string, time: string, rank: number, lobbyRank:number): void {
+        for (let i = 0; i < this.questionHistory.length; i++) {
+            if (this.questionHistory[i] == undefined){
+                this.questionHistory[i] = false;
+            }
+        }
         let numCorrect: number = this.questionHistory.reduce((count, value) => value ? count + 1 : count, 0);
         this.ws.send(ApiResponseFactory.endGamePlayerResponse(time, numCorrect + '', JSON.stringify(this.questionHistory), sessionLeaderboard, globalLeaderoard, rank, lobbyRank));
         this.ws.close();
