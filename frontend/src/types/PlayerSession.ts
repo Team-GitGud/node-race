@@ -113,7 +113,7 @@ export class PlayerSession extends Session {
     }
 
     this.ws.send(JSON.stringify({
-      action: "PLAYER_LEFT",
+      action: "PLAYER_LEAVE",
       data: { 
         playerId: this.player.getId(),
         lobbyId: this.lobbyCode,
