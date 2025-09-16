@@ -3,7 +3,8 @@
     <!-- Host View -->
     <div class="host-view">
         <ReturnHomeComponent
-            message="Are you sure you want to return to the home page? <br/> The session will continue, but you will not be able to reconnect to it." />
+            message="Are you sure you want to return to the home page? <br/> The session will end and you will not be able to reconnect." 
+            :onConfirm="endGame"/>
         <!-- Logo -->
         <LogoComponent />
 
@@ -157,7 +158,7 @@ const handleCancel = async () => {
         const apiManager = APIManager.getInstance();
         const session = await apiManager.getSession();
         if (session instanceof HostSession) {
-            session.endSession();
+            session.endGame();
         }
     }
     // Navigate home regardless of game state
@@ -177,6 +178,14 @@ const startGame = async () => {
         session.startGame();
     }
 };
+
+const endGame = async () => {
+    const apiManager = APIManager.getInstance();
+    const session = await apiManager.getSession();
+    if (session instanceof HostSession) {
+        session.endGame();
+    }
+}
 
 // Clipboard Operations
 const copyLobbyCode = async () => {

@@ -29,12 +29,14 @@ import Logo from '@/assets/logo.png';
 import { useRouter } from 'vue-router';
 
 const props = withDefaults(
-    defineProps<{ 
-        message?: string, 
-        skipConfirm?: boolean 
+    defineProps<{
+        message?: string,
+        onConfirm?: () => void
+        skipConfirm?: boolean
     }>(),
     {
         message: 'Are you sure you want to return to the home page? <br/> You will be disconnected from the current game.',
+        onConfirm: undefined,
         skipConfirm: false
     }
 );
@@ -51,6 +53,9 @@ const handleHomeClick = () => {
 }
 
 const handleConfirmClick = () => {
+    if (props.onConfirm) {
+        props.onConfirm();
+    }
     router.push('/');
 }
 </script>
