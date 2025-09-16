@@ -29,7 +29,6 @@ export class HostSession extends Session {
         
         this.addEventListener("PLAYER_LEFT", (data) => {
             this.players.value = this.players.value.filter(player => player.id !== data.playerId);
-            console.log("Player left:", data.playerId);
         });
 
         this.addEventListener("ALL_PLAYERS", (data) => {
@@ -38,13 +37,11 @@ export class HostSession extends Session {
                     new Player(serverPlayer.id, serverPlayer.name, parseInt(serverPlayer.score) || 0)
                 );
                 this.players.value = playerObjects;
-                console.log("Players updated from server:", playerObjects);
             }
         });
 
         this.addEventListener("PLAYER_LEAVE", (data) => {
             this.players.value = this.players.value.filter(player => player.id !== data.playerId);
-            console.log("Player left via PLAYER_LEAVE:", data.playerId);
         });
 
         // Listen for server error messages
@@ -57,7 +54,6 @@ export class HostSession extends Session {
         if (questions !== undefined && questions.length > 0) {
             // If there's no players, for some reason there's no questions generated.
             const adaptedQuestions = QuestionAdapter.fromBackendQuestions(questions);
-            console.log("Adapted questions:", adaptedQuestions);
         }
     }
 
