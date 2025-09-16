@@ -40,12 +40,12 @@ export class ApiResponseFactory {
         `;
     }
 
-    static playerLeftResponse(type: string, playerId: string, playerArray: string): string {
+    static playerLeftResponse(playerId: string, playerArray: string): string {
         return `
         {
-            "type": "${type}",
+            "type": "PLAYER_LEFT",
             "playerId": "${playerId}",
-            "players": ${playerArray}
+            "players": ${playerArray.trim().length === 0 ? "[]" : playerArray}
         }
         `;
     }
