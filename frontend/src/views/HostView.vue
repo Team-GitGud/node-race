@@ -3,7 +3,8 @@
     <!-- Host View -->
     <div class="host-view">
         <ReturnHomeComponent
-            message="Are you sure you want to return to the home page? <br/> The session will continue, but you will not be able to reconnect to it." />
+            message="Are you sure you want to return to the home page? <br/> The session will end and you will not be able to reconnect." 
+            :onConfirm="endGame"/>
         <!-- Logo -->
         <LogoComponent />
 
@@ -157,7 +158,7 @@ const handleCancel = async () => {
         const apiManager = APIManager.getInstance();
         const session = await apiManager.getSession();
         if (session instanceof HostSession) {
-            session.endSession();
+            session.endGame();
         }
     }
     // Clear persisted game state when navigating home
@@ -179,6 +180,14 @@ const startGame = async () => {
         session.startGame();
     }
 };
+
+const endGame = async () => {
+    const apiManager = APIManager.getInstance();
+    const session = await apiManager.getSession();
+    if (session instanceof HostSession) {
+        session.endGame();
+    }
+}
 
 // Clipboard Operations
 const copyLobbyCode = async () => {
@@ -350,19 +359,6 @@ onUnmounted(() => {
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 1rem;
-}
-
-/* Custom scrollbar styling for webkit browsers */
-.player-list::-webkit-scrollbar {
-    width: 0.5rem;
-}
-
-.player-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.player-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
 }
 
 .player-item {

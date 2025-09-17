@@ -380,6 +380,38 @@ nickname, score, questions
 
 ---
 
+### Practice question (single player)
+
+```json
+{
+  "type": "PRACTICE_QUESTION",
+  "question": 
+    {
+      "tree": {
+        // Tree data structure here
+      },
+	    "solution": {
+        // solution is here
+      },
+      "questionType": "In oder BFS"
+    }
+  
+}
+```
+
+### Player Leaves by themselves and sends a signal to the host
+
+```json
+{
+  "type": "PLAYER_LEFT",
+  "playerId": "p_z9y8x7w6"
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+}
+```
+---
+
 ### Game Started (to all players)
 
 ```json
@@ -407,7 +439,6 @@ nickname, score, questions
   ]
 }
 ```
-
 ---
 
 

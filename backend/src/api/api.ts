@@ -8,6 +8,7 @@ import { url } from 'node:inspector';
 import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
 import { Player } from '../data-access/player';
+import {GameLogic} from '../session-logic/gameLogic';
 
 
 export class api {
@@ -101,6 +102,11 @@ export class api {
                 }
                 break;
 
+            case (ApiPaths.PRACTICE):
+                console.log("practice");
+                ws.send(ApiResponseFactory.practiceQuestionResponse(JSON.stringify(new GameLogic().generateQuestion(false))))
+                break;
+
             default:
                 ws.send("Error: path not found");
         }
@@ -142,8 +148,27 @@ export class api {
                 this.endGame(message, ws);
                 break;
 
+            case ("PLAYER_LEAVE"):
+                this.playerLeave(message, ws);
+                break;
+
             default:
                 ws.send("Error: no action block found");
+        }
+    }
+
+    static playerLeave(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyId;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyId not found");
+            return;
+        }
+
+        const playerId: string = message.data.playerId;
+        lobby.playerLeave(playerId)
+        if (!lobby.players.some(player => player.ID === playerId)) {
+            console.log("Kicked player:", playerId);
         }
     }
 
@@ -265,4 +290,5 @@ class ApiPaths {
     static CREATE_LOBBY = '/api/v1/lobby/create';
     static JOIN_LOBBY = '/api/v1/lobby/join';
     static REJOIN_LOBBY = '/api/v1/lobby/rejoin';
+    static PRACTICE = '/api/v1/practice';
 }

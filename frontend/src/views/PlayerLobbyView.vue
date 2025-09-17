@@ -1,6 +1,7 @@
 <template>
     <ScreenBackground blur/>
-    <ReturnHomeComponent/>
+    <ReturnHomeComponent
+        :onConfirm="handleReturnHome"/>
     <h1>Lobby - {{ lobbyCode }}</h1>
     <h3>Welcome: {{ playerName }}</h3>
 
@@ -10,7 +11,7 @@
     </div>
 
     <div class="cancel-container">
-        <CustomButton :action="() => $router.push('/')" type="negative">Cancel</CustomButton>
+        <CustomButton :action="() => handleReturnHome()" type="negative">Cancel</CustomButton>
     </div>
 </template>
 
@@ -45,6 +46,14 @@ onUnmounted(() => {
         clearInterval(intervalId);
     }
 });
+
+const handleReturnHome = async () => {
+    const session: PlayerSession | null = await APIManager.getInstance().getSession() as PlayerSession;
+    if (session) {
+        session.leaveSession();
+    }
+    router.push('/');
+}
 </script>
 
 <style>

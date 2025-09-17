@@ -132,12 +132,18 @@ export class Lobby {
         return result;
     }
 
-    removePlayer(playerID: string): void {
-        const removedPlayer: Player = this.players.filter(p => p.ID === playerID)[0];
-        this.players = this.players.filter(p => p.ID !== playerID);
+    removePlayer(playerId: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
+        this.players = this.players.filter(p => p.ID !== playerId);
 
         removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
         this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
+    }
+
+    playerLeave(playerId: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
+        this.players = this.players.filter(p => p.ID !== playerId);
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEAVE", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
     validateHost(id: string): boolean {
@@ -175,18 +181,18 @@ export class Lobby {
     getLeaderboard() {
         // Sort players first based on score
         this.players.sort((a, b) => a.getScore() - b.getScore());
-        let playerStringArray:  string[] = [];
+        let playerStringArray: string[] = [];
         for (let index = 0; index < this.players.length; index++) {
-            playerStringArray.push(`{"rank": "${index + 1 }", "name": "${this.players[index].getName()}", "score": "${this.players[index].getScore()}"}`);
+            playerStringArray.push(`{"rank": "${index + 1}", "name": "${this.players[index].getName()}", "score": "${this.players[index].getScore()}"}`);
         }
         return JSON.stringify(playerStringArray);
-        
+
     }
 
-    getRank(playerId : string){
+    getRank(playerId: string) {
         this.players.sort((a, b) => a.getScore() - b.getScore());
-        let p = this.players.find((p)=> p.ID == playerId)
-        if (p != undefined){
+        let p = this.players.find((p) => p.ID == playerId)
+        if (p != undefined) {
             return this.players.indexOf(p);
         }
         return -1;

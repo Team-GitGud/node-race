@@ -1,6 +1,7 @@
 <template>
     <ScreenBackground blur/>
-    <ReturnHomeComponent/>
+    <ReturnHomeComponent
+        :onConfirm="handleReturnHome"/>
     <div class="question-navigation-view">
         <h2 class="page-title">Question Navigation</h2>
         <div class="questions-container">
@@ -16,9 +17,19 @@ import QuestionCard from '@/components/QuestionCard.vue';
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
-import { watch } from 'vue';
+import { PlayerSession } from '@/types/PlayerSession';
+import APIManager from '@/types/APIManager';
+import router from '@/router';
 
 const { questions } = usePlayerSession();
+
+const handleReturnHome = async () => {
+    const session: PlayerSession | null = await APIManager.getInstance().getSession() as PlayerSession;
+    if (session) {
+        session.leaveSession();
+    }
+    router.push('/');
+}
 
 </script>
 

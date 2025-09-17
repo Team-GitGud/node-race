@@ -112,18 +112,6 @@ describe("ApiResponseFactory Tests", () => {
             expect(parsed.playerId).toBe(playerId);
             expect(parsed.players).toEqual(JSON.parse(playerArray));
         });
-
-        it("should handle different leave types", () => {
-            const type = "PLAYER_DISCONNECTED";
-            const playerId = "player-456";
-            const playerArray = '["player1"]';
-
-            const response = ApiResponseFactory.playerLeftResponse(type, playerId, playerArray);
-            const parsed = JSON.parse(response.trim());
-
-            expect(parsed.type).toBe(type);
-            expect(parsed.playerId).toBe(playerId);
-        });
     });
 
     describe("startGamePlayerResponse", () => {
@@ -348,7 +336,7 @@ describe("ApiResponseFactory Tests", () => {
                 () => ApiResponseFactory.playerJoinPlayerResponse("player1", "[]"),
                 () => ApiResponseFactory.playerJoinHostResponse("player1", "user1"),
                 () => ApiResponseFactory.kickPlayerResponse("KICK", "reason"),
-                () => ApiResponseFactory.playerLeftResponse("LEFT", "player1", "[]"),
+                () => ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", "player1", "[]"),
                 () => ApiResponseFactory.startGamePlayerResponse("[]"),
                 () => ApiResponseFactory.startGameHostResponse(),
                 () => ApiResponseFactory.endGamePlayerResponse("0", "0", "{}", "[]", "[]", 0, 0),

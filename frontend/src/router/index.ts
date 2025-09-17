@@ -5,6 +5,7 @@ import HostView from '../views/HostView.vue';
 import QuestionNavigationView from '@/views/QuestionNavigationView.vue';
 import PlayerLobbyView from '@/views/PlayerLobbyView.vue';
 import LeaderboardView from '@/views/LeaderboardView.vue';
+import PracticeView from '@/views/PracticeView.vue';
 
 const routes: Array<RouteRecordRaw> = [
 	{
@@ -44,6 +45,11 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/leaderboard',
 		name: 'leaderboard',
 		component: LeaderboardView
+	},
+	{
+		path: '/practice',
+		name: 'practice',
+		component: PracticeView,
 	},
 	{
 		path: '/:pathMatch(.*)*',

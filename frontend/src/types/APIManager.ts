@@ -157,6 +157,8 @@ class APIManager {
     /** Get loading state */
     public getIsLoading(): Ref<boolean> { return this.isLoading; }
 
+    public setIsLoading(value: boolean) { this.isLoading.value = value; }
+
     /** Save session info to localStorage */
     private saveSessionInfo(info: any, role: "host" | "player") {
         const key = role === "host" ? APIManager.HOST_SESSION_KEY : APIManager.PLAYER_SESSION_KEY;
