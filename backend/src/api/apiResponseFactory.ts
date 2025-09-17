@@ -149,11 +149,12 @@ export class ApiResponseFactory {
         `;
     }
 
-    static getLeaderboardResponse(leaderboard: string): string {
+    static getLeaderboardResponse(leaderboard: string, lobbyLeaderboard?: string): string {
         return `
         {
             "type": "LEADERBOARD",
             "leaderboard": ${leaderboard ?? "\"[]\""} 
+            "lobbyLeaderboard": ${lobbyLeaderboard ?? "\"[]\""}
         }
         `;
     }
