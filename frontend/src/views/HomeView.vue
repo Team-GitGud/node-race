@@ -102,7 +102,7 @@ async function handleJoinGame() {
 	justify-content: center;
 	position: fixed;
 	top: 50%;
-	left: 58%;
+	left: 50%;
 	transform: translate(-50%, -50%);
 	width: 100%;
 	margin-top: 8vh; /* Adjust this value to position vertically */
