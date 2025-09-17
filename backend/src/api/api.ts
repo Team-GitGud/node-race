@@ -9,6 +9,7 @@ import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
 import { Player } from '../data-access/player';
 import {GameLogic} from '../session-logic/gameLogic';
+import { Database } from "../data-access/db";
 
 
 export class api {
@@ -109,7 +110,8 @@ export class api {
 
             case (ApiPaths.LEADERBOARD):
                 // Send leaderboard here
-                
+                console.log("Sending only global leaderboard");
+                ws.send(ApiResponseFactory.getLeaderboardResponse(new Database().getLeaderboard()))
                 break;
 
             default:
