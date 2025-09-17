@@ -107,6 +107,11 @@ export class api {
                 ws.send(ApiResponseFactory.practiceQuestionResponse(JSON.stringify(new GameLogic().generateQuestion(false))))
                 break;
 
+            case (ApiPaths.LEADERBOARD):
+                // Send leaderboard here
+                
+                break;
+
             default:
                 ws.send("Error: path not found");
         }
@@ -291,4 +296,5 @@ class ApiPaths {
     static JOIN_LOBBY = '/api/v1/lobby/join';
     static REJOIN_LOBBY = '/api/v1/lobby/rejoin';
     static PRACTICE = '/api/v1/practice';
+    static LEADERBOARD = '/api/v1/leaderboard';
 }
