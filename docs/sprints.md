@@ -104,3 +104,16 @@
 - **Goals:**
   - Finalize leaderboard implementation.
   - Continue testing and improving stability of the application.
+- **Results:**
+  - Finalization of the leaderboard implementation is being pushed to the next sprint, however all the backend logic is complete.
+  - Outside of leaderboard, majority of testing and improved stability issues have been resolved.
+
+## Sprint 10
+- **Start Date:** 19/09/2025
+- **End Date:** 26/09/2025
+- **Goals:**
+  - Finalize leaderboard implementation.
+  - Design and implement host analytical view in the frontend and backend.
+  - Continue testing and improving stability of the application.
+  - Prepare for user testing the following week.
+  - Prepare for final report.
