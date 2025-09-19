@@ -3,16 +3,18 @@ import { Node } from './tree/Node';
 export class Question {
     id: number;
     title: string;
+    type?: string;
     root: Node;
     correctOrder: Map<number, number>;
     answerStatus: boolean | null;
 
-    constructor(id: number, title: string, root: Node, correctOrder: Map<number, number>) {
+    constructor(id: number, title: string, root: Node, correctOrder: Map<number, number>, type?: string) {
         this.id = id;
         this.title = title;
         this.root = root;
         this.correctOrder = correctOrder;
         this.answerStatus = null;
+        this.type = type;
     }
 
     public isCorrect(selectedOrder: Map<number, number>): boolean {

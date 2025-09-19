@@ -1,7 +1,7 @@
 <template>
     <div class="question-container" @click="navigateToQuestion">
         <div :class="['question-card', `status-${question.answerStatus}`]">
-            <h3 class="question-name">{{ question.title }} {{ Number(question.id) }}</h3>
+            <h3 class="question-name">Q{{ Number(question.id) + 1 }} - {{ question.type }} </h3>
             <div class="checkbox" v-if="question.answerStatus == null" />
             <h4 class="tick" v-if="question.answerStatus == true">✔</h4>
             <h3 class="cross" v-if="question.answerStatus == false">X</h3>
@@ -21,7 +21,6 @@ const props = defineProps<{
 function navigateToQuestion() {
     router.push('/question/' + props.question.id);
 }
-
 </script>
 
 <style scoped>
@@ -65,7 +64,7 @@ function navigateToQuestion() {
 }
 
 .question-name {
-    padding-left: 75px;
+    padding-left: 30px;
     margin: 5px 0 5px 0;
 }
 
