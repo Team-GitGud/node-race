@@ -1,7 +1,7 @@
 <template>
     <ScreenBackground blur/>
-
-    <CustomButton :action="() => $router.push('/')" style="position: absolute; top: 20px; left: 20px;">Back to Home</CustomButton>
+    <ReturnHomeComponent
+        :onConfirm="handleReturnHome"/>
     <h1>Lobby - {{ lobbyCode }}</h1>
     <h3>Welcome: {{ playerName }}</h3>
 
@@ -11,13 +11,14 @@
     </div>
 
     <div class="cancel-container">
-        <CustomButton :action="() => $router.push('/')" type="negative">Cancel</CustomButton>
+        <CustomButton :action="() => handleReturnHome()" type="negative">Cancel</CustomButton>
     </div>
 </template>
 
 <script lang="ts" setup>
 import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
+import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import router from '@/router';
 import APIManager from '@/types/APIManager';
 import { GameTimer } from '@/types/GameTimer';
@@ -45,6 +46,14 @@ onUnmounted(() => {
         clearInterval(intervalId);
     }
 });
+
+const handleReturnHome = async () => {
+    const session: PlayerSession | null = await APIManager.getInstance().getSession() as PlayerSession;
+    if (session) {
+        session.leaveSession();
+    }
+    router.push('/');
+}
 </script>
 
 <style>

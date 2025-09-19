@@ -1,0 +1,40 @@
+name: Build and push Backend Docker image
+
+on:
+  workflow_run:
+    workflows: ["Test Backend"]
+    types:
+      - completed
+  workflow_dispatch:
+
+concurrency:
+  group: docker-backend-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-backend:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: [self-hosted, truenas]
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push backend Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          file: ./backend/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/node-race-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

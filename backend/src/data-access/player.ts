@@ -45,9 +45,14 @@ export class Player {
         this.ws.send(ApiResponseFactory.startGamePlayerResponse(questions));
     }
 
-    endGame(sessionLeaderboard: string, globalLeaderoard: string, time: string): void {
+    endGame(sessionLeaderboard: string, globalLeaderoard: string, time: string, rank: number, lobbyRank:number): void {
+        for (let i = 0; i < this.questionHistory.length; i++) {
+            if (this.questionHistory[i] == undefined){
+                this.questionHistory[i] = false;
+            }
+        }
         let numCorrect: number = this.questionHistory.reduce((count, value) => value ? count + 1 : count, 0);
-        this.ws.send(ApiResponseFactory.endGamePlayerResponse(time, numCorrect + '', JSON.stringify(this.questionHistory), sessionLeaderboard, globalLeaderoard));
+        this.ws.send(ApiResponseFactory.endGamePlayerResponse(time, numCorrect + '', JSON.stringify(this.questionHistory), sessionLeaderboard, globalLeaderoard, rank, lobbyRank));
         this.ws.close();
     }
     //static endGamePlayerResponse(time: string, numCorrect: string, answer: string, sessLeaderboard: string, globalLeaderoard: string): string {
@@ -67,13 +72,11 @@ export class Player {
     }
 
     toJsonString(): string {
-        return JSON.stringify(`
-        {
+        return `{
             "name": "${this.name}",
             "id": "${this.ID}",
             "score": "${this.score}"
-        }
-        `);
+        }`;
     }
 
 }

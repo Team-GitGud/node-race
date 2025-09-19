@@ -25,6 +25,13 @@ export function usePlayerSession() {
         playerName.value = session.getPlayer().getNickname();
         questions.value = session.getQuestions();
 
+        session.setOnLeaveCallback((reason?: string) => { 
+            if (reason) {
+                AlertService.alert(`You were kicked: ${reason}`);
+            }
+            router.push('/'); 
+        });
+
         if (questions.value.length !== 0 && router.currentRoute.value.path === '/lobby') {
             router.push('/question-navigation');
         }
@@ -36,7 +43,7 @@ export function usePlayerSession() {
             const gameTimer = new GameTimer(start, start + fiveMinutes);
             session.setGameTimer(gameTimer);
             gameTimer.start();
-            router.push('/question-navigation');
+            router.push('/question/0');
         });
     });
 

@@ -121,7 +121,7 @@ describe('QuestionAdapter', () => {
       const questions = QuestionAdapter.fromBackendQuestions(mockBackendQuestions);
       const firstQuestion = questions[0];
       
-      expect(firstQuestion.id).toBe('0');
+      expect(firstQuestion.id).toBe(0);
       expect(firstQuestion.title).toBe('Post order Depth first search');
       expect(firstQuestion.root).toBeDefined();
       expect(firstQuestion.correctOrder).toBeInstanceOf(Map);
@@ -154,9 +154,9 @@ describe('QuestionAdapter', () => {
     it('should generate sequential IDs for questions', () => {
       const questions = QuestionAdapter.fromBackendQuestions(mockBackendQuestions);
       
-      expect(questions[0].id).toBe('0');
-      expect(questions[1].id).toBe('1');
-      expect(questions[2].id).toBe('2');
+      expect(questions[0].id).toBe(0);
+      expect(questions[1].id).toBe(1);
+      expect(questions[2].id).toBe(2);
     });
 
     it('should handle empty array', () => {
@@ -169,7 +169,7 @@ describe('QuestionAdapter', () => {
       const questions = QuestionAdapter.fromBackendQuestions(singleQuestion);
       
       expect(questions).toHaveLength(1);
-      expect(questions[0].id).toBe('0');
+      expect(questions[0].id).toBe(0);
     });
   });
 

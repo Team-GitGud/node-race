@@ -2,6 +2,7 @@
 	<div class="home">
 		<ScreenBackground />
 		<div class="button-container">
+			<CustomButton :action="() => $router.push('/practice')">Practice</CustomButton>
 			<CustomButton :action="() => joinIsOpen = true">Join</CustomButton>
 			<ModalPopup title="Join a Game" v-if="joinIsOpen" @close="joinIsOpen = false">
 				<template #body>
@@ -23,13 +24,25 @@
 					</div>
 				</template>
 				<template #footer>
-					<CustomButton :action="() => handleJoinGame()" type="positive">Connect</CustomButton>
 					<CustomButton :action="() => joinIsOpen = false" type="negative">Close</CustomButton>
+					<CustomButton :action="() => handleJoinGame()" type="positive">Connect</CustomButton>
 				</template>
 			</ModalPopup>
 	
-			<CustomButton :action="() => handleHostClick()">Host</CustomButton>
-			<CustomButton shrink :action="() => $router.push('/question/0')">?</CustomButton>
+			<CustomButton :action="() => HostisOpen = true">Host</CustomButton>
+
+			<ModalPopup title="Host a Game" v-if="HostisOpen" @close="HostisOpen = false">
+				<template #body>
+					<h4> Would you like to create a game lobby? </h4>
+				</template>
+
+				<template #footer>
+					<CustomButton :action="() => HostisOpen = false" type="negative">Close</CustomButton>
+					<CustomButton :action="() => handleHostClick()" type="positive">Host</CustomButton>
+				</template>
+			</ModalPopup>
+
+			<TutorialPopup />
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
 		<BuildInfo />
@@ -47,6 +60,7 @@ import APIManager from '@/types/APIManager';
 import { AlertService } from '@/types/AlertService';
 import router from '@/router';
 import { ref } from 'vue';
+import TutorialPopup from '@/components/TutorialPopup.vue';
 
 async function handleHostClick() {
 	if (await APIManager.getInstance().createSession()) {
@@ -57,6 +71,7 @@ async function handleHostClick() {
 }
 
 const joinIsOpen = ref<boolean>(false);
+const HostisOpen = ref<boolean>(false);
 const nicknameInput = ref<InstanceType<typeof TextInput> | null>(null);
 const codeInput = ref<InstanceType<typeof TextInput> | null>(null);
 
