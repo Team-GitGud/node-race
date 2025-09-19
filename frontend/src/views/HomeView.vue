@@ -101,11 +101,8 @@ async function handleJoinGame() {
 	display: flex;
 	justify-content: center;
 	position: fixed;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
+	top: 56%;
 	width: 100%;
-	margin-top: 8vh; /* Adjust this value to position vertically */
 }
 
 .input-container {
