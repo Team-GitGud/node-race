@@ -9,6 +9,7 @@ import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
 import { Player } from '../data-access/player';
 import {GameLogic} from '../session-logic/gameLogic';
+import { Database } from "../data-access/db";
 
 
 export class api {
@@ -105,6 +106,12 @@ export class api {
             case (ApiPaths.PRACTICE):
                 console.log("practice");
                 ws.send(ApiResponseFactory.practiceQuestionResponse(JSON.stringify(new GameLogic().generateQuestion(false))))
+                break;
+
+            case (ApiPaths.LEADERBOARD):
+                // Send leaderboard here
+                console.log("Sending only global leaderboard");
+                ws.send(ApiResponseFactory.getLeaderboardResponse(new Database().getLeaderboard()))
                 break;
 
             default:
@@ -214,7 +221,7 @@ export class api {
             return;
         }
 
-        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard()));
+        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard(), lobby.getLeaderboard()));
 
     }
 
@@ -291,4 +298,5 @@ class ApiPaths {
     static JOIN_LOBBY = '/api/v1/lobby/join';
     static REJOIN_LOBBY = '/api/v1/lobby/rejoin';
     static PRACTICE = '/api/v1/practice';
+    static LEADERBOARD = '/api/v1/leaderboard';
 }
