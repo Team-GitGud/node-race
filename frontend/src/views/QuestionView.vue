@@ -6,12 +6,12 @@
             class="navigate-left-icon" />
         <div class="tree-container">
             <TreeNode v-if="currentQuestion" :node="currentQuestion.root" :selectedOrder="selectedOrder"
-                :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect"
+                :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect($event)"
                 style="margin-top: 0px;" />
         </div>
         <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight"
             alt="Navigate Right" class="navigate-right-icon" />
-        <div class="bottom-right-buttons">
+        <div class="bottom-right-buttons" v-if="!hasAnswered">
             <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
                 <h3>Submit</h3>
             </CustomButton>
@@ -35,15 +35,14 @@
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
 import { ref, computed, onMounted, watch, withDefaults, defineProps, onUnmounted } from 'vue';
-import { Question } from '@/types/Question';
 import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
 import TimerComponent from '@/components/TimerComponent.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import { GameTimer } from '@/types/GameTimer';
+import { Session } from '@/types/Session';
 import { PlayerSession } from '@/types/PlayerSession';
-import { Node } from '@/types/tree/Node';
 import { usePlayerSession } from '@/types/usePlayerSession';
 import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
@@ -51,26 +50,40 @@ import NavigateRight from '@/assets/navigate-right.svg';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
 
 const router = useRouter();
-const gameTimer = ref<GameTimer | null>(null);
+const { questions, gameTimer } = usePlayerSession();
+const selectedOrder = ref<Map<number, number>>(new Map());
+const hasAnswered = ref(false);
+const session = ref<Session | null>(null);
+
+// In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
+const result = ref<boolean | null>(null);
 
 interface Props {
-    questionIndex?: number;
+    questionIndex: number;
 }
 const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
-// Reactive data
-const { questions } = usePlayerSession();
-const selectedOrder = ref<Map<number, number>>(new Map());
-const startTime = ref(0);
 
-// We make this null to indicate the result hasn't been checked yet.
-// In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
-const result = ref<boolean | null>(null);
+onMounted(async () => {
+    session.value = await APIManager.getInstance().getSession();
+    console.log("Trying to find session...")
+    if (!session.value || !(session.value instanceof PlayerSession)) return;
+    console.log("Found session", session.value);
+
+    questions.value = session.value.getQuestions();
+    gameTimer.value = session.value.getGameTimer();
+    console.log("Game timer", gameTimer.value);
+    selectedOrder.value = new Map();
+    // Added this null check because it's null if from localStorage.
+    hasAnswered.value = session.value.getAnswers()[props.questionIndex] !== undefined && session.value.getAnswers()[props.questionIndex] !== null;
+    console.log("Answers", session.value.getAnswers());
+    console.log("Has answered question? ", hasAnswered.value);
+    result.value = hasAnswered.value ? session.value.getAnswers()[props.questionIndex] ?? false : null;
+});
 
 const handleSelect = (newOrder: Map<number, number>) => {
     selectedOrder.value = newOrder;
-    console.log("New Order", selectedOrder.value);
 };
 
 const resetOrder = () => {
@@ -79,91 +92,56 @@ const resetOrder = () => {
 };
 
 const checkAnswer = async () => {
+    if (!session.value || !(session.value instanceof PlayerSession)) return;
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        session.addAnswer(props.questionIndex, result.value ?? false);
-        console.log("Order", selectedOrder.value);
-        session.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
-    }
+    session.value.addAnswer(props.questionIndex, result.value ?? false);
+    session.value.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
+    session.value.setAnswerTimes(props.questionIndex, gameTimer.value?.getTimeLeft() ?? 0);
 
-    // TODO: Send the result to the backend. Make the question not available for the player to answer again.
     setTimeout(async () => {
         resetOrder();
-        if (!session || !(session instanceof PlayerSession)) {
-            return;
-        }
-        console.log("Setting answer time", startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
-        session.setAnswerTime(props.questionIndex, startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
-        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
-        }
-        if (props.questionIndex + 1 >= questions.value.length) {
+        } else if (props.questionIndex + 1 >= questions.value.length) {
             router.push("/question-navigation");
             return;
-        }
-
-        // This will cycle through all questions until it finds one that hasn't been answered.
-        let i = 1
-        while (await hasAnsweredQuestion(props.questionIndex + i)) {
-            i++;
-            if (props.questionIndex + i >= questions.value.length) {
-                router.push("/question-navigation");
-                return;
+        } else {
+            // This will cycle through all questions until it finds one that hasn't been answered.
+            let i = 1
+            while (await hasAnsweredQuestion(props.questionIndex + i)) {
+                i++;
+                if (props.questionIndex + i >= questions.value.length) {
+                    router.push("/question-navigation");
+                    return;
+                }
             }
+            router.push(`/question/${props.questionIndex + i}`);
         }
-        router.push(`/question/${props.questionIndex + i}`);
     }, 2000);
 };
 
 const answeredAllQuestions = async () => {
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        const answers = session.getAnswers();
+    if (!session.value || !(session.value instanceof PlayerSession)) return false;
 
-        // Check if all previous questions (0 to currentIndex-1) have been answered
-        for (let i = 0; i < questions.value.length; i++) {
-            if (answers[i] === undefined) {
-                return false;
-            }
+    // Check if all previous questions (0 to currentIndex-1) have been answered
+    const answers = session.value.getAnswers();
+    for (let i = 0; i < questions.value.length; i++) {
+        if (answers[i] === undefined) {
+            return false;
         }
     }
     return true;
 }
 
 const hasAnsweredQuestion = async (questionIndex: number) => {
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        const answers = session.getAnswers();
-        return answers[questionIndex] !== undefined;
-    }
+    if (!session.value || !(session.value instanceof PlayerSession)) return false;
+    return session.value.getAnswers()[questionIndex] !== undefined;
 }
 
 const currentQuestion = computed(() => {
     return questions.value[props.questionIndex];
 })
-
-onMounted(async () => {
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        questions.value = session.getQuestions();
-        gameTimer.value = session.getGameTimer();
-        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
-    }
-    selectedOrder.value = new Map();
-    result.value = null;
-});
-
-watch(currentQuestion, () => {
-    selectedOrder.value = new Map();
-    result.value = null;
-});
-
-watch(selectedOrder, () => {
-    console.log("Selected Order", selectedOrder.value);
-});
 
 const nextQuestion = () => {
     router.push(`/question/${props.questionIndex + 1}`);

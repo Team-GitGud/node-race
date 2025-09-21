@@ -4,9 +4,6 @@
     <div class="host-view">
         <ReturnHomeComponent
             message="Are you sure you want to return to the home page? <br/> The session will continue, but you will not be able to reconnect to it." />
-        <!-- Logo -->
-        <LogoComponent />
-
         <!-- Left Side: Lobby Controls -->
         <div class="lobby-left">
             <div class="lobby-content">

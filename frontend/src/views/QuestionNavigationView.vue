@@ -1,6 +1,6 @@
 <template>
-    <ScreenBackground blur/>
-    <ReturnHomeComponent/>
+    <ScreenBackground blur />
+    <ReturnHomeComponent />
     <div class="question-navigation-view">
         <h2 class="page-title">Question Navigation</h2>
         <div class="questions-container">
@@ -16,7 +16,6 @@ import QuestionCard from '@/components/QuestionCard.vue';
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
-import { watch } from 'vue';
 
 const { questions } = usePlayerSession();
 
@@ -25,12 +24,16 @@ const { questions } = usePlayerSession();
 <style>
 .question-navigation-view {
     position: absolute;
-    top: 0; bottom: 0; left: 0; right: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow: hidden;
 }
+
 .page-title {
     justify-self: center;
     padding: 20px;
@@ -48,5 +51,4 @@ const { questions } = usePlayerSession();
 .question-wrapper {
     display: block;
 }
-
 </style>

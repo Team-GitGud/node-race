@@ -113,4 +113,12 @@ export class HostSession extends Session {
         }));
         console.log("Kick player request sent for:", playerId);
     }
+
+    public getHostId(): string {
+        return this.hostId;
+    }
+    // In some places we're calling it hostToken, so we'll keep it for now.
+    public getHostToken(): string {
+        return this.hostId;
+    }
 }

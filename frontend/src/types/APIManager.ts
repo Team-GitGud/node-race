@@ -1,6 +1,7 @@
 import { Session } from './Session';
 import { PlayerSession } from './PlayerSession';
 import { HostSession } from './HostSession';
+import { GameTimer } from './GameTimer';
 import { ref, Ref } from 'vue';
 
 class APIManager {
@@ -156,6 +157,11 @@ class APIManager {
         localStorage.setItem(key, JSON.stringify(info));
     }
 
+    /** Update player session data in localStorage (for gameTimer, answers, etc.) */
+    public updatePlayerSessionData(sessionData: any) {
+        this.saveSessionInfo(sessionData, "player");
+    }
+
     /** Load session info from localStorage */
     private loadSessionInfo(role: "host" | "player"): any | null {
         const key = role === "host" ? APIManager.HOST_SESSION_KEY : APIManager.PLAYER_SESSION_KEY;
@@ -196,8 +202,20 @@ class APIManager {
             ws.onmessage = (event) => {
                 this.stopLoading();
                 const { questions } = this.parseWsMsg(event, resolve);
-                if (role === "host") { this.session = new HostSession(ws, info.lobbyCode, info.hostToken); }
-                else { this.session = new PlayerSession(ws, info.lobbyCode, info.playerId, info.playerName, questions); }
+                if (role === "host") { 
+                    this.session = new HostSession(ws, info.lobbyCode, info.hostToken); 
+                } else { 
+                    const playerSession = new PlayerSession(ws, info.lobbyCode, info.playerId, info.playerName, questions);
+                    this.session = playerSession;
+
+                    // If there's a game timer, we can assume there's questions and answers. 
+                    if (info.gameTimer) {
+                        const restoredTimer = GameTimer.fromJSON(info.gameTimer);
+                        playerSession.setGameTimer(restoredTimer);
+                        playerSession.setAnswers(info.answers);
+                        playerSession.setAnswerTime(info.answerTimes);
+                    }
+                }
                 this.setupSessionMessageHandler(ws);
                 resolve(true);
             };

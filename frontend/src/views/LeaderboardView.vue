@@ -32,7 +32,6 @@ import PlayerRank from "@/components/PlayerRank.vue";
 import { ref, onMounted } from "vue";
 import { PlayerSession } from "@/types/PlayerSession";
 import { HostSession } from "@/types/HostSession";
-import Logo from "@/components/LogoComponent.vue";
 import LeaderboardQuestionCard from "@/components/LeaderboardQuestionCard.vue";
 import LeaderboardComponent from "@/components/LeaderboardComponent.vue";
 import APIManager from "@/types/APIManager";

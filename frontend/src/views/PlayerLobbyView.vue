@@ -1,6 +1,6 @@
 <template>
-    <ScreenBackground blur/>
-    <ReturnHomeComponent/>
+    <ScreenBackground blur />
+    <ReturnHomeComponent />
     <h1>Lobby - {{ lobbyCode }}</h1>
     <h3>Welcome: {{ playerName }}</h3>
 
@@ -18,11 +18,6 @@
 import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
-import router from '@/router';
-import APIManager from '@/types/APIManager';
-import { GameTimer } from '@/types/GameTimer';
-import { PlayerSession } from '@/types/PlayerSession';
-import { AlertService } from '@/types/AlertService';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
 
@@ -53,13 +48,15 @@ onUnmounted(() => {
     width: 100%;
     flex-direction: column;
     justify-content: center;
-    position: absolute; bottom: calc(100vh / 2 - 60px)
+    position: absolute;
+    bottom: calc(100vh / 2 - 60px)
 }
 
 .cancel-container {
     display: flex;
     width: 100%;
     justify-content: center;
-    position: absolute; bottom: 20px;
+    position: absolute;
+    bottom: 20px;
 }
 </style>

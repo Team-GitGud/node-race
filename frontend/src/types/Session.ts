@@ -95,4 +95,8 @@ export class Session {
       this.addEventListener("LEADERBOARD", handleLeaderboardResponse);
     });
   }
+
+  public getLobbyCode(): string {
+    return this.lobbyCode;
+  }
 }
