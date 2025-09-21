@@ -36,7 +36,10 @@ class APIManager {
         const page = window.location.pathname;
         if (page === '/host') {
             const success = await this.reconnectSession("host");
-            if (!success) return null;
+            if (!success) {
+                this.stopLoading();
+                return null
+            }
         } else if (
             page === '/lobby' ||
             page === '/question-navigation' ||
@@ -44,7 +47,10 @@ class APIManager {
             page === '/leaderboard'
         ) {
             const success = await this.reconnectSession("player");
-            if (!success) return null;
+            if (!success) {
+                this.stopLoading();
+                return null;
+            }
         }
         return this.session;
     }
@@ -100,6 +106,7 @@ class APIManager {
         } catch (error) {
             console.error('Error parsing WebSocket message:', error);
             console.error('WebSocket message:', event.data);
+            this.stopLoading();
             resolve(false);
         }
     }
@@ -152,6 +159,8 @@ class APIManager {
     /** Get loading state */
     public getIsLoading(): Ref<boolean> { return this.isLoading; }
 
+    public setIsLoading(value: boolean) { this.isLoading.value = value; }
+
     /** Save session info to localStorage */
     private saveSessionInfo(info: any, role: "host" | "player") {
         const key = role === "host" ? APIManager.HOST_SESSION_KEY : APIManager.PLAYER_SESSION_KEY;
@@ -195,7 +204,10 @@ class APIManager {
         this.startLoading();
         return new Promise((resolve) => {
             const info = this.loadSessionInfo(role);
-            if (!info) { return resolve(false); }
+            if (!info) { 
+                this.stopLoading();
+                return resolve(false); 
+            }
 
             const ws = this.createWs(role === "host" ? `lobby/rejoin?id=${encodeURIComponent(info.hostToken)}&lobbyId=${encodeURIComponent(info.lobbyCode)}` : 
                 `lobby/rejoin?id=${encodeURIComponent(info.playerId)}&lobbyId=${encodeURIComponent(info.lobbyCode)}`,

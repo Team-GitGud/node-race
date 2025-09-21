@@ -224,8 +224,8 @@ nickname, score, questions
 ```json
 {
   "action": "GET_LEADERBOARD",
-  data: {
-    lobbyId: "ajsdlf"
+  "data": {
+    "lobbyId": "ajsdlf"
   }
 }
 ```
@@ -236,7 +236,7 @@ nickname, score, questions
   "leaderboard": [
         {"rank": "1", "name": "Donald", "score": "10"}
     ],
-    "lobbyLeaderboard": [
+    "lobbyLeaderboard": [ // Will be empty if no lobbyId is supplied
       {"rank": "1", "name": "Ronald", "score": "9"}
     ]
 }
@@ -382,6 +382,38 @@ nickname, score, questions
 
 ---
 
+### Practice question (single player)
+
+```json
+{
+  "type": "PRACTICE_QUESTION",
+  "question": 
+    {
+      "tree": {
+        // Tree data structure here
+      },
+	    "solution": {
+        // solution is here
+      },
+      "questionType": "In oder BFS"
+    }
+  
+}
+```
+
+### Player Leaves by themselves and sends a signal to the host
+
+```json
+{
+  "type": "PLAYER_LEFT",
+  "playerId": "p_z9y8x7w6"
+  "players": [
+        {"id": "adsfsafd", "name": "Donald", "score": "10"}
+    ]
+}
+```
+---
+
 ### Game Started (to all players)
 
 ```json
@@ -409,7 +441,6 @@ nickname, score, questions
   ]
 }
 ```
-
 ---
 
 

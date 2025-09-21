@@ -8,6 +8,8 @@ import { url } from 'node:inspector';
 import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
 import { Player } from '../data-access/player';
+import {GameLogic} from '../session-logic/gameLogic';
+import { Database } from "../data-access/db";
 
 
 export class api {
@@ -101,6 +103,17 @@ export class api {
                 }
                 break;
 
+            case (ApiPaths.PRACTICE):
+                console.log("practice");
+                ws.send(ApiResponseFactory.practiceQuestionResponse(JSON.stringify(new GameLogic().generateQuestion(false))))
+                break;
+
+            case (ApiPaths.LEADERBOARD):
+                // Send leaderboard here
+                console.log("Sending only global leaderboard");
+                ws.send(ApiResponseFactory.getLeaderboardResponse(new Database().getLeaderboard()))
+                break;
+
             default:
                 ws.send("Error: path not found");
         }
@@ -133,38 +146,57 @@ export class api {
             case ("SUBMIT_ANSWER"):
                 this.submitAnswer(message, ws);
                 break;
-            
+
             case ("GET_RANK"):
                 this.getRank(message, ws);
                 break;
 
             case ("END_GAME"):
                 this.endGame(message, ws);
-                break;            
+                break;
+
+            case ("PLAYER_LEAVE"):
+                this.playerLeave(message, ws);
+                break;
 
             default:
                 ws.send("Error: no action block found");
         }
     }
 
-    static endGame(message: any, ws: WebSocket){
+    static playerLeave(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyId;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyId not found");
+            return;
+        }
+
+        const playerId: string = message.data.playerId;
+        lobby.playerLeave(playerId)
+        if (!lobby.players.some(player => player.ID === playerId)) {
+            console.log("Kicked player:", playerId);
+        }
+    }
+
+    static endGame(message: any, ws: WebSocket) {
         const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
             ws.send("LobbyID not found");
             return;
         }
-        
-        if (lobby.validateHost(message.hostId)){
+
+        if (lobby.validateHost(message.hostId)) {
             lobby.endGame();
-        } else{
+        } else {
             ws.send("Invalid host token");
             return;
         }
 
     }
 
-    static getRank(message: any, ws: WebSocket){
+    static getRank(message: any, ws: WebSocket) {
         const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
         if (lobby === undefined) {
@@ -173,7 +205,7 @@ export class api {
         }
 
         let player = lobby.getPlayer(message.playerId);
-        if (player != undefined){
+        if (player != undefined) {
             ws.send(ApiResponseFactory.getRankResponse(lobby.database.getPos(player.score), lobby.getRank(player.ID)));
         } else {
             ws.send(ApiResponseFactory.getRankResponse(-1, -1));
@@ -202,7 +234,9 @@ export class api {
             return;
         }
 
-        lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber);
+        if (!lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber)){
+            ws.send("Error processing answer either player does not exist or question already submitted");
+        }
 
     }
 
@@ -263,4 +297,6 @@ class ApiPaths {
     static CREATE_LOBBY = '/api/v1/lobby/create';
     static JOIN_LOBBY = '/api/v1/lobby/join';
     static REJOIN_LOBBY = '/api/v1/lobby/rejoin';
+    static PRACTICE = '/api/v1/practice';
+    static LEADERBOARD = '/api/v1/leaderboard';
 }

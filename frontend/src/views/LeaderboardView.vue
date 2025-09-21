@@ -130,26 +130,5 @@ onMounted(async () => {
     overflow-y: scroll;
     box-sizing: border-box;
     min-height: 0;
-    scrollbar-width: thin;
-    scrollbar-color: white grey;
-}
-
-.answer-cards::-webkit-scrollbar {
-    width: 8px;
-}
-
-.answer-cards::-webkit-scrollbar-track {
-    background: white;
-    border-radius: 4px;
-}
-
-.answer-cards::-webkit-scrollbar-thumb {
-    background: white;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-}
-
-.answer-cards::-webkit-scrollbar-thumb:hover {
-    background: #f0f0f0;
 }
 </style>

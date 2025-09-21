@@ -90,19 +90,24 @@ export class Lobby {
     /**
     * Calculates the score of a player.
     */
-    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number): void {
+    calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number): boolean {
         let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
-        if (p == undefined) { return; }
+        if (p == undefined) { return false; }
+        // Just does nothing if a question 
+        if (p.questionHistory[questionNumber] != undefined){
+            return false;
+        }
         let correct = this.gameLogic.questions[questionNumber].solution
         for (let key in correct) {
             if (correct[key] != answer[key]) {
-                p.questionHistory.push(false);
+                p.questionHistory[questionNumber] = false;
                 p.calculateScore(this.timer, false);
-                return;
+                return true;
             }
         }
-        p.questionHistory.push(true);
+        p.questionHistory[questionNumber];
         p.calculateScore(this.timer, true);
+        return true;
     }
 
     /**
@@ -127,12 +132,18 @@ export class Lobby {
         return result;
     }
 
-    removePlayer(playerID: string): void {
-        const removedPlayer: Player = this.players.filter(p => p.ID === playerID)[0];
-        this.players = this.players.filter(p => p.ID !== playerID);
+    removePlayer(playerId: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
+        this.players = this.players.filter(p => p.ID !== playerId);
 
         removedPlayer.ws.send(ApiResponseFactory.kickPlayerResponse("PLAYER_KICKED", "Removed by host"));
         this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
+    }
+
+    playerLeave(playerId: string): void {
+        const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
+        this.players = this.players.filter(p => p.ID !== playerId);
+        this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEAVE", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
     validateHost(id: string): boolean {
@@ -168,7 +179,6 @@ export class Lobby {
     }
 
     getLeaderboard() {
-        // Sort players first based on score (descending order for leaderboard)
         this.players.sort((a, b) => b.getScore() - a.getScore());
         let playerObjectArray = [];
         for (let index = 0; index < this.players.length; index++) {
@@ -182,10 +192,10 @@ export class Lobby {
         
     }
 
-    getRank(playerId : string){
+    getRank(playerId: string) {
         this.players.sort((a, b) => a.getScore() - b.getScore());
-        let p = this.players.find((p)=> p.ID == playerId)
-        if (p != undefined){
+        let p = this.players.find((p) => p.ID == playerId)
+        if (p != undefined) {
             return this.players.indexOf(p);
         }
         return -1;

@@ -1,6 +1,7 @@
 <template>
-    <ScreenBackground blur />
-    <ReturnHomeComponent />
+    <ScreenBackground blur/>
+    <ReturnHomeComponent
+        :onConfirm="handleReturnHome"/>
     <h1>Lobby - {{ lobbyCode }}</h1>
     <h3>Welcome: {{ playerName }}</h3>
 
@@ -10,7 +11,7 @@
     </div>
 
     <div class="cancel-container">
-        <CustomButton :action="() => $router.push('/')" type="negative">Cancel</CustomButton>
+        <CustomButton :action="() => handleReturnHome()" type="negative">Cancel</CustomButton>
     </div>
 </template>
 
@@ -18,13 +19,16 @@
 import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
+import APIManager from '@/types/APIManager';
+import { PlayerSession } from '@/types/PlayerSession';
+import { useRouter } from 'vue-router';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
 
 const waitingMessages = ref(["to Start", "to Start.", "to Start..", "to Start..."]);
 const currentMessage = ref<string>(waitingMessages.value[0]);
 let intervalId: number | undefined;
-
+const router = useRouter();
 const { lobbyCode, playerName } = usePlayerSession();
 
 onMounted(() => {
@@ -40,6 +44,14 @@ onUnmounted(() => {
         clearInterval(intervalId);
     }
 });
+
+const handleReturnHome = async () => {
+    const session: PlayerSession | null = await APIManager.getInstance().getSession() as PlayerSession;
+    if (session) {
+        session.leaveSession();
+    }
+    router.push('/');
+}
 </script>
 
 <style>

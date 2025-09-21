@@ -45,7 +45,7 @@ export class ApiResponseFactory {
         {
             "type": "${type}",
             "playerId": "${playerId}",
-            "players": ${playerArray}
+            "players": ${playerArray.trim().length === 0 ? "[]" : playerArray}
         }
         `;
     }
@@ -65,6 +65,15 @@ export class ApiResponseFactory {
             "type": "GAME_STARTED_HOST"
         }
         `;
+    }
+
+    static practiceQuestionResponse(question: string): string {
+        return `
+        {
+            "type": "PRACTICE_QUESTION",
+            "question": ${question}
+            
+        }`
     }
 
     static endGamePlayerResponse(time: string, numCorrect: string, answer: string, sessLeaderboard: string, globalLeaderoard: string, rank: number, lobbyRank: number): string {
@@ -142,7 +151,7 @@ export class ApiResponseFactory {
         `;
     }
 
-    static getLeaderboardResponse(leaderboard: string, lobbyLeaderboard: string): string {
+    static getLeaderboardResponse(leaderboard: string, lobbyLeaderboard?: string): string {
         return `
         {
             "type": "LEADERBOARD",

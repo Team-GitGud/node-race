@@ -5,13 +5,14 @@ on:
     paths:
       - 'backend/**'
       - '.github/workflows/test-backend.yml'
+      - '.github/workflows/docker-backend.yml'
     branches:
       - main
-      - alexanderheffernan/testing-ci-cd
   pull_request:
     paths:
       - 'backend/**'
       - '.github/workflows/test-backend.yml'
+      - '.github/workflows/docker-backend.yml'
     branches:
       - main
 

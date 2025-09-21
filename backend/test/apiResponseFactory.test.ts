@@ -112,18 +112,6 @@ describe("ApiResponseFactory Tests", () => {
             expect(parsed.playerId).toBe(playerId);
             expect(parsed.players).toEqual(JSON.parse(playerArray));
         });
-
-        it("should handle different leave types", () => {
-            const type = "PLAYER_DISCONNECTED";
-            const playerId = "player-456";
-            const playerArray = '["player1"]';
-
-            const response = ApiResponseFactory.playerLeftResponse(type, playerId, playerArray);
-            const parsed = JSON.parse(response.trim());
-
-            expect(parsed.type).toBe(type);
-            expect(parsed.playerId).toBe(playerId);
-        });
     });
 
     describe("startGamePlayerResponse", () => {
@@ -163,9 +151,11 @@ describe("ApiResponseFactory Tests", () => {
             const answer = '{"question1": "A", "question2": "B"}';
             const sessLeaderboard = '[{"rank": 1, "name": "Player1", "score": 100}]';
             const globalLeaderboard = '[{"rank": 1, "name": "Player1", "score": 1000}]';
+            const rank = 1;
+            const lobbyRank = 2;
 
             const response = ApiResponseFactory.endGamePlayerResponse(
-                time, numCorrect, answer, sessLeaderboard, globalLeaderboard
+                time, numCorrect, answer, sessLeaderboard, globalLeaderboard, rank, lobbyRank
             );
             const parsed = JSON.parse(response.trim());
 
@@ -183,9 +173,11 @@ describe("ApiResponseFactory Tests", () => {
             const answer = "{}";
             const sessLeaderboard = "[]";
             const globalLeaderboard = "[]";
+            const rank = 0;
+            const lobbyRank = 0;
 
             const response = ApiResponseFactory.endGamePlayerResponse(
-                time, numCorrect, answer, sessLeaderboard, globalLeaderboard
+                time, numCorrect, answer, sessLeaderboard, globalLeaderboard, rank, lobbyRank
             );
             const parsed = JSON.parse(response.trim());
 
@@ -344,10 +336,10 @@ describe("ApiResponseFactory Tests", () => {
                 () => ApiResponseFactory.playerJoinPlayerResponse("player1", "[]"),
                 () => ApiResponseFactory.playerJoinHostResponse("player1", "user1"),
                 () => ApiResponseFactory.kickPlayerResponse("KICK", "reason"),
-                () => ApiResponseFactory.playerLeftResponse("LEFT", "player1", "[]"),
+                () => ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", "player1", "[]"),
                 () => ApiResponseFactory.startGamePlayerResponse("[]"),
                 () => ApiResponseFactory.startGameHostResponse(),
-                () => ApiResponseFactory.endGamePlayerResponse("0", "0", "{}", "[]", "[]"),
+                () => ApiResponseFactory.endGamePlayerResponse("0", "0", "{}", "[]", "[]", 0, 0),
                 () => ApiResponseFactory.sessionLeaderboardGenerator(1, "player1", 100),
                 () => ApiResponseFactory.endGameHostResponse(),
                 () => ApiResponseFactory.getAllPlayerResponse("[]"),
