@@ -1,5 +1,7 @@
 import { Player } from "./Player";
 import { Question } from "./Question";
+import { AlertService } from "./AlertService";
+import { useRouter } from "vue-router";
 
 export class Session {
   ws: WebSocket;
@@ -102,6 +104,12 @@ export class Session {
   }
 
   public async fetchLeaderboard(): Promise<void> {
+    if (this.ws.readyState !== WebSocket.OPEN) {
+      AlertService.alert("Server has closed the connection because the session has reached 5 minutes.");
+      const router = useRouter();
+      router.push("/");
+      return;
+    }
     return new Promise((resolve) => {
       const message = JSON.stringify({
         action: "GET_LEADERBOARD",
@@ -109,7 +117,7 @@ export class Session {
           lobbyId: this.lobbyCode
         },
       });
-      console.log("Sending leaderboard request", message);
+      console.debug("Sending leaderboard request", message);
       this.ws.send(message);
 
       // Listen for the leaderboard response event

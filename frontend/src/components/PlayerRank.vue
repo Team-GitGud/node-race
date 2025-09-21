@@ -2,7 +2,7 @@
     <div class="player-rank" v-if="session && session instanceof PlayerSession">
         <div class="row-one">
             <div class="rank">
-                <span class="rank-number">{{playerRank}}</span>
+                <span class="rank-number" :class="getRankColor(playerRank)">{{playerRank}}.</span>
                 <span>{{ session.getPlayer().getNickname() }}</span>
             </div>
             <span>5000</span>
@@ -35,6 +35,13 @@ const formattedTime = computed(() => {
     const seconds = timeSpent.value % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 });
+
+const getRankColor = (rank: number) => {
+    if (rank === 1) return 'gold';
+    if (rank === 2) return 'silver';
+    if (rank >= 3) return 'bronze';
+    return '';
+};
 
 // Event handler for rank updates
 const handleRankUpdate = (data: { rank: number; lobbyRank: number }) => {
@@ -100,6 +107,18 @@ onUnmounted(() => {
 }
 
 .rank-number {
-    color: #FFB246;
+    color: var(--text-color);
+}
+
+.rank-number.gold {
+    color: var(--gold-color);
+}
+
+.rank-number.silver {
+    color: var(--silver-color);
+}
+
+.rank-number.bronze {
+    color: var(--bronze-color);
 }
 </style>

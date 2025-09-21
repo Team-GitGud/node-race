@@ -12,15 +12,18 @@
         </div>
         <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight"
             alt="Navigate Right" class="navigate-right-icon" />
-        <div class="bottom-right-buttons" v-if="!hasAnswered">
-            <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
+        <div class="bottom-right-buttons">
+            <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="hasAnswered">
                 <h3>Submit</h3>
             </CustomButton>
-            <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="false">
+            <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="hasAnswered">
                 <img :src="ResetIcon" alt="Reset" class="btn-img" />
             </CustomButton>
         </div>
         <div class="bottom-left-buttons">
+            <CustomButton v-if="answerDisabled" class="back-to-leaderboard-button" :action="() => $router.push('/leaderboard')" type="neutral">
+                <h3>Leaderboard</h3>
+            </CustomButton>
             <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')"
                 type="neutral" :disabled="false">
                 <h3>Questions</h3>
@@ -53,7 +56,7 @@ const router = useRouter();
 const { questions, gameTimer } = usePlayerSession();
 const selectedOrder = ref<Map<number, number>>(new Map());
 const hasAnswered = ref(false);
-// Remove gameHasEnded ref - we'll compute it from answers
+const answerDisabled = ref(false);
 const session = ref<Session | null>(null);
 
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
@@ -75,6 +78,7 @@ const initializeQuestion = async () => {
     questions.value = session.value.getQuestions();
     gameTimer.value = session.value.getGameTimer();
     selectedOrder.value = new Map();
+    answerDisabled.value = await answeredAllQuestions();
     hasAnswered.value = await hasAnsweredQuestion(props.questionIndex);
     if (hasAnswered.value) {
         result.value = session.value.getAnswers()[props.questionIndex] ?? false;
@@ -112,8 +116,8 @@ const checkAnswer = async () => {
     session.value.setAnswerTimes(props.questionIndex, gameTimer.value?.getLastAnswerTimeAndLogNewTime() ?? 0);
     hasAnswered.value = true;
 
-    resetOrder();
     setTimeout(async () => {
+        resetOrder();
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
@@ -219,7 +223,8 @@ h2 {
 
 .submit-button :deep(.btn-inner),
 .reset-button :deep(.btn-inner),
-.question-navigation-button :deep(.btn-inner) {
+.question-navigation-button :deep(.btn-inner),
+.back-to-leaderboard-button :deep(.btn-inner) {
     height: 40px;
 }
 
@@ -245,6 +250,7 @@ h2 {
     position: absolute;
     bottom: 50px;
     left: 60px;
+    display: flex;
 }
 
 .back-to-home-button {

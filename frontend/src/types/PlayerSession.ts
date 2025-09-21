@@ -208,6 +208,7 @@ export class PlayerSession extends Session {
           playerId: this.player.getId(),
           },
         });
+        console.debug("Sending score request", message);
         this.ws.send(message);
         resolve();
       });
@@ -222,6 +223,7 @@ export class PlayerSession extends Session {
           lobbyId: this.lobbyCode,
           },
         });
+        console.debug("Sending rank request", message);
         this.ws.send(message);
         resolve();
       });
