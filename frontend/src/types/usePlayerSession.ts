@@ -45,6 +45,12 @@ export function usePlayerSession() {
             gameTimer.start();
             router.push('/question/0');
         });
+
+        session.addEventListener("GAME_END", (data) => {
+            const reason = data?.reason || "Game ended by host";
+            AlertService.alert(`The game has ended: ${reason}`);
+            router.push('/');
+        });
     });
 
     return { lobbyCode, playerName, questions };

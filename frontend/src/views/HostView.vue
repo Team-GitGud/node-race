@@ -3,8 +3,10 @@
     <!-- Host View -->
     <div class="host-view">
         <ReturnHomeComponent
-            message="Are you sure you want to return to the home page? <br/> The session will end and you will not be able to reconnect." 
-            :onConfirm="endGame"/>
+            :message="exitModalMessage"
+            :forceOpen="isExitModalOpen"
+            :onConfirm="endGame"
+            @modalClosed="isExitModalOpen = false"/>
         <!-- Logo -->
         <LogoComponent />
 
@@ -62,6 +64,7 @@
 
 // Vue & Core Imports
 import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { onBeforeRouteLeave } from 'vue-router';
 import router from '@/router';
 
 // Components
@@ -85,6 +88,9 @@ const { lobbyCode, players, gameStarted } = useHostSession();
 // Copy Status Tracking
 type CopyStatus = 'idle' | 'success' | 'error';
 const copyStatus = ref<CopyStatus>('idle');
+
+// Modal state for exit confirmation (used by cancel button and back navigation)
+const isExitModalOpen = ref(false);
 
 // Screen Width Tracking for Responsive Design
 const screenWidth = ref(window.innerWidth);
@@ -134,6 +140,13 @@ const cancelButtonText = computed(() => {
     return gameStarted.value ? 'End Game' : 'Cancel';
 });
 
+// Exit modal message based on game state (used by all exit actions)
+const exitModalMessage = computed(() => {
+    return gameStarted.value
+        ? 'Are you sure you want to end the game? <br/> All players will be disconnected and you will not be able to reconnect.'
+        : 'Are you sure you want to cancel the lobby? <br/> All players will be disconnected.';
+});
+
 // Responsive button width based on screen size
 const copyButtonWidth = computed(() => {
     if (screenWidth.value < 550) {
@@ -152,19 +165,17 @@ const goHome = () => {
 };
 
 // Handle Cancel/End Game button
-const handleCancel = async () => {
-    if (gameStarted.value) {
-        // End the game session if it has started
-        const apiManager = APIManager.getInstance();
-        const session = await apiManager.getSession();
-        if (session instanceof HostSession) {
-            session.endGame();
-        }
+const handleCancel = () => {
+    isExitModalOpen.value = true;
+};
+
+// Handle cancelled back navigation (just cancel the navigation attempt)
+const handleBackCancel = () => {
+    // Cancel the navigation
+    if (navigationCallback.value) {
+        navigationCallback.value(false);
+        navigationCallback.value = null;
     }
-    // Clear persisted game state when navigating home
-    localStorage.removeItem('host-game-started');
-    // Navigate home regardless of game state
-    goHome();
 };
 
 // Game Management
@@ -182,10 +193,20 @@ const startGame = async () => {
 };
 
 const endGame = async () => {
+    isNavigatingAway.value = true;
+
     const apiManager = APIManager.getInstance();
     const session = await apiManager.getSession();
     if (session instanceof HostSession) {
         session.endGame();
+    }
+    // Clear persisted game state when navigating home
+    localStorage.removeItem('host-game-started');
+
+    // Allow any pending navigation (like back button) to proceed
+    if (navigationCallback.value) {
+        navigationCallback.value(false); // Cancel back navigation since we're navigating programmatically
+        navigationCallback.value = null;
     }
 }
 
@@ -227,6 +248,28 @@ onMounted(() => {
 
 onUnmounted(() => {
     window.removeEventListener('resize', handleResize);
+});
+
+// Navigation state for back button handling
+const isNavigatingAway = ref(false);
+const navigationCallback = ref<((value: boolean) => void) | null>(null);
+
+// Route leave guard for back button navigation
+onBeforeRouteLeave((to: any, from: any, next: (value: boolean) => void) => {
+    // If already navigating programmatically (e.g., after confirming modal), allow it
+    if (isNavigatingAway.value) {
+        next(true);
+        return;
+    }
+
+    // Show shared confirmation modal
+    isExitModalOpen.value = true;
+
+    // Store the next callback to call it later
+    navigationCallback.value = next;
+
+    // Don't proceed with navigation yet - wait for user response
+    next(false);
 });
 
 </script>

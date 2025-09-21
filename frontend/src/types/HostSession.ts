@@ -18,7 +18,7 @@ export class HostSession extends Session {
             this.handleGameStarted(data.questions);
         });
         
-        this.addEventListener("SESSION_ENDED", (data) => {
+        this.addEventListener("GAME_END", (data) => {
             this.handleSessionEnded(data.reason);
         });
 
@@ -58,7 +58,7 @@ export class HostSession extends Session {
     }
 
     public handleSessionEnded(reason: string) {
-        console.log("Session ended with reason:", reason);
+        console.log("Game ended with reason:", reason);
     }
 
     /**

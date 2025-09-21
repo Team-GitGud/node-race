@@ -1,6 +1,6 @@
 <template>
     <img @click="handleHomeClick" class="back-logo" :src="Logo" alt="NodeRace Logo"/>
-    <ModalPopup title="Exit Game?" v-if="isOpen" @close="isOpen = false">
+    <ModalPopup title="Exit Game?" v-if="isOpen" @close="handleCancelClick">
         <template #body>
             <p v-html="props.message"></p>
         </template>
@@ -12,7 +12,7 @@
                 Yes
             </CustomButton>
             <CustomButton
-                :action="() => isOpen = false"
+                :action="handleCancelClick"
                 type="negative"
             >
                 No
@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, defineProps, withDefaults } from 'vue';
+import { ref, defineProps, withDefaults, watch, defineEmits } from 'vue';
 import ModalPopup from '@/components/ModalPopup.vue';
 import CustomButton from '@/components/CustomButton.vue';
 import Logo from '@/assets/logo.png';
@@ -33,16 +33,29 @@ const props = withDefaults(
         message?: string,
         onConfirm?: () => void
         skipConfirm?: boolean
+        forceOpen?: boolean
     }>(),
     {
         message: 'Are you sure you want to return to the home page? <br/> You will be disconnected from the current game.',
         onConfirm: undefined,
-        skipConfirm: false
+        skipConfirm: false,
+        forceOpen: false
     }
 );
 
 const router = useRouter();
 const isOpen = ref(false);
+
+const emit = defineEmits<{
+    modalClosed: []
+}>();
+
+// Watch for forceOpen prop to programmatically open modal
+watch(() => props.forceOpen, (newValue) => {
+    if (newValue) {
+        isOpen.value = true;
+    }
+});
 
 const handleHomeClick = () => {
     if (props.skipConfirm) {
@@ -53,10 +66,18 @@ const handleHomeClick = () => {
 }
 
 const handleConfirmClick = () => {
+    isOpen.value = false;
+    emit('modalClosed');
+
     if (props.onConfirm) {
         props.onConfirm();
     }
     router.push('/');
+}
+
+const handleCancelClick = () => {
+    isOpen.value = false;
+    emit('modalClosed');
 }
 </script>
 

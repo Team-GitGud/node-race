@@ -74,7 +74,7 @@ export function useHostSession() {
             // router.push('/leaderboard');
         });
 
-        session.addEventListener("SESSION_ENDED", () => {
+        session.addEventListener("GAME_END", () => {
             gameStarted.value = false;
             saveGameStartedState(false);
         });
