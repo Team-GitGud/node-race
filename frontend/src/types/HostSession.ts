@@ -49,7 +49,7 @@ export class HostSession extends Session {
     }
 
     public handleGameStarted(questions: BackendQuestion[]) {
-        if (questions !== undefined && questions.length > 0) {
+        if (questions !== undefined && questions.length > 0 && questions !== null) {
             // If there's no players, for some reason there's no questions generated.
             const adaptedQuestions = QuestionAdapter.fromBackendQuestions(questions);
             console.log("Adapted questions:", adaptedQuestions);

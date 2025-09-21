@@ -95,6 +95,7 @@ export class PlayerSession extends Session {
 
   public addAnswer(questionIndex: number, answer: boolean) {
     this.answers[questionIndex] = answer;
+    console.log("Answers changed", this.answers);
     this.saveState(); // Save to localStorage when answers change
   }
 
@@ -157,17 +158,17 @@ export class PlayerSession extends Session {
     });
   }
 
-  public setAnswerTimes(questionIndex: number, time: number) {
-    if (this.answerTimes[questionIndex] !== undefined) return;
-
-    this.answerTimes[questionIndex] = time;
-  }
   public setAnswers(answers: Array<boolean>) {
     this.answers = answers;
   }
 
   public setAnswerTime(answerTimes: Array<number>) {
     this.answerTimes = answerTimes;
+  }
+
+  public setAnswerTimes(questionIndex: number, time: number) {
+    if (this.answerTimes[questionIndex] !== undefined && this.answerTimes[questionIndex] !== 0 && this.answerTimes[questionIndex] !== null) return;
+    this.answerTimes[questionIndex] = time;
   }
 
   public getAnswerTimes(questionIndex: number): number {

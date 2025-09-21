@@ -40,7 +40,6 @@ import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
 import TimerComponent from '@/components/TimerComponent.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
-import { GameTimer } from '@/types/GameTimer';
 import { Session } from '@/types/Session';
 import { PlayerSession } from '@/types/PlayerSession';
 import { usePlayerSession } from '@/types/usePlayerSession';
@@ -53,6 +52,7 @@ const router = useRouter();
 const { questions, gameTimer } = usePlayerSession();
 const selectedOrder = ref<Map<number, number>>(new Map());
 const hasAnswered = ref(false);
+const gameHasEnded = ref(false);
 const session = ref<Session | null>(null);
 
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
@@ -65,7 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
 
-onMounted(async () => {
+const initializeQuestion = async () => {
     session.value = await APIManager.getInstance().getSession();
     console.log("Trying to find session...")
     if (!session.value || !(session.value instanceof PlayerSession)) return;
@@ -73,14 +73,24 @@ onMounted(async () => {
 
     questions.value = session.value.getQuestions();
     gameTimer.value = session.value.getGameTimer();
-    console.log("Game timer", gameTimer.value);
     selectedOrder.value = new Map();
-    // Added this null check because it's null if from localStorage.
-    hasAnswered.value = session.value.getAnswers()[props.questionIndex] !== undefined && session.value.getAnswers()[props.questionIndex] !== null;
-    console.log("Answers", session.value.getAnswers());
-    console.log("Has answered question? ", hasAnswered.value);
-    result.value = hasAnswered.value ? session.value.getAnswers()[props.questionIndex] ?? false : null;
-});
+    hasAnswered.value = await hasAnsweredQuestion(props.questionIndex);
+    if (hasAnswered.value) {
+        result.value = session.value.getAnswers()[props.questionIndex] ?? false;
+        if (gameHasEnded.value) gameTimer.value?.stop(); // Stop counting down when the question is answered. Allows us to go back.
+    } else {
+        gameTimer.value?.start();
+        result.value = null; // Otherwise the nodes will be red/green.
+    }
+};
+
+onMounted(initializeQuestion);
+
+
+// Immediate false just means it won't call on the first mount.
+watch(() => props.questionIndex, () => {
+    initializeQuestion();
+}, { immediate: false });
 
 const handleSelect = (newOrder: Map<number, number>) => {
     selectedOrder.value = newOrder;
@@ -96,12 +106,13 @@ const checkAnswer = async () => {
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
     session.value.addAnswer(props.questionIndex, result.value ?? false);
     session.value.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
-    session.value.setAnswerTimes(props.questionIndex, gameTimer.value?.getTimeLeft() ?? 0);
+    session.value.setAnswerTimes(props.questionIndex, gameTimer.value?.getLastAnswerTimeAndLogNewTime() ?? 0);
 
     setTimeout(async () => {
         resetOrder();
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
+            gameHasEnded.value = true;
             return;
         } else if (props.questionIndex + 1 >= questions.value.length) {
             router.push("/question-navigation");
@@ -127,7 +138,7 @@ const answeredAllQuestions = async () => {
     // Check if all previous questions (0 to currentIndex-1) have been answered
     const answers = session.value.getAnswers();
     for (let i = 0; i < questions.value.length; i++) {
-        if (answers[i] === undefined) {
+        if (answers[i] === undefined || answers[i] === null) {
             return false;
         }
     }
@@ -136,7 +147,7 @@ const answeredAllQuestions = async () => {
 
 const hasAnsweredQuestion = async (questionIndex: number) => {
     if (!session.value || !(session.value instanceof PlayerSession)) return false;
-    return session.value.getAnswers()[questionIndex] !== undefined;
+    return session.value.getAnswers()[questionIndex] !== undefined && session.value.getAnswers()[questionIndex] !== null;
 }
 
 const currentQuestion = computed(() => {

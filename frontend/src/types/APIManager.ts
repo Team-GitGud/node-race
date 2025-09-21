@@ -99,6 +99,7 @@ class APIManager {
             return data;
         } catch (error) {
             console.error('Error parsing WebSocket message:', error);
+            console.error('WebSocket message:', event.data);
             resolve(false);
         }
     }

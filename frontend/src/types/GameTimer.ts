@@ -3,6 +3,7 @@ export class GameTimer {
   private startTime: number;
   private endTime: number;
   private elapsedTime: number; // Time elapsed since start
+  private lastAnswerTime: number; // Time since last answer in milliseconds.
   private isRunning: boolean;
 
   private timer: number | null = null;
@@ -10,6 +11,7 @@ export class GameTimer {
 
   public constructor(startTime: number, endTime: number) {
     this.startTime = startTime;
+    this.lastAnswerTime = startTime;
     this.endTime = endTime;
     this.totalDuration = endTime - startTime;
     this.elapsedTime = 0;
@@ -20,12 +22,11 @@ export class GameTimer {
     if (this.isRunning) {
       return;
     }
-    console.log("Starting game timer");
     this.isRunning = true;
     this.elapsedTime = this.elapsedTime !== 0 ? this.elapsedTime : 0;
     this.timer = setInterval(() => {
       this.elapsedTime = new Date().getTime() - this.startTime;
-      this.saveRunnable();
+      this.saveRunnable(); // We save the current time it takes to cache.
     }, 1000);
   }
 
@@ -34,6 +35,7 @@ export class GameTimer {
       clearInterval(this.timer);
       this.timer = null;
     }
+    this.isRunning = false;
   }
 
   public setSaveRunnable(runnable: () => void): void {
@@ -56,6 +58,13 @@ export class GameTimer {
     return Math.ceil(this.elapsedTime / 1000);
   }
 
+  /** We log the new time, and then calculate the time spent on the last answer. */
+  public getLastAnswerTimeAndLogNewTime(): number {
+    const timeSinceLastAnswer = new Date().getTime() - this.lastAnswerTime;
+    this.lastAnswerTime = new Date().getTime();
+    return Math.ceil(timeSinceLastAnswer / 1000);
+  }
+
   /** Serialize timer state for localStorage */
   public toJSON(): any {
     return {
@@ -63,7 +72,8 @@ export class GameTimer {
       endTime: this.endTime,
       totalDuration: this.totalDuration,
       elapsedTime: this.elapsedTime,
-      isRunning: this.isRunning
+      isRunning: this.isRunning,
+      lastAnswerTime: this.lastAnswerTime
     };
   }
 
@@ -72,7 +82,8 @@ export class GameTimer {
     const timer = new GameTimer(data.startTime, data.endTime);
     timer.elapsedTime = data.elapsedTime;
     timer.isRunning = data.isRunning;
-    
+    timer.lastAnswerTime = data.lastAnswerTime;
+
     // Restart timer if it was running
     if (timer.isRunning) {
       console.log("Restarting game timer");

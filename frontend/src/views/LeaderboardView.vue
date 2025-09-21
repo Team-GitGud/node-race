@@ -27,11 +27,9 @@
 <script lang="ts" setup>
 import ScreenBackground from "@/components/ScreenBackground.vue";
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
-import CustomButton from "@/components/CustomButton.vue";
 import PlayerRank from "@/components/PlayerRank.vue";
 import { ref, onMounted } from "vue";
 import { PlayerSession } from "@/types/PlayerSession";
-import { HostSession } from "@/types/HostSession";
 import LeaderboardQuestionCard from "@/components/LeaderboardQuestionCard.vue";
 import LeaderboardComponent from "@/components/LeaderboardComponent.vue";
 import APIManager from "@/types/APIManager";
