@@ -7,8 +7,6 @@
             :forceOpen="isExitModalOpen"
             :onConfirm="endGame"
             @modalClosed="isExitModalOpen = false"/>
-        <!-- Logo -->
-        <LogoComponent />
 
         <!-- Left Side: Lobby Controls -->
         <div class="lobby-left">
