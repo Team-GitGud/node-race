@@ -78,6 +78,10 @@ export class Lobby {
         console.log("game end ended");
     }
 
+    /**
+     * Generates the session leaderboard from the current lobby/game
+     * This is not saved and its different from the global leaderboard
+     */
     generateSessionLeaderboardJson(): string {
         let rank: number = 1;
         return JSON.stringify(
@@ -94,7 +98,7 @@ export class Lobby {
         let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
         if (p == undefined) { return false; }
         // Just does nothing if a question 
-        if (p.questionHistory[questionNumber] != undefined){
+        if (p.questionHistory[questionNumber] != undefined) {
             return false;
         }
         let correct = this.gameLogic.questions[questionNumber].solution
@@ -119,7 +123,7 @@ export class Lobby {
 
     /**
      * generates a random string of length 5
-    */
+     */
     static generateKey(): string {
         const length: number = 5;
         const characters: String = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -132,6 +136,11 @@ export class Lobby {
         return result;
     }
 
+    /**
+     * This is for the host to kick someone.
+     * Removes a player from the game.
+     * @param playerId The player to remove.
+     */
     removePlayer(playerId: string): void {
         const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
         this.players = this.players.filter(p => p.ID !== playerId);
@@ -140,20 +149,37 @@ export class Lobby {
         this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEFT", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
+    /**
+     * This is for the Player when a player leaves on their own.
+     * Removes a player from a game.
+     * @param playerId The player to remove.
+     */
     playerLeave(playerId: string): void {
         const removedPlayer: Player = this.players.filter(p => p.ID === playerId)[0];
         this.players = this.players.filter(p => p.ID !== playerId);
         this.ws.send(ApiResponseFactory.playerLeftResponse("PLAYER_LEAVE", removedPlayer.ID, this.getAllPlayersJson()));
     }
 
+    /**
+     * Checks if the id is the host and if the id has permission to do certain api actions.
+     */
     validateHost(id: string): boolean {
         return id === this.hostToken;
     }
 
+    /**
+     * Fetches all players in the lobby to the host.
+     */
     sendAllPlayers(): void {
         this.ws.send(ApiResponseFactory.getAllPlayerResponse(this.getAllPlayersJson()));
     }
 
+    /**
+     * Rejoins a player or host for when they reload the browser.
+     * This function closes the old websocket related to the entity and assign a new websocket to the entity.
+     * @param playerId playerId, could also be the hostId.
+     * @param playerWs the new websocket.
+     */
     rejoinLobby(playerId: string, playerWs: WebSocket): void {
         if (playerId === this.hostToken) {
             this.ws.close();
@@ -170,10 +196,16 @@ export class Lobby {
         player.rejoin(playerWs, this.gameLogic.getQuestionJSON());
     }
 
+    /**
+     * returns a single player, the return will be undefined if a player with the give id doesnt exist.
+     */
     getPlayer(playerId: string): Player | undefined {
         return this.players.filter(p => p.ID === playerId)[0];
     }
 
+    /**
+     * returns the json format of all the players in the current lobby.
+     */
     getAllPlayersJson(): string {
         return `[${this.players.map((p: Player) => p.toJsonString()).join(',')}]`;
     }
@@ -197,19 +229,5 @@ export class Lobby {
         }
         return -1;
 
-    }
-
-    updateGlobalLeaderboard(): void {
-        //TODO: implement with leaderboard
-    }
-
-    checkGameEnd(): boolean {
-        //TODO: implement after timer
-        return false;
-    }
-
-    getTime(): number {
-        //TODO: implement after timer
-        return 1;
     }
 }

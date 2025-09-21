@@ -4,11 +4,10 @@ import { WebSocket, WebSocketServer, RawData } from 'ws';
 import { IncomingMessage } from 'node:http';
 import http from 'http';
 import { LobbyManager } from '../data-access/lobbyManager';
-import { url } from 'node:inspector';
 import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
-import { Player } from '../data-access/player';
-import {GameLogic} from '../session-logic/gameLogic';
+import { GameLogic } from '../session-logic/gameLogic';
+import { Database } from "../data-access/db";
 
 
 export class api {
@@ -55,8 +54,11 @@ export class api {
     }
 
     /**
-    * Handles the initial connection between the frontend and backend
-    * There are 2 main cases, lobby creation and playerJoining a lobby
+    * Handles the initial connection between the frontend and backend parameters 
+    * are passed in the url because  the initial connection does not accept JSON.
+    *
+    * @param ws the websocket object associated with the initial connection.
+    * @param data the data from the frontend including url.
     */
     static handleInitialConnection(ws: WebSocket, data: IncomingMessage) {
         const fullURL: URL = new URL(data.url ?? "", "http://localhost");
@@ -66,11 +68,13 @@ export class api {
         console.log(data.url);
 
         switch (path) {
+            // Creates a Lobby 
             case (ApiPaths.CREATE_LOBBY):
                 this.lobbies.createLobby(ws);
                 break;
 
 
+            // Lets a player Join a lobby
             case (ApiPaths.JOIN_LOBBY):
                 console.log("lobby join");
                 // Parse url urlParameters
@@ -88,6 +92,7 @@ export class api {
                 }
                 break;
 
+            // Lets player or host rejoin lobby if they refresh the broswer tab
             case (ApiPaths.REJOIN_LOBBY):
                 // Parse url urlParameters
                 const playerId: string = urlParameters.id;
@@ -102,9 +107,17 @@ export class api {
                 }
                 break;
 
+            // Single player option that returns a single question
             case (ApiPaths.PRACTICE):
                 console.log("practice");
                 ws.send(ApiResponseFactory.practiceQuestionResponse(JSON.stringify(new GameLogic().generateQuestion(false))))
+                break;
+
+            // Returns the leaderboard when theres no game
+            case (ApiPaths.LEADERBOARD):
+                // Send leaderboard here
+                console.log("Sending only global leaderboard");
+                ws.send(ApiResponseFactory.getLeaderboardResponse(new Database().getLeaderboard()))
                 break;
 
             default:
@@ -112,6 +125,13 @@ export class api {
         }
     }
 
+    /**
+    * This functions handles requests from the frontend while a game is running.
+    * The messages in this case is a json object and each json rquest must contain an action parameter.
+    *
+    * @param message json message containing the request content.
+    * @param ws the websocket associated with the request.
+    */
     static handleMessages(message: any, ws: WebSocket) {
         const action: string = message.action;
 
@@ -214,7 +234,7 @@ export class api {
             return;
         }
 
-        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard()));
+        ws.send(ApiResponseFactory.getLeaderboardResponse(lobby.database.getLeaderboard(), lobby.getLeaderboard()));
 
     }
 
@@ -227,7 +247,7 @@ export class api {
             return;
         }
 
-        if (!lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber)){
+        if (!lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber)) {
             ws.send("Error processing answer either player does not exist or question already submitted");
         }
 
@@ -286,9 +306,13 @@ export class api {
     }
 }
 
+/**
+* This is a static class that contains the all of the URL endpoints that does not need a websocket connection.
+*/
 class ApiPaths {
     static CREATE_LOBBY = '/api/v1/lobby/create';
     static JOIN_LOBBY = '/api/v1/lobby/join';
     static REJOIN_LOBBY = '/api/v1/lobby/rejoin';
     static PRACTICE = '/api/v1/practice';
+    static LEADERBOARD = '/api/v1/leaderboard';
 }
