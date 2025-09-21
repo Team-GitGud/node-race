@@ -86,7 +86,7 @@ export class GameTimer {
 
     // Restart timer if it was running
     if (timer.isRunning) {
-      console.log("Restarting game timer");
+      console.debug("Restarting game timer");
       timer.isRunning = false;
       timer.start();
     }

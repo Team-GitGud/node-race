@@ -37,7 +37,15 @@ export class PlayerSession extends Session {
     });
 
     this.addEventListener("LEADERBOARD", (data) => {
-      this.handleLeaderboard(data.leaderboard);
+      this.handleLeaderboard(data.leaderboard, data.lobbyLeaderboard);
+    });
+
+    this.addEventListener("SCORE", (data) => {
+      this.handleScore(data.score, data.rank);
+    });
+
+    this.addEventListener("RANK", (data) => {
+      this.handleRank(data.data.rank, data.data.lobbyRank);
     });
   }
 
@@ -71,19 +79,6 @@ export class PlayerSession extends Session {
     this.leaveSession(reason);
   }
 
-  public handleLeaderboard(
-    leaderboard: Array<{
-      rank: number;
-      name: string;
-      score: number;
-    }>
-  ) {
-    console.log("Received leaderboard", leaderboard);
-    this.leaderboard = leaderboard.map((player) => {
-      return new Player(player.rank.toString(), player.name, player.score);
-    });
-    console.log("Leaderboard", this.leaderboard);
-  }
 
   public getQuestions(): Array<Question> {
     return this.questions;
@@ -195,5 +190,52 @@ export class PlayerSession extends Session {
     };
     
     APIManager.getInstance().updatePlayerSessionData(sessionData);
+  }
+
+  public async fetchScore(): Promise<void> {
+    return new Promise((resolve) => {
+      const message = JSON.stringify({
+        action: "GET_SCORE",
+        data: {
+          playerId: this.player.getId(),
+          },
+        });
+        this.ws.send(message);
+        resolve();
+      });
+  }
+
+  public async fetchRank(): Promise<void> {
+    return new Promise((resolve) => {
+      const message = JSON.stringify({
+        action: "GET_RANK",
+        playerId: this.player.getId(),
+        data: {
+          lobbyId: this.lobbyCode,
+          },
+        });
+        this.ws.send(message);
+        resolve();
+      });
+  }
+
+  public handleRank(rank: number, lobbyRank: number) {
+    this.player.setLobbyRank(lobbyRank);
+    this.player.setGlobalRank(rank);
+    // Emit a custom event for rank updates
+    this.emitEvent("RANK_UPDATED", { rank, lobbyRank });
+  }
+
+  public handleScore(score: number, rank: number) {
+    this.player.setScore(score);
+    this.player.setGlobalRank(rank);
+  }
+
+  public getGlobalLeaderboard(): Array<Player> {
+    return this.globalLeaderboard;
+  }
+
+  public getLobbyLeaderboard(): Array<Player> {
+    return this.lobbyLeaderboard;
   }
 }

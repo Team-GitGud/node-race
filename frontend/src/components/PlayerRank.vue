@@ -2,7 +2,7 @@
     <div class="player-rank" v-if="session && session instanceof PlayerSession">
         <div class="row-one">
             <div class="rank">
-                <span class="rank-number">1.</span>
+                <span class="rank-number">{{playerRank}}</span>
                 <span>{{ session.getPlayer().getNickname() }}</span>
             </div>
             <span>5000</span>
@@ -19,14 +19,15 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, computed, ref, onMounted } from "vue";
+import { defineProps, computed, ref, onMounted, onUnmounted } from "vue";
 import { Session } from "@/types/Session";
 import { PlayerSession } from "@/types/PlayerSession";
 
 const timeSpent = ref();
+const playerRank = ref(-1);
 
 const props = defineProps<{
-    session: Session;
+    session: Session | null;
 }>();
 
 const formattedTime = computed(() => {
@@ -35,12 +36,28 @@ const formattedTime = computed(() => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 });
 
-onMounted(() => {
+// Event handler for rank updates
+const handleRankUpdate = (data: { rank: number; lobbyRank: number }) => {
+    playerRank.value = data.rank;
+};
+
+onMounted(async () => {
     if (props.session instanceof PlayerSession) {
+        await props.session.fetchRank();
+        playerRank.value = props.session.getPlayer().getLobbyRank();
         timeSpent.value = (60 * 5) - (props.session.getGameTimer()?.getTimeLeft() ?? 0);
+        
+        // Listen for rank updates
+        props.session.addEventListener("RANK_UPDATED", handleRankUpdate);
     }
 });
 
+onUnmounted(() => {
+    // Clean up event listener
+    if (props.session instanceof PlayerSession) {
+        props.session.removeEventListener("RANK_UPDATED", handleRankUpdate);
+    }
+});
 </script>
 
 <style scoped>

@@ -133,9 +133,11 @@ export class ApiResponseFactory {
     static getRankResponse(rank: number, lobbyRank: number): string {
         return `
         {
-            "type:": "RANK",
-            "rank": ${rank},
-            "lobbyRank": ${lobbyRank}
+            "type": "RANK",
+            "data": {
+                "rank": ${rank},
+                "lobbyRank": ${lobbyRank}
+            }
         }
         `;
     }
@@ -144,7 +146,8 @@ export class ApiResponseFactory {
         return `
         {
             "type": "LEADERBOARD",
-            "leaderboard": ${leaderboard ?? "\"[]\""} 
+            "leaderboard": ${leaderboard ?? "\"[]\""},
+            "lobbyLeaderboard": ${lobbyLeaderboard ?? "\"[]\""}
         }
         `;
     }

@@ -52,7 +52,7 @@ const router = useRouter();
 const { questions, gameTimer } = usePlayerSession();
 const selectedOrder = ref<Map<number, number>>(new Map());
 const hasAnswered = ref(false);
-const gameHasEnded = ref(false);
+// Remove gameHasEnded ref - we'll compute it from answers
 const session = ref<Session | null>(null);
 
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
@@ -67,9 +67,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const initializeQuestion = async () => {
     session.value = await APIManager.getInstance().getSession();
-    console.log("Trying to find session...")
+    console.debug("Trying to find session...")
     if (!session.value || !(session.value instanceof PlayerSession)) return;
-    console.log("Found session", session.value);
+    console.debug("Found session", session.value);
 
     questions.value = session.value.getQuestions();
     gameTimer.value = session.value.getGameTimer();
@@ -77,7 +77,9 @@ const initializeQuestion = async () => {
     hasAnswered.value = await hasAnsweredQuestion(props.questionIndex);
     if (hasAnswered.value) {
         result.value = session.value.getAnswers()[props.questionIndex] ?? false;
-        if (gameHasEnded.value) gameTimer.value?.stop(); // Stop counting down when the question is answered. Allows us to go back.
+        if (await answeredAllQuestions()) {
+            gameTimer.value?.stop(); // Stop counting down when the question is answered. Allows us to go back.
+        }
     } else {
         gameTimer.value?.start();
         result.value = null; // Otherwise the nodes will be red/green.
@@ -107,12 +109,12 @@ const checkAnswer = async () => {
     session.value.addAnswer(props.questionIndex, result.value ?? false);
     session.value.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
     session.value.setAnswerTimes(props.questionIndex, gameTimer.value?.getLastAnswerTimeAndLogNewTime() ?? 0);
+    hasAnswered.value = true;
 
+    resetOrder();
     setTimeout(async () => {
-        resetOrder();
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
-            gameHasEnded.value = true;
             return;
         } else if (props.questionIndex + 1 >= questions.value.length) {
             router.push("/question-navigation");

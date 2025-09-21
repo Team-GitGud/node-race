@@ -23,7 +23,8 @@ import { ref, onMounted, defineProps } from 'vue';
 import { Player } from '@/types/Player';
 
 const props = defineProps<{
-    players: Player[];
+    globalPlayers: Player[];
+    localPlayers: Player[];
 }>();
 
 const currentPlayers = ref<Player[]>([]);
@@ -33,9 +34,9 @@ const viewLocal = ref(true);
 
 onMounted(() => {
     // TODO: Actually get the local and global.
-    currentPlayers.value = props.players;
-    localPlayers.value = props.players;
-    globalPlayers.value = props.players;
+    currentPlayers.value = props.localPlayers;
+    localPlayers.value = props.localPlayers;
+    globalPlayers.value = props.globalPlayers;
 });
 
 const setCurrentPlayers = (players: Player[]) => {

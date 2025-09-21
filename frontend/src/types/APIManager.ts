@@ -234,12 +234,14 @@ class APIManager {
                 if (typeof data === 'string') {
                     data = JSON.parse(data);
                 }
+                console.log("Received message", data);
                 // Route the message to the session's EventListener system
                 if (this.session && data.type) {
                     this.session.emitEvent(data.type, data);
                 }
             } catch (error) {
                 console.error('Error parsing WebSocket message:', error);
+                console.error('WebSocket message:', event.data);
             }
         };
     }
