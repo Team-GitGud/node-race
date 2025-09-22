@@ -224,8 +224,8 @@ nickname, score, questions
 ```json
 {
   "action": "GET_LEADERBOARD",
-  data: {
-    lobbyId: "ajsdlf"
+  "data": {
+    "lobbyId": "ajsdlf"
   }
 }
 ```
@@ -236,7 +236,7 @@ nickname, score, questions
   "leaderboard": [
         {"rank": "1", "name": "Donald", "score": "10"}
     ],
-    "lobbyLeaderboard": [
+    "lobbyLeaderboard": [ // Will be empty if no lobbyId is supplied
       {"rank": "1", "name": "Ronald", "score": "9"}
     ]
 }

@@ -7,6 +7,7 @@ import { LobbyManager } from '../data-access/lobbyManager';
 import { Lobby } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
 import { GameLogic } from '../session-logic/gameLogic';
+import { Player } from '../data-access/player';
 import { Database } from "../data-access/db";
 
 

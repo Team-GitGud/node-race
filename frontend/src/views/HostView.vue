@@ -359,19 +359,6 @@ onUnmounted(() => {
     padding-right: 1rem;
 }
 
-/* Custom scrollbar styling for webkit browsers */
-.player-list::-webkit-scrollbar {
-    width: 0.5rem;
-}
-
-.player-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.player-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
-}
-
 .player-item {
     display: flex;
     justify-content: space-between;
