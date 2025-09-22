@@ -16,13 +16,18 @@ export class LobbyManager {
     }
 
     /**
-     * gets the lobby with the accociated lobbyID
+     * Gets the lobby with the accociated lobbyID.
+     * @param lobbyId the lobbyId
      */
-    getLobby(lobbyID: string): Lobby | undefined {
-        return this.lobbies.get(lobbyID);
+    getLobby(lobbyId: string): Lobby | undefined {
+        return this.lobbies.get(lobbyId);
     }
 
-    removeLobby(lobbyID: string): void {
-        this.lobbies.delete(lobbyID);
+    /**
+     * Removes a lobby. This is essentially ending a game.
+     * @param lobbyId the lobbyId
+     */
+    removeLobby(lobbyId: string): void {
+        this.lobbies.delete(lobbyId);
     }
 }
