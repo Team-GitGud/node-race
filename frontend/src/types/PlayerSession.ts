@@ -37,7 +37,15 @@ export class PlayerSession extends Session {
     });
 
     this.addEventListener("LEADERBOARD", (data) => {
-      this.handleLeaderboard(data.leaderboard);
+      this.handleLeaderboard(data.leaderboard, data.lobbyLeaderboard);
+    });
+
+    this.addEventListener("SCORE", (data) => {
+      this.handleScore(data.data.score, data.data.rank);
+    });
+
+    this.addEventListener("RANK", (data) => {
+      this.handleRank(data.data.rank, data.data.lobbyRank);
     });
   }
 
@@ -47,13 +55,16 @@ export class PlayerSession extends Session {
 
   public handleGameStarted(questions: BackendQuestion[]) {
     this.questions = QuestionAdapter.fromBackendQuestions(questions);
-    // TODO: Handle game started for Player Session.
-    console.log("Game started with questions:", questions);
 
     // Start inactivity checker when game starts
     if (this.inactivityChecker) {
       this.inactivityChecker.stop();
     }
+    if (this.gameTimer) {
+      this.gameTimer.stop();
+    }
+    this.gameTimer = new GameTimer(Date.now(), Date.now() + 5 * 60 * 1000);
+    this.gameTimer.start();
     this.inactivityChecker = new InactivityChecker();
     this.inactivityChecker.start();
   }
@@ -68,19 +79,6 @@ export class PlayerSession extends Session {
     this.leaveSession(reason);
   }
 
-  public handleLeaderboard(
-    leaderboard: Array<{
-      rank: number;
-      name: string;
-      score: number;
-    }>
-  ) {
-    console.log("Received leaderboard", leaderboard);
-    this.leaderboard = leaderboard.map((player) => {
-      return new Player(player.rank.toString(), player.name, player.score);
-    });
-    console.log("Leaderboard", this.leaderboard);
-  }
 
   public getQuestions(): Array<Question> {
     return this.questions;
@@ -92,6 +90,8 @@ export class PlayerSession extends Session {
 
   public addAnswer(questionIndex: number, answer: boolean) {
     this.answers[questionIndex] = answer;
+    console.log("Answers changed", this.answers);
+    this.saveState(); // Save to localStorage when answers change
   }
 
   private onLeaveCallback?: (reason: string) => void;
@@ -133,6 +133,8 @@ export class PlayerSession extends Session {
 
   public setGameTimer(gameTimer: GameTimer) {
     this.gameTimer = gameTimer;
+    this.saveState(); // Save to localStorage when timer is set
+    this.gameTimer.setSaveRunnable(() => this.saveState());
   }
 
   public getGameTimer(): GameTimer | null {
@@ -159,11 +161,94 @@ export class PlayerSession extends Session {
     });
   }
 
-  public setAnswerTime(questionIndex: number, time: number) {
+  public setAnswers(answers: Array<boolean>) {
+    this.answers = answers;
+  }
+
+  public setAnswerTime(answerTimes: Array<number>) {
+    this.answerTimes = answerTimes;
+  }
+
+  public setAnswerTimes(questionIndex: number, time: number) {
+    if (this.answerTimes[questionIndex] !== undefined && this.answerTimes[questionIndex] !== 0 && this.answerTimes[questionIndex] !== null) return;
     this.answerTimes[questionIndex] = time;
   }
 
   public getAnswerTimes(questionIndex: number): number {
     return this.answerTimes[questionIndex];
+  }
+
+  public getPlayerId(): string {
+    return this.player.getId();
+  }
+
+  public getPlayerName(): string {
+    return this.player.getNickname();
+  }
+
+  /** Save session state to localStorage (call this when gameTimer or answers change) */
+  public saveState() {
+    const sessionData = {
+      lobbyCode: this.lobbyCode,
+      playerId: this.player.getId(),
+      playerName: this.player.getNickname(),
+      gameTimer: this.gameTimer ? this.gameTimer.toJSON() : null,
+      answers: [...this.answers],
+      answerTimes: [...this.answerTimes]
+    };
+    
+    APIManager.getInstance().updatePlayerSessionData(sessionData);
+  }
+
+  public async fetchScore(): Promise<void> {
+    return new Promise((resolve) => {
+      const message = JSON.stringify({
+        action: "GET_SCORE",
+        playerId: this.player.getId(),
+        data: {
+          lobbyId: this.lobbyCode
+          },
+        });
+        console.debug("Sending score request", message);
+        this.ws.send(message);
+        resolve();
+      });
+  }
+
+  public async fetchRank(): Promise<void> {
+    return new Promise((resolve) => {
+      const message = JSON.stringify({
+        action: "GET_RANK",
+        playerId: this.player.getId(),
+        data: {
+          lobbyId: this.lobbyCode,
+          },
+        });
+        console.debug("Sending rank request", message);
+        this.ws.send(message);
+        resolve();
+      });
+  }
+
+  public handleRank(rank: number, lobbyRank: number) {
+    this.player.setLobbyRank(lobbyRank);
+    this.player.setGlobalRank(rank);
+    // Emit a custom event for rank updates
+    this.emitEvent("RANK_UPDATED", { rank, lobbyRank });
+  }
+
+  public handleScore(score: number, rank: number) {
+    this.player.setScore(score);
+    this.player.setLobbyRank(rank + 1);
+    // Emit a custom event for score updates
+    this.emitEvent("SCORE_UPDATED", { score, rank: rank + 1 });
+  }
+
+  public getGlobalLeaderboard(): Array<Player> {
+    return this.globalLeaderboard;
+  }
+
+  public getLobbyLeaderboard(): Array<Player> {
+    return this.lobbyLeaderboard;
   }
 }

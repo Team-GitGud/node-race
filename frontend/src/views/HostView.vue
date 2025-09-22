@@ -5,9 +5,6 @@
         <ReturnHomeComponent
             message="Are you sure you want to return to the home page? <br/> The session will end and you will not be able to reconnect." 
             :onConfirm="endGame"/>
-        <!-- Logo -->
-        <LogoComponent />
-
         <!-- Left Side: Lobby Controls -->
         <div class="lobby-left">
             <div class="lobby-content">

@@ -36,12 +36,16 @@ const handleReturnHome = async () => {
 <style>
 .question-navigation-view {
     position: absolute;
-    top: 0; bottom: 0; left: 0; right: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     overflow: hidden;
 }
+
 .page-title {
     justify-self: center;
     padding: 20px;
@@ -59,5 +63,4 @@ const handleReturnHome = async () => {
 .question-wrapper {
     display: block;
 }
-
 </style>

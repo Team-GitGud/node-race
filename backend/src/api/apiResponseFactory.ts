@@ -142,9 +142,11 @@ export class ApiResponseFactory {
     static getRankResponse(rank: number, lobbyRank: number): string {
         return `
         {
-            "type:": "RANK",
-            "rank": ${rank},
-            "lobbyRank": ${lobbyRank}
+            "type": "RANK",
+            "data": {
+                "rank": ${rank},
+                "lobbyRank": ${lobbyRank}
+            }
         }
         `;
     }
@@ -155,6 +157,18 @@ export class ApiResponseFactory {
             "type": "LEADERBOARD",
             "leaderboard": ${leaderboard ?? "\"[]\""},
             "lobbyLeaderboard": ${lobbyLeaderboard ?? "\"[]\""}
+        }
+        `;
+    }
+
+    static getScoreResponse(score: number, rank: number): string {
+        return `
+        {
+            "type": "SCORE",
+            "data": {
+                "score": ${score},
+                "rank": ${rank}
+            }
         }
         `;
     }
