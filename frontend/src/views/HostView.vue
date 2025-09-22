@@ -10,10 +10,60 @@
 
         <!-- Left Side: Lobby Controls -->
         <div class="lobby-left">
-            <div class="lobby-content">
+
+            <!-- if game started, show analytics -->
+            <div class="analytics-content" v-if="gameStarted">
+
+                <!-- Title -->
+                <h1>Analytics</h1>
+
+                <!-- Question Analytics  -->
+                <div class="question-analytics">
+                    <div class="question-analytics-item" v-for="(question, index) in questions" :key="question.id">
+                        <div class="question-header">
+                            <p class="question-title">Q{{ index + 1 }}: {{ question.title }}</p>
+                            <p class="question-time">Avg Time: {{ question.averageAnswerTime }}</p>
+                        </div>
+                        <div class="question-analytics-item-box">
+                            <div 
+                                v-if="question.correctAnswerCount > 0" 
+                                class="question-analytics-item-box-correct" 
+                                :style="{ width: `${(question.correctAnswerCount / totalPlayers) * 100}%` }"
+                            >
+                                {{ question.correctAnswerCount }}
+                            </div>
+                            <div 
+                                v-if="question.incorrectAnswerCount > 0" 
+                                class="question-analytics-item-box-incorrect" 
+                                :style="{ width: `${(question.incorrectAnswerCount / totalPlayers) * 100}%` }"
+                            >
+                                {{ question.incorrectAnswerCount }}
+                            </div>
+                            <div 
+                                class="question-analytics-item-box-unanswered" 
+                                :style="{ width: `${((totalPlayers - question.correctAnswerCount - question.incorrectAnswerCount) / totalPlayers) * 100}%` }"
+                            ></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="buttons">
+                    <!-- Cancel/End Game button -->
+                    <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="110">
+                        {{ cancelButtonText }}
+                    </CustomButton>
+                </div>
+
+            </div>
+
+            <!-- else show lobby -->
+            <div class="lobby-content" v-else>
+
+                <!-- Title -->
                 <h1>Lobby</h1>
 
-                <!-- Game Code Section --><!-- Game Code Section -->
+                <!-- Game Code Section -->
                 <div class="game-code-container">
                     <p class="game-code-label">Game Code:</p>
                     <CustomButton :action="copyLobbyCode" :width="copyButtonWidth" :type="copyButtonType"
@@ -76,12 +126,53 @@ import ScreenBackground from '@/components/ScreenBackground.vue';
 import APIManager from '@/types/APIManager';
 import { HostSession } from '@/types/HostSession';
 import { useHostSession } from '@/types/useHostSession';
+import { HostQuestion } from '@/types/HostQuestion';
 
 
 // ===== DATA & STATE =====
 
 // Host Session Data
-const { lobbyCode, players, gameStarted } = useHostSession();
+const { lobbyCode, players, gameStarted} = useHostSession();
+
+
+//Fake questions data for testing
+const questions = ref<HostQuestion[]>([
+    {
+        id: 1,
+        title: 'Question 1',
+        averageAnswerTime: 10,
+        correctAnswerCount: 10,
+        incorrectAnswerCount: 0
+    },
+    {
+        id: 2,
+        title: 'Question 2',
+        averageAnswerTime: 20,
+        correctAnswerCount: 8,
+        incorrectAnswerCount: 2
+    },
+    {
+        id: 3,
+        title: 'Question 3',
+        averageAnswerTime: 30,
+        correctAnswerCount: 5,
+        incorrectAnswerCount: 5
+    },
+    {
+        id: 4,
+        title: 'Question 4',
+        averageAnswerTime: 40,
+        correctAnswerCount: 2,
+        incorrectAnswerCount: 1
+    },
+    {
+        id: 5,
+        title: 'Question 5',
+        averageAnswerTime: 50,
+        correctAnswerCount: 0,
+        incorrectAnswerCount: 0
+    },
+]);
 
 // Copy Status Tracking
 type CopyStatus = 'idle' | 'success' | 'error';
@@ -157,23 +248,9 @@ const copyButtonWidth = computed(() => {
 
 // ===== METHODS =====
 
-// Navigation
-const goHome = () => {
-    router.push('/');
-};
-
 // Handle Cancel/End Game button
 const handleCancel = () => {
     isExitModalOpen.value = true;
-};
-
-// Handle cancelled back navigation (just cancel the navigation attempt)
-const handleBackCancel = () => {
-    // Cancel the navigation
-    if (navigationCallback.value) {
-        navigationCallback.value(false);
-        navigationCallback.value = null;
-    }
 };
 
 // Game Management
@@ -269,6 +346,10 @@ onBeforeRouteLeave((to: any, from: any, next: (value: boolean) => void) => {
     // Don't proceed with navigation yet - wait for user response
     next(false);
 });
+
+// Total players for analytics
+//const totalPlayers = computed(() => players.value.length);
+const totalPlayers = 10;
 
 </script>
 
@@ -385,6 +466,8 @@ onBeforeRouteLeave((to: any, from: any, next: (value: boolean) => void) => {
     justify-content: space-evenly;
     align-items: center;
     gap: 1rem;
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
 
@@ -422,5 +505,83 @@ onBeforeRouteLeave((to: any, from: any, next: (value: boolean) => void) => {
     font-size: 2rem;
     padding: 5px 0px;
     min-width: 50px;
+}
+
+
+
+/* Question Analytics Styles */
+
+.analytics-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    padding-bottom: 2rem;
+    box-sizing: border-box;
+}
+
+.question-analytics{
+
+    display: flex;
+    min-width: 500px;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    padding: 1rem;
+    flex: 1;
+    min-height: 0; /* Allow flex item to shrink below content size */
+}
+
+.question-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.question-title {
+    font-weight: bold;
+    font-size: 2.5rem;
+}
+
+.question-time {
+    font-size: 2rem;
+}
+
+.question-analytics-item-box {
+    display: flex;
+    height: 30px;
+    background: #f0f0f0;
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+    max-height: 30vh;
+}
+
+.question-analytics-item-box-correct {
+    background: #139705;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.question-analytics-item-box-incorrect {
+    background: #AA0707;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.question-analytics-item-box-unanswered {
+    background: white;
 }
 </style>
