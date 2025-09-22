@@ -1,7 +1,7 @@
 <template>
     <div @click="handleClick" v-if="question" class="question-card border"
         :class="{ 'correct': answerStatus === true, 'incorrect': answerStatus === false }">
-        <h3 class="question-name">{{ question.title }}</h3>
+        <h3 class="question-name">Q{{ Number(question.id) + 1 }} - {{ question.type }} </h3>
         <div class="results">
             <span class="timer">
                 <h3>{{ formattedTime }}</h3>
