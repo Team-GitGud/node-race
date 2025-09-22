@@ -5,7 +5,7 @@
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
         <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
             class="navigate-left-icon" />
-        <div class="tree-container">
+        <div class="tree-container" :style="{ transform: `scale(${treeScale})` }">
             <TreeNode v-if="currentQuestion" :node="currentQuestion.root" :selectedOrder="selectedOrder"
                 :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect($event)"
                 style="margin-top: 0px;" />
@@ -38,7 +38,7 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { ref, computed, onMounted, watch, withDefaults, defineProps, onUnmounted } from 'vue';
+import { ref, computed, onMounted, watch, withDefaults, defineProps, onUnmounted, nextTick } from 'vue';
 import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
@@ -58,6 +58,7 @@ const selectedOrder = ref<Map<number, number>>(new Map());
 const hasAnswered = ref(false);
 const answerDisabled = ref(false);
 const session = ref<Session | null>(null);
+const treeScale = ref(1);
 
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
 const result = ref<boolean | null>(null);
@@ -68,6 +69,41 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
+
+const calculateTreeScale = () => {
+    nextTick(() => {
+        const treeContainer = document.querySelector('.tree-container');
+        if (!treeContainer) return;
+        
+        const containerRect = treeContainer.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        
+        // Define safe zones for buttons (with some padding)
+        const bottomButtonHeight = 140; // Height reserved for bottom buttons + padding
+        const sideButtonWidth = 200; // Width reserved for side buttons + padding
+        
+        // Calculate available space
+        const availableHeight = viewportHeight - bottomButtonHeight - 100; // 100px for top margin
+        const availableWidth = viewportWidth - (sideButtonWidth * 2); // Both sides
+        
+        // Calculate scale factors
+        let scaleX = 1;
+        let scaleY = 1;
+        
+        if (containerRect.height > availableHeight) {
+            scaleY = availableHeight / containerRect.height;
+        }
+        
+        if (containerRect.width > availableWidth) {
+            scaleX = availableWidth / containerRect.width;
+        }
+        
+        // Use the smaller scale to ensure tree fits in both dimensions
+        const newScale = Math.min(scaleX, scaleY, 1); // Never scale up, only down
+        treeScale.value = Math.max(newScale, 0.3); // Minimum scale of 0.3
+    });
+};
 
 const initializeQuestion = async () => {
     session.value = await APIManager.getInstance().getSession();
@@ -89,10 +125,21 @@ const initializeQuestion = async () => {
         gameTimer.value?.start();
         result.value = null; // Otherwise the nodes will be red/green.
     }
+    
+    // Calculate tree scale after DOM updates
+    calculateTreeScale();
 };
 
-onMounted(initializeQuestion);
+onMounted(() => {
+    initializeQuestion();
+    // Add window resize listener for responsive scaling
+    window.addEventListener('resize', calculateTreeScale);
+});
 
+onUnmounted(() => {
+    // Clean up resize listener
+    window.removeEventListener('resize', calculateTreeScale);
+});
 
 // Immediate false just means it won't call on the first mount.
 watch(() => props.questionIndex, () => {
@@ -200,6 +247,8 @@ h2 {
 
 .tree-container {
     margin-top: 5vh;
+    transform-origin: center top;
+    transition: transform 0.3s ease;
 }
 
 .navigate-left-icon,
@@ -211,6 +260,7 @@ h2 {
     height: 88px;
     flex-shrink: 0;
     cursor: pointer;
+    z-index: 1000;
 }
 
 .navigate-left-icon {
@@ -244,6 +294,7 @@ h2 {
     display: flex;
     align-items: center;
     gap: 5px;
+    z-index: 100;
 }
 
 .bottom-left-buttons {
@@ -251,6 +302,7 @@ h2 {
     bottom: 50px;
     left: 60px;
     display: flex;
+    z-index: 90;
 }
 
 .back-to-home-button {
@@ -266,6 +318,7 @@ h2 {
     display: flex;
     align-items: center;
     gap: 15px;
+    z-index: 100;
 }
 
 .question-number {

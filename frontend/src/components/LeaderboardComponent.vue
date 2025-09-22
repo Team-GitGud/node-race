@@ -12,7 +12,7 @@
                         1 }}.</span>
                     <span class="nickname">{{ player.nickname }}</span>
                 </div>
-                <span>{{ player.score }}</span>
+                <span>{{ parseInt(player.score.toString()) }}</span>
             </div>
         </div>
     </div>
@@ -20,7 +20,9 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, defineProps } from 'vue';
+import APIManager from '@/types/APIManager';
 import { Player } from '@/types/Player';
+import { PlayerSession } from '@/types/PlayerSession';
 
 const props = defineProps<{
     globalPlayers: Player[];
@@ -32,11 +34,15 @@ const localPlayers = ref<Player[]>([]);
 const globalPlayers = ref<Player[]>([]);
 const viewLocal = ref(true);
 
-onMounted(() => {
-    // TODO: Actually get the local and global.
+onMounted(async () => {
+    // Cheaty way to include the user into the global players because it hasn't updated yet.
+    const session = await APIManager.getInstance().getSession();
     currentPlayers.value = props.localPlayers;
     localPlayers.value = props.localPlayers;
     globalPlayers.value = props.globalPlayers;
+    if (session instanceof PlayerSession) {
+        globalPlayers.value.push(session.getPlayer());
+    }
 });
 
 const setCurrentPlayers = (players: Player[]) => {

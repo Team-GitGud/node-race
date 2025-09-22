@@ -5,7 +5,7 @@
                 <span class="rank-number" :class="getRankColor(playerRank)">{{playerRank}}.</span>
                 <span>{{ session.getPlayer().getNickname() }}</span>
             </div>
-            <span>{{playerScore}}</span>
+            <span>{{parseInt(playerScore.toString())}}</span>
         </div>
         <div class="row-two">
             <span>Total Time Spent:</span>
