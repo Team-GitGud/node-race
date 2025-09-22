@@ -1,10 +1,10 @@
 <template>
     <div class="question-container" @click="navigateToQuestion">
-        <div :class="['question-card', `status-${question.answerStatus}`]">
+        <div :class="['question-card', `status-${answerStatus}`]">
             <h3 class="question-name">{{ question.title }} {{ Number(question.id) }}</h3>
-            <div class="checkbox" v-if="question.answerStatus == null" />
-            <h4 class="tick" v-if="question.answerStatus == true">✔</h4>
-            <h3 class="cross" v-if="question.answerStatus == false">X</h3>
+            <div class="checkbox" v-if="answerStatus == null" />
+            <h4 class="tick" v-if="answerStatus == true">✔</h4>
+            <h3 class="cross" v-if="answerStatus == false">X</h3>
         </div>
     </div>
 </template>
@@ -12,16 +12,27 @@
 <script lang="ts" setup>
 import router from '@/router';
 import { Question } from '@/types/Question';
-import { defineProps } from 'vue';
+import { defineProps, ref } from 'vue';
+import { onMounted } from 'vue';
+import APIManager from '@/types/APIManager';
+import { PlayerSession } from '@/types/PlayerSession';
 
 const props = defineProps<{
     question: Question;
 }>();
 
+const answerStatus = ref<boolean | null>(null);
+
+onMounted(async () => {
+    const session = await APIManager.getInstance().getSession();
+    answerStatus.value = (session as PlayerSession).getAnswers()[props.question.id] !== undefined 
+    && (session as PlayerSession).getAnswers()[props.question.id] !== null 
+    ? (session as PlayerSession).getAnswers()[props.question.id] : null;
+});
+
 function navigateToQuestion() {
     router.push('/question/' + props.question.id);
 }
-
 </script>
 
 <style scoped>

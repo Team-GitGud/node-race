@@ -73,7 +73,7 @@ function handleClick() {
     const newOrder = new Map(props.selectedOrder);
     const current = newOrder.get(props.node.id);
     
-    if (current === undefined) {
+    if (current === undefined || current === null) {
         // Node hasn't been selected yet, add it to the next position
         const nextPosition = newOrder.size;
         newOrder.set(props.node.id, nextPosition);

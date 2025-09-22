@@ -1,10 +1,13 @@
 import { Player } from "./Player";
 import { Question } from "./Question";
+import { AlertService } from "./AlertService";
+import { useRouter } from "vue-router";
 
 export class Session {
   ws: WebSocket;
   lobbyCode: string;
-  protected leaderboard: Array<Player> = [];
+  protected globalLeaderboard: Array<Player> = [];
+  protected lobbyLeaderboard: Array<Player> = [];
 
   constructor(ws: WebSocket, lobbyCode: string) {
     this.ws = ws;
@@ -72,18 +75,49 @@ export class Session {
     }
   }
 
-  public getLeaderboard(): Array<Player> {
-    return this.leaderboard.sort((a, b) => b.getScore() - a.getScore());
+  public handleLeaderboard(
+    leaderboard: Array<{
+      rank: number;
+      name: string;
+      score: number;
+    }>, 
+    lobbyLeaderboard?: Array<{
+      rank: number;
+      name: string;
+      score: number;
+    }>
+  ) {
+    this.globalLeaderboard = leaderboard?.map((player) => {
+      return new Player(player.rank.toString(), player.name, player.score);
+    }) ?? [];
+    this.lobbyLeaderboard = lobbyLeaderboard?.map((player) => {
+      return new Player(player.rank.toString(), player.name, player.score);
+    }) ?? [];
+  }
+
+  public getGlobalLeaderboard(): Array<Player> {
+    return this.globalLeaderboard.sort((a, b) => b.getScore() - a.getScore());
+  }
+
+  public getLobbyLeaderboard(): Array<Player> {
+    return this.lobbyLeaderboard.sort((a, b) => b.getScore() - a.getScore());
   }
 
   public async fetchLeaderboard(): Promise<void> {
+    if (this.ws.readyState !== WebSocket.OPEN) {
+      AlertService.alert("Server has closed the connection because the session has reached 5 minutes.");
+      const router = useRouter();
+      router.push("/");
+      return;
+    }
     return new Promise((resolve) => {
       const message = JSON.stringify({
         action: "GET_LEADERBOARD",
         data: {
-          lobbyId: this.lobbyCode,
+          lobbyId: this.lobbyCode
         },
       });
+      console.debug("Sending leaderboard request", message);
       this.ws.send(message);
 
       // Listen for the leaderboard response event
@@ -94,5 +128,10 @@ export class Session {
 
       this.addEventListener("LEADERBOARD", handleLeaderboardResponse);
     });
+  }
+
+
+  public getLobbyCode(): string {
+    return this.lobbyCode;
   }
 }

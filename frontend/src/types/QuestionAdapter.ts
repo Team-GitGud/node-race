@@ -38,7 +38,7 @@ export class QuestionAdapter {
   static toBackendAnswer(answer: Map<number, number>): {
     [key: string]: number;
   } {
-    console.log("To Backend", answer);
+    console.debug("To Backend", answer);
     const result: { [key: string]: number } = {};
 
     // Convert Map where key=nodeId, value=order to object where key=order, value=nodeId

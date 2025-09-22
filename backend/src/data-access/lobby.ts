@@ -211,14 +211,17 @@ export class Lobby {
     }
 
     getLeaderboard() {
-        // Sort players first based on score
-        this.players.sort((a, b) => a.getScore() - b.getScore());
-        let playerStringArray: string[] = [];
+        this.players.sort((a, b) => b.getScore() - a.getScore());
+        let playerObjectArray = [];
         for (let index = 0; index < this.players.length; index++) {
-            playerStringArray.push(`{"rank": "${index + 1}", "name": "${this.players[index].getName()}", "score": "${this.players[index].getScore()}"}`);
+            playerObjectArray.push({
+                rank: index + 1,
+                name: this.players[index].getName(),
+                score: this.players[index].getScore()
+            });
         }
-        return JSON.stringify(playerStringArray);
-
+        return JSON.stringify(playerObjectArray);
+        
     }
 
     getRank(playerId: string) {
