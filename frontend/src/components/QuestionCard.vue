@@ -1,7 +1,7 @@
 <template>
     <div class="question-container" @click="navigateToQuestion">
         <div :class="['question-card', `status-${answerStatus}`]">
-            <h3 class="question-name">{{ question.title }} {{ Number(question.id) }}</h3>
+            <h3 class="question-name">Q{{ Number(question.id) + 1 }} - {{ question.type }} </h3>
             <div class="checkbox" v-if="answerStatus == null" />
             <h4 class="tick" v-if="answerStatus == true">✔</h4>
             <h3 class="cross" v-if="answerStatus == false">X</h3>
@@ -76,7 +76,7 @@ function navigateToQuestion() {
 }
 
 .question-name {
-    padding-left: 75px;
+    padding-left: 30px;
     margin: 5px 0 5px 0;
 }
 

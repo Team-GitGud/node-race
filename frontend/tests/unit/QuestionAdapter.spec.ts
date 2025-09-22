@@ -122,7 +122,7 @@ describe('QuestionAdapter', () => {
       const firstQuestion = questions[0];
       
       expect(firstQuestion.id).toBe(0);
-      expect(firstQuestion.title).toBe('Post order Depth first search');
+      expect(firstQuestion.title).toBe('Depth First Search - Post order');
       expect(firstQuestion.root).toBeDefined();
       expect(firstQuestion.correctOrder).toBeInstanceOf(Map);
     });
@@ -266,17 +266,17 @@ describe('QuestionAdapter', () => {
   describe('question type handling', () => {
     it('should handle Post order Depth first search', () => {
       const questions = QuestionAdapter.fromBackendQuestions([mockBackendQuestions[0]]);
-      expect(questions[0].title).toBe('Post order Depth first search');
+      expect(questions[0].title).toBe('Depth First Search - Post order');
     });
 
     it('should handle In order Depth first search', () => {
       const questions = QuestionAdapter.fromBackendQuestions([mockBackendQuestions[1]]);
-      expect(questions[0].title).toBe('In order Depth first search');
+      expect(questions[0].title).toBe('Depth First Search - In order');
     });
 
-    it('should handle Pre order Breadth first search', () => {
+    it('should handle Breadth first search', () => {
       const questions = QuestionAdapter.fromBackendQuestions([mockBackendQuestions[2]]);
-      expect(questions[0].title).toBe('Pre order Breadth first search');
+      expect(questions[0].title).toBe('Breadth First Search');
     });
   });
 
