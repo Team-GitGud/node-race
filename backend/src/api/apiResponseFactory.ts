@@ -160,4 +160,16 @@ export class ApiResponseFactory {
         }
         `;
     }
+
+    static getScoreResponse(score: number, rank: number): string {
+        return `
+        {
+            "type": "SCORE",
+            "data": {
+                "score": ${score},
+                "rank": ${rank}
+            }
+        }
+        `;
+    }
 }

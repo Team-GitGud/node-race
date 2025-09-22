@@ -287,8 +287,9 @@ nickname, score, questions
 ```json
 {
     "action": "GET_SCORE",
+    "playerId": "asdfgh"
     "data": {
-        "playerId": "asdfgh"
+        "lobbyId": "asdfhj",
     }
 }
 ```

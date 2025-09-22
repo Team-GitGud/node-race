@@ -37,6 +37,7 @@ import { Session } from "@/types/Session";
 import { Question } from "@/types/Question";
 import { Player } from "@/types/Player";
 import { useRouter } from "vue-router";
+import { AlertService } from "@/types/AlertService";
 
 const router = useRouter();
 const session = ref<Session | null>(null);
@@ -51,12 +52,13 @@ onMounted(async () => {
     session.value = await APIManager.getInstance().getSession();
 
     if (session.value === null) {
-        alert("No session found");
+        AlertService.alert("No session found");
         router.push("/");
         return;
     }
     await session.value.fetchLeaderboard();
     if (session.value instanceof PlayerSession) {
+        await session.value.fetchScore();
         playerRank.value = session.value.getPlayer().getLobbyRank();
         playerAnswers.value = session.value.getAnswers();
         questions.value = session.value.getQuestions();

@@ -41,7 +41,7 @@ export class PlayerSession extends Session {
     });
 
     this.addEventListener("SCORE", (data) => {
-      this.handleScore(data.score, data.rank);
+      this.handleScore(data.data.score, data.data.rank);
     });
 
     this.addEventListener("RANK", (data) => {
@@ -204,8 +204,9 @@ export class PlayerSession extends Session {
     return new Promise((resolve) => {
       const message = JSON.stringify({
         action: "GET_SCORE",
+        playerId: this.player.getId(),
         data: {
-          playerId: this.player.getId(),
+          lobbyId: this.lobbyCode
           },
         });
         console.debug("Sending score request", message);
@@ -238,7 +239,9 @@ export class PlayerSession extends Session {
 
   public handleScore(score: number, rank: number) {
     this.player.setScore(score);
-    this.player.setGlobalRank(rank);
+    this.player.setLobbyRank(rank + 1);
+    // Emit a custom event for score updates
+    this.emitEvent("SCORE_UPDATED", { score, rank: rank + 1 });
   }
 
   public getGlobalLeaderboard(): Array<Player> {

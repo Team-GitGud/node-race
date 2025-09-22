@@ -5,7 +5,7 @@
                 <span class="rank-number" :class="getRankColor(playerRank)">{{playerRank}}.</span>
                 <span>{{ session.getPlayer().getNickname() }}</span>
             </div>
-            <span>5000</span>
+            <span>{{playerScore}}</span>
         </div>
         <div class="row-two">
             <span>Total Time Spent:</span>
@@ -25,6 +25,7 @@ import { PlayerSession } from "@/types/PlayerSession";
 
 const timeSpent = ref();
 const playerRank = ref(-1);
+const playerScore = ref(-1);
 
 const props = defineProps<{
     session: Session | null;
@@ -45,24 +46,36 @@ const getRankColor = (rank: number) => {
 
 // Event handler for rank updates
 const handleRankUpdate = (data: { rank: number; lobbyRank: number }) => {
+    console.debug("Rank updated", data);
     playerRank.value = data.rank;
+};
+
+// Event handler for score updates
+const handleScoreUpdate = (data: { score: number; rank: number }) => {
+    console.debug("Score updated", data);
+    playerScore.value = data.score;
+    playerRank.value = data.rank; // This is the lobby rank
 };
 
 onMounted(async () => {
     if (props.session instanceof PlayerSession) {
-        await props.session.fetchRank();
         playerRank.value = props.session.getPlayer().getLobbyRank();
+        playerScore.value = props.session.getPlayer().getScore();
         timeSpent.value = (60 * 5) - (props.session.getGameTimer()?.getTimeLeft() ?? 0);
         
         // Listen for rank updates
         props.session.addEventListener("RANK_UPDATED", handleRankUpdate);
+        
+        // Listen for score updates
+        props.session.addEventListener("SCORE_UPDATED", handleScoreUpdate);
     }
 });
 
 onUnmounted(() => {
-    // Clean up event listener
+    // Clean up event listeners
     if (props.session instanceof PlayerSession) {
         props.session.removeEventListener("RANK_UPDATED", handleRankUpdate);
+        props.session.removeEventListener("SCORE_UPDATED", handleScoreUpdate);
     }
 });
 </script>

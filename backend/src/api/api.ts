@@ -10,6 +10,7 @@ import { ApiResponseFactory } from './apiResponseFactory';
 import { Player } from '../data-access/player';
 import {GameLogic} from '../session-logic/gameLogic';
 import { Database } from "../data-access/db";
+import { SourceTextModule } from 'node:vm';
 
 
 export class api {
@@ -158,10 +159,29 @@ export class api {
             case ("PLAYER_LEAVE"):
                 this.playerLeave(message, ws);
                 break;
+            case ("GET_SCORE"):
+                this.getScore(message, ws);
+                break;
 
             default:
                 ws.send("Error: no action block found");
         }
+    }
+
+    static getScore(message: any, ws: WebSocket): void {
+        const lobbyId = message.data.lobbyId;
+        const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
+        if (lobby === undefined) {
+            ws.send("LobbyID not found");
+            return;
+        }
+        const playerId = message.playerId;
+        const player = lobby.getPlayer(playerId);
+        if (player === undefined) {
+            ws.send("PlayerID not found");
+            return;
+        }
+        ws.send(ApiResponseFactory.getScoreResponse(player.score, lobby.getRank(player.ID)));
     }
 
     static playerLeave(message: any, ws: WebSocket): void {
