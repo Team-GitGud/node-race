@@ -123,6 +123,7 @@ export class Lobby {
             data.name = p.getName();
             data.score = p.getScore();
             data.answers = p.questionHistory;
+            data.playerId = p.ID;
         })
 
         return playerAnalytics;
@@ -135,8 +136,10 @@ export class Lobby {
             qd.id = i;
             qd.title = this.gameLogic.questions[i].questionType;
             let totalAnswertime = 0;
-            this.players.forEach((p) => {
-                if (p.questionHistory[i] == undefined) {
+
+            this.players.forEach((p)=>{
+                if (p.questionHistory[i] == undefined){
+                    qd.unansweredCount++;
                     return;
                 }
                 if (p.questionHistory[i]) {
@@ -278,6 +281,7 @@ export class Lobby {
 
 class playerData {
     name: string = "";
+    playerId: string = "";
     score: number = 0;
     answers: Array<Boolean> = [];
 }
@@ -288,4 +292,5 @@ class questionData {
     averageAnswerTime = 0;
     correctAnswerCount = 0;
     incorrectAnswerCount = 0;
+    unansweredCount = 0;
 }

@@ -392,9 +392,10 @@ nickname, score, questions
     {
       "id": 0,
       "title": "Breadth first search",
-      "Average answer time": 20, //Seconds
+      "averageAnswerTime": 20, //Seconds
       "correctAnswerCount": 3,
-      "incorrectAnswerCount": 10
+      "incorrectAnswerCount": 10,
+      "unansweredCount": 7
     }
   ],
   "playerData": [
