@@ -151,6 +151,18 @@ export class ApiResponseFactory {
         `;
     }
 
+    // Bit of a hack to turn the classes into json strings then back into JSON objects but it means i dont have to import the classes
+    static getAnalyticsUpdate(lobbyData: string, playerData: string ){
+        return `
+        {
+            "type": "ANALYTICS_UPDATED",
+            "questionData": ${JSON.parse(lobbyData)},
+            "playerData": ${JSON.parse(playerData)}
+        }
+        `;
+
+    }
+
     static getLeaderboardResponse(leaderboard: string, lobbyLeaderboard?: string): string {
         return `
         {
