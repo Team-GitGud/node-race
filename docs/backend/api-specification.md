@@ -383,6 +383,32 @@ nickname, score, questions
 
 ---
 
+### Analytics update (to host)
+
+```json
+{
+  "type": "ANALYTICS_UPDATED",
+  "questionData": [
+    {
+      "id": 0,
+      "title": "Breadth first search",
+      "Average answer time": 20, //Seconds
+      "correctAnswerCount": 3,
+      "incorrectAnswerCount": 10
+    }
+  ],
+  "playerData": [
+    {
+    "name": "the throngler",
+    "score": 50000,
+    "answers": [true, ,false] // Note it is possible for an empty item as players can solve questions in any order
+  }
+  ]
+}
+```
+
+---
+
 ### Practice question (single player)
 
 ```json
