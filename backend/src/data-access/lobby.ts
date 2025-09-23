@@ -142,7 +142,9 @@ export class Lobby {
                 }
                 totalAnswertime += p.questionTimes[i];
             })
-            qd.averageAnswerTime = totalAnswertime/( qd.incorrectAnswerCount + qd.correctAnswerCount );
+            if (qd.incorrectAnswerCount + qd.correctAnswerCount != 0){
+                qd.averageAnswerTime = totalAnswertime/( qd.incorrectAnswerCount + qd.correctAnswerCount );
+            }
             lobbyData.push(qd);
         }
         return lobbyData;
