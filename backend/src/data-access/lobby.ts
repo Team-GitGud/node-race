@@ -123,6 +123,31 @@ export class Lobby {
 
         return playerAnalytics;
     }
+
+    getLobbyAnalytics(): Array<questionData>{
+        let lobbyData: Array<questionData> = []
+        for (let i = 0; i < this.gameLogic.numberDifficultQuestions + this.gameLogic.numberNormalQuestions; i++){
+            let qd = new questionData();
+            qd.id = i;
+            qd.title = this.gameLogic.questions[i].questionType;
+            let totalAnswertime = 0;
+            this.players.forEach((p)=>{
+                if (p.questionHistory[i] == undefined){
+                    return;
+                }
+                if (p.questionHistory[i]){
+                    qd.correctAnswerCount++;
+                } else{
+                    qd.incorrectAnswerCount++;
+                }
+                totalAnswertime += p.questionTimes[i];
+            })
+            qd.averageAnswerTime = totalAnswertime/( qd.incorrectAnswerCount + qd.correctAnswerCount );
+            lobbyData.push(qd);
+        }
+        return lobbyData;
+    }
+
     /**
      * Generates the token for the host, used to authenticate host actions like remove player
      */
@@ -249,4 +274,12 @@ class playerData{
     name: string = "";
     score: number = 0;
     answers: Array<Boolean> = [];
+}
+
+class questionData{
+    id:number = 0;
+    title:string = "";
+    averageAnswerTime = 0;
+    correctAnswerCount = 0;
+    incorrectAnswerCount= 0;
 }
