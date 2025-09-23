@@ -120,6 +120,7 @@ export class Lobby {
             data.score = p.getScore();
             data.answers = p.questionHistory;
             data.playerId = p.ID;
+            playerAnalytics.push(data);
         })
 
         return playerAnalytics;
