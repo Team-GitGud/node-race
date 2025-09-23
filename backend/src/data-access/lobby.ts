@@ -97,28 +97,29 @@ export class Lobby {
     calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number): boolean {
         let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
         if (p == undefined) { return false; }
-        // Just does nothing if a question 
+        // Just does nothing if a question has been answered already
         if (p.questionHistory[questionNumber] != undefined) {
             return false;
         }
         let correct = this.gameLogic.questions[questionNumber].solution
         for (let key in correct) {
             if (correct[key] != answer[key]) {
-                p.questionHistory[questionNumber] = false;
-                p.calculateScore(this.timer, false);
+                p.calculateScore(this.timer, false, questionNumber);
                 return true;
             }
         }
-        p.questionHistory[questionNumber];
-        p.calculateScore(this.timer, true);
+        p.calculateScore(this.timer, true, questionNumber);
         return true;
     }
 
-    getPlayerAnalytics(): Object{
-        let playerAnalytics = new Object(){
-            playerdataArray: Array = [];
-        };
-        
+    getPlayerAnalytics(): Array<playerData>{
+        let playerAnalytics: Array<playerData> = [];
+        this.players.forEach((p)=>{
+            let data = new playerData();
+            data.name = p.getName();
+            data.score = p.getScore();
+            data.answers = p.questionHistory;
+        })
 
         return playerAnalytics;
     }
@@ -241,4 +242,11 @@ export class Lobby {
         return -1;
 
     }
+}
+
+
+class playerData{
+    name: string = "";
+    score: number = 0;
+    answers: Array<Boolean> = [];
 }

@@ -11,6 +11,7 @@ export class Player {
     questionStart: number;
     prevQuestionTime: number;
     questionHistory: Array<Boolean> = [];
+    questionTimes: Array<number> = [];
 
     constructor(name: string, ws: WebSocket, lobby: Lobby) {
         this.name = name;
@@ -26,7 +27,9 @@ export class Player {
      *
      * @param score 
      */
-    calculateScore(timer: Timer, correct: boolean): void {
+    calculateScore(timer: Timer, correct: boolean, questionNumber: number): void {
+        this.questionHistory[questionNumber] = correct;
+        this.questionTimes[questionNumber]= timer.getTime() - this.prevQuestionTime;
         if (correct) {
             this.score = this.score + 100 + (900 * ((timer.getTime() - this.prevQuestionTime) / 100));
         }
