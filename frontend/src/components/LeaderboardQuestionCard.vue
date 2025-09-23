@@ -1,33 +1,43 @@
 <template>
     <div @click="handleClick" v-if="question" class="question-card border"
-        :class="{ 'correct': question.answerStatus === true, 'incorrect': question.answerStatus === false }">
-        <h3 class="question-name">{{ question.title }}</h3>
+        :class="{ 'correct': answerStatus === true, 'incorrect': answerStatus === false }">
+        <h3 class="question-name">Q{{ Number(question.id) + 1 }} - {{ question.type }} </h3>
         <div class="results">
             <span class="timer">
                 <h3>{{ formattedTime }}</h3>
             </span>
-            <img class="icon" :src="CorrectIcon" alt="Correct" v-if="question.answerStatus === true" />
-            <img class="icon" :src="IncorrectIcon" alt="Incorrect" v-if="question.answerStatus === false" />
+            <img class="icon" :src="CorrectIcon" alt="Correct" v-if="answerStatus === true" />
+            <img class="icon" :src="IncorrectIcon" alt="Incorrect" v-if="answerStatus === false" />
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { Question } from '@/types/Question';
-import { defineProps, computed } from 'vue';
+import { defineProps, computed, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import CorrectIcon from '@/assets/correct.svg';
 import IncorrectIcon from '@/assets/incorrect.svg';
+import APIManager from '@/types/APIManager';
+import { PlayerSession } from '@/types/PlayerSession';
 
 const props = defineProps<{
     question: Question;
     answerTime: number;
 }>();
 
+const answerStatus = ref<boolean | null>(null);
+
+onMounted(async () => {
+    const session = await APIManager.getInstance().getSession();
+    answerStatus.value = (session as PlayerSession).getAnswers()[props.question.id] !== undefined 
+    && (session as PlayerSession).getAnswers()[props.question.id] !== null 
+    ? (session as PlayerSession).getAnswers()[props.question.id] : null;
+});
+
 const router = useRouter();
 
 const formattedTime = computed(() => {
-    console.log("Answer Time", props.answerTime);
     const minutes = Math.floor(props.answerTime / 60);
     const seconds = props.answerTime % 60;
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;

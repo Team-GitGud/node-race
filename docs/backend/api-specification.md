@@ -259,8 +259,10 @@ nickname, score, questions
 ```json
 {
   "type": "RANK",
-  "rank": 4,
-  "lobbyRank": 2
+  "data": {
+    "rank": 4,
+    "lobbyRank": 2
+  }
 }
 ```
 
@@ -285,8 +287,9 @@ nickname, score, questions
 ```json
 {
     "action": "GET_SCORE",
+    "playerId": "asdfgh"
     "data": {
-        "playerId": "asdfgh"
+        "lobbyId": "asdfhj",
     }
 }
 ```

@@ -19,18 +19,16 @@
 import CustomButton from '@/components/CustomButton.vue'
 import ScreenBackground from '@/components/ScreenBackground.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
-import router from '@/router';
 import APIManager from '@/types/APIManager';
-import { GameTimer } from '@/types/GameTimer';
 import { PlayerSession } from '@/types/PlayerSession';
-import { AlertService } from '@/types/AlertService';
+import { useRouter } from 'vue-router';
 import { ref, onMounted, onUnmounted } from 'vue';
 import { usePlayerSession } from '@/types/usePlayerSession';
 
 const waitingMessages = ref(["to Start", "to Start.", "to Start..", "to Start..."]);
 const currentMessage = ref<string>(waitingMessages.value[0]);
 let intervalId: number | undefined;
-
+const router = useRouter();
 const { lobbyCode, playerName } = usePlayerSession();
 
 onMounted(() => {
@@ -62,13 +60,15 @@ const handleReturnHome = async () => {
     width: 100%;
     flex-direction: column;
     justify-content: center;
-    position: absolute; bottom: calc(100vh / 2 - 60px)
+    position: absolute;
+    bottom: calc(100vh / 2 - 60px)
 }
 
 .cancel-container {
     display: flex;
     width: 100%;
     justify-content: center;
-    position: absolute; bottom: 20px;
+    position: absolute;
+    bottom: 20px;
 }
 </style>

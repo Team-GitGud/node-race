@@ -2,10 +2,10 @@
     <div class="player-rank" v-if="session && session instanceof PlayerSession">
         <div class="row-one">
             <div class="rank">
-                <span class="rank-number">1.</span>
+                <span class="rank-number" :class="getRankColor(playerRank)">{{playerRank}}.</span>
                 <span>{{ session.getPlayer().getNickname() }}</span>
             </div>
-            <span>5000</span>
+            <span>{{parseInt(playerScore.toString())}}</span>
         </div>
         <div class="row-two">
             <span>Total Time Spent:</span>
@@ -19,14 +19,16 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, computed, ref, onMounted } from "vue";
+import { defineProps, computed, ref, onMounted, onUnmounted } from "vue";
 import { Session } from "@/types/Session";
 import { PlayerSession } from "@/types/PlayerSession";
 
 const timeSpent = ref();
+const playerRank = ref(-1);
+const playerScore = ref(-1);
 
 const props = defineProps<{
-    session: Session;
+    session: Session | null;
 }>();
 
 const formattedTime = computed(() => {
@@ -35,12 +37,47 @@ const formattedTime = computed(() => {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 });
 
-onMounted(() => {
+const getRankColor = (rank: number) => {
+    if (rank === 1) return 'gold';
+    if (rank === 2) return 'silver';
+    if (rank >= 3) return 'bronze';
+    return '';
+};
+
+// Event handler for rank updates
+const handleRankUpdate = (data: { rank: number; lobbyRank: number }) => {
+    console.debug("Rank updated", data);
+    playerRank.value = data.rank;
+};
+
+// Event handler for score updates
+const handleScoreUpdate = (data: { score: number; rank: number }) => {
+    console.debug("Score updated", data);
+    playerScore.value = data.score;
+    playerRank.value = data.rank; // This is the lobby rank
+};
+
+onMounted(async () => {
     if (props.session instanceof PlayerSession) {
+        playerRank.value = props.session.getPlayer().getLobbyRank();
+        playerScore.value = props.session.getPlayer().getScore();
         timeSpent.value = (60 * 5) - (props.session.getGameTimer()?.getTimeLeft() ?? 0);
+        
+        // Listen for rank updates
+        props.session.addEventListener("RANK_UPDATED", handleRankUpdate);
+        
+        // Listen for score updates
+        props.session.addEventListener("SCORE_UPDATED", handleScoreUpdate);
     }
 });
 
+onUnmounted(() => {
+    // Clean up event listeners
+    if (props.session instanceof PlayerSession) {
+        props.session.removeEventListener("RANK_UPDATED", handleRankUpdate);
+        props.session.removeEventListener("SCORE_UPDATED", handleScoreUpdate);
+    }
+});
 </script>
 
 <style scoped>
@@ -83,6 +120,18 @@ onMounted(() => {
 }
 
 .rank-number {
-    color: #FFB246;
+    color: var(--text-color);
+}
+
+.rank-number.gold {
+    color: var(--gold-color);
+}
+
+.rank-number.silver {
+    color: var(--silver-color);
+}
+
+.rank-number.bronze {
+    color: var(--bronze-color);
 }
 </style>
