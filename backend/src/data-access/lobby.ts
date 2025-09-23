@@ -274,14 +274,14 @@ export class Lobby {
 }
 
 
-class playerData{
+export class playerData{
     name: string = "";
     playerId: string = "";
     score: number = 0;
     answers: Array<Boolean> = [];
 }
 
-class questionData{
+export class questionData{
     id:number = 0;
     title:string = "";
     averageAnswerTime = 0;
