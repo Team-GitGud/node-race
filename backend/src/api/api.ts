@@ -4,7 +4,7 @@ import { WebSocket, WebSocketServer, RawData } from 'ws';
 import { IncomingMessage } from 'node:http';
 import http from 'http';
 import { LobbyManager } from '../data-access/lobbyManager';
-import { Lobby } from '../data-access/lobby';
+import { Lobby, playerData, questionData } from '../data-access/lobby';
 import { ApiResponseFactory } from './apiResponseFactory';
 import { GameLogic } from '../session-logic/gameLogic';
 import { Player } from '../data-access/player';
@@ -183,7 +183,9 @@ export class api {
     }
 
     static analyticsUpdate(lobby: Lobby){
-        lobby.ws.send(ApiResponseFactory.getAnalyticsUpdate(JSON.stringify(lobby.getLobbyAnalytics()), JSON.stringify(lobby.getPlayerAnalytics())));
+        console.log("THing");
+        console.log(ApiResponseFactory.getAnalyticsUpdate(lobby.getLobbyAnalytics(), lobby.getPlayerAnalytics()));
+        lobby.ws.send(ApiResponseFactory.getAnalyticsUpdate(lobby.getLobbyAnalytics(), lobby.getPlayerAnalytics()));
     }
 
     static getScore(message: any, ws: WebSocket): void {

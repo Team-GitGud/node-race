@@ -1,3 +1,4 @@
+import { Lobby, playerData, questionData } from '../data-access/lobby';
 export class ApiResponseFactory {
     static createLobbyResponse(lobbyCode: string, hostToken: string): string {
         return `
@@ -151,13 +152,12 @@ export class ApiResponseFactory {
         `;
     }
 
-    // Bit of a hack to turn the classes into json strings then back into JSON objects but it means i dont have to import the classes
-    static getAnalyticsUpdate(lobbyData: string, playerData: string ){
+    static getAnalyticsUpdate(lobbyData: questionData[], playerData: playerData[] ){
         return `
         {
             "type": "ANALYTICS_UPDATED",
-            "questionData": ${JSON.parse(lobbyData)},
-            "playerData": ${JSON.parse(playerData)}
+            "questionData": ${JSON.stringify(lobbyData)},
+            "playerData": ${JSON.stringify(playerData)}
         }
         `;
 
