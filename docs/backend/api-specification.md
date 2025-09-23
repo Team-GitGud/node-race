@@ -394,7 +394,8 @@ nickname, score, questions
       "title": "Breadth first search",
       "averageAnswerTime": 20, //Seconds
       "correctAnswerCount": 3,
-      "incorrectAnswerCount": 10
+      "incorrectAnswerCount": 10,
+      "unansweredCount": 7
     }
   ],
   "playerData": [
