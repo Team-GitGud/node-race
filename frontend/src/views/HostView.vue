@@ -1,54 +1,64 @@
 <template>
+    <!-- Screen Background -->
     <ScreenBackground blur />
     <!-- Host View -->
     <div class="host-view">
-        <ReturnHomeComponent
-            :message="exitModalMessage"
-            :forceOpen="isExitModalOpen"
-            :onConfirm="endGame"
-            @modalClosed="isExitModalOpen = false"/>
+
+        <!-- Return Home Component -->
+        <ReturnHomeComponent :message="exitModalMessage" :forceOpen="isExitModalOpen" :onConfirm="endGame"
+            @modalClosed="isExitModalOpen = false" />
 
         <!-- Left Side: Lobby Controls -->
         <div class="lobby-left">
 
-            <!-- if game started, show analytics -->
-            <div class="analytics-content" v-if="gameStarted">
+            <!-- if analytics should be shown, show analytics -->
+            <div class="analytics-content" v-if="showAnalytics">
 
-                <!-- Title -->
-                <h1>Analytics</h1>
+                <!-- Analytics Header -->
+                <div class="analytics-header">
+                    <!-- Title -->
+                    <h1 title="Analytics">Analytics</h1>
+                    <!-- Game Timer -->
+                    <TimerComponent class="host-timer" :gameTimer="gameTimer" />
+                </div>
 
                 <!-- Question Analytics  -->
                 <div class="question-analytics">
-                    <div class="question-analytics-item" v-for="(question, index) in questions" :key="question.id">
+                    <div class="question-analytics-item" v-for="(question, index) in questions" :key="question.getId()">
+
+                        <!-- Question Header -->
                         <div class="question-header">
-                            <p class="question-title">Q{{ index + 1 }}: {{ question.title }}</p>
-                            <p class="question-time">Avg Time: {{ question.averageAnswerTime }}</p>
+                            <p class="question-title" title="">Q{{ index + 1 }}: {{ question.getTitle() }}</p>
+                            <p class="question-time">Avg Time: {{ question.getAverageAnswerTime() }}</p>
                         </div>
+
+                        <!-- Question Analytics Item Box -->
                         <div class="question-analytics-item-box">
-                            <div 
-                                v-if="question.correctAnswerCount > 0" 
-                                class="question-analytics-item-box-correct" 
-                                :style="{ width: `${(question.correctAnswerCount / totalPlayers) * 100}%` }"
-                            >
-                                {{ question.correctAnswerCount }}
+                            
+                            <!-- Correct Answers -->
+                            <div v-if="question.getCorrectAnswerCount() > 0" class="question-analytics-item-box-correct"
+                                :style="{ width: `${(question.getCorrectAnswerCount() / totalPlayers) * 100}%` }">
+                                {{ question.getCorrectAnswerCount() }}
                             </div>
-                            <div 
-                                v-if="question.incorrectAnswerCount > 0" 
-                                class="question-analytics-item-box-incorrect" 
-                                :style="{ width: `${(question.incorrectAnswerCount / totalPlayers) * 100}%` }"
-                            >
-                                {{ question.incorrectAnswerCount }}
+                            
+                            <!-- Incorrect Answers -->
+                            <div v-if="question.getIncorrectAnswerCount() > 0"
+                                class="question-analytics-item-box-incorrect"
+                                :style="{ width: `${(question.getIncorrectAnswerCount() / totalPlayers) * 100}%` }">
+                                {{ question.getIncorrectAnswerCount() }}
                             </div>
-                            <div 
-                                class="question-analytics-item-box-unanswered" 
-                                :style="{ width: `${((totalPlayers - question.correctAnswerCount - question.incorrectAnswerCount) / totalPlayers) * 100}%` }"
-                            ></div>
+                            
+                            <!-- Unanswered Answers -->
+                            <div class="question-analytics-item-box-unanswered"
+                                :style="{ width: `${((totalPlayers - question.getCorrectAnswerCount() - question.getIncorrectAnswerCount()) / totalPlayers) * 100}%` }">
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Buttons -->
                 <div class="buttons">
+                    
                     <!-- Cancel/End Game button -->
                     <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="110">
                         {{ cancelButtonText }}
@@ -58,16 +68,18 @@
             </div>
 
             <!-- else show lobby -->
-            <div class="lobby-content" v-else>
+            <div class="lobby-content" v-if="!showAnalytics">
 
                 <!-- Title -->
-                <h1>Lobby</h1>
+                <h1 title="Lobby">Lobby</h1>
 
                 <!-- Game Code Section -->
                 <div class="game-code-container">
-                    <p class="game-code-label">Game Code:</p>
+                    <p class="game-code-label" title="Game Code">Game Code:</p>
+                    
+                    <!-- Copy Game Code Button -->
                     <CustomButton :action="copyLobbyCode" :width="copyButtonWidth" :type="copyButtonType"
-                        class="copy-button">
+                        class="copy-button" title="Copy Game Code">
                         {{ lobbyCode }} &nbsp;
                         <FontAwesomeIcon :icon="faCopy" />
                     </CustomButton>
@@ -76,13 +88,13 @@
                 <!-- Buttons -->
                 <div class="buttons">
                     <!-- Cancel/End Game button -->
-                    <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="110">
+                    <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="110" title="Cancel/End Game">
                         {{ cancelButtonText }}
                     </CustomButton>
 
                     <!-- Start Game Button -->
                     <CustomButton :action="startGame" :type="startButtonType" class="start-button" :width="110"
-                        :disabled="startButtonDisabled">
+                        :disabled="startButtonDisabled" title="Start Game">
                         {{ startButtonText }}
                     </CustomButton>
                 </div>
@@ -93,14 +105,75 @@
         <div class="lobby-right border">
             <div class="lobby-content player-content">
                 <div class=" player-list-title-container">
-                    <h2 class="player-list-title">Players ({{ players.length }})</h2>
+                    <h2 class="player-list-title" title="Players List">Players ({{ sortedPlayers.length }})</h2>
                 </div>
                 <div class="player-list">
-                    <div v-for="player in players" :key="player.id" class="player-item">
-                        <span class="player-name">{{ player.nickname }}</span>
-                        <CustomButton :action="() => kickPlayer(player.id)" type="negative" class="kick-button">
-                            X
-                        </CustomButton>
+                    <!-- if analytics should be shown, show players with answers -->
+                    <div v-if="showAnalytics">
+                        <div v-for="hostPlayer in sortedPlayers" :key="hostPlayer.getId()" class="player-item">
+                            
+                            <!-- Player Info first row -->
+                            <div class="player-info-top">
+                                
+                                <!-- Player Info grouped on the Left -->
+                                <div class="player-info-left">
+                                    <span class="player-rank" title="Rank" :style="{ color: getRankColor(hostPlayer.getRank()) }">{{ hostPlayer.getRank() }}.</span>
+                                    <span class="player-name" title="Player Name">{{ hostPlayer.getNickname() }}</span>
+                                </div>
+                            
+                                <!-- Player Score -->
+                                <span class="player-score" title="Score">{{ hostPlayer.getScore() }}</span>
+                               
+                                <!-- Kick Player Button -->
+                                <CustomButton :action="() => kickPlayer(hostPlayer.getId())" type="negative"
+                                    class="kick-button" title="Kick player">
+                                    X
+                                </CustomButton>
+                            </div>
+
+                            <!-- Player Info second row -->
+                            <div class="player-info-bottom">
+                                
+                                <!-- Progress Indicators -->
+                                <div class="progress-indicators">
+                                   
+                                    <!-- Answers Indicators -->
+                                    <template v-for="(answer, index) in hostPlayer.getAnswers()" :key="index">
+                                        
+                                        <!-- Indicator -->
+                                        <div class="indicator" :class="{
+                                            'correct': answer === true,
+                                            'incorrect': answer === false,
+                                            'unanswered': answer === null
+                                        }" :title="index + 1 + '. ' + (answer === true ? 'Correct' : answer === false ? 'Incorrect' : 'Unanswered')">
+                                        </div>
+                                        
+                                        <!-- Indicator Separator -->
+                                        <span v-if="index < hostPlayer.getAnswers().length - 1"
+                                            class="indicator-separator">-</span>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- else show just players -->
+                    <div v-if="!showAnalytics">
+                        <div v-for="hostPlayer in sortedPlayers" :key="hostPlayer.getId()" class="player-item">
+                            
+                            <!-- Player Info first row -->
+                            <div class="player-info-top">
+                                
+                                <!-- Player Info grouped on the Left -->
+                                <div class="player-info-left">
+                                    <span class="player-name">{{ hostPlayer.getNickname() }}</span>
+                                </div>
+                                
+                                <!-- Kick Player Button -->
+                                <CustomButton :action="() => kickPlayer(hostPlayer.getId())" type="negative" class="kick-button">
+                                    X
+                                </CustomButton>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -111,9 +184,8 @@
 <script lang="ts" setup>
 
 // Vue & Core Imports
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { onBeforeRouteLeave } from 'vue-router';
-import router from '@/router';
 
 // Components
 import CustomButton from '@/components/CustomButton.vue';
@@ -121,58 +193,24 @@ import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faCopy } from '@fortawesome/free-solid-svg-icons';
 import ScreenBackground from '@/components/ScreenBackground.vue';
+import TimerComponent from '@/components/TimerComponent.vue';
 
 // Types & Services
 import APIManager from '@/types/APIManager';
 import { HostSession } from '@/types/HostSession';
 import { useHostSession } from '@/types/useHostSession';
-import { HostQuestion } from '@/types/HostQuestion';
-
+import { GameTimer } from '@/types/GameTimer';
 
 // ===== DATA & STATE =====
 
 // Host Session Data
-const { lobbyCode, players, gameStarted} = useHostSession();
+const { lobbyCode, playersData, questions, gameStarted, gameStartedTime } = useHostSession();
 
+// Analytics View State
+const showAnalytics = ref(false);
 
-//Fake questions data for testing
-const questions = ref<HostQuestion[]>([
-    {
-        id: 1,
-        title: 'Question 1',
-        averageAnswerTime: 10,
-        correctAnswerCount: 10,
-        incorrectAnswerCount: 0
-    },
-    {
-        id: 2,
-        title: 'Question 2',
-        averageAnswerTime: 20,
-        correctAnswerCount: 8,
-        incorrectAnswerCount: 2
-    },
-    {
-        id: 3,
-        title: 'Question 3',
-        averageAnswerTime: 30,
-        correctAnswerCount: 5,
-        incorrectAnswerCount: 5
-    },
-    {
-        id: 4,
-        title: 'Question 4',
-        averageAnswerTime: 40,
-        correctAnswerCount: 2,
-        incorrectAnswerCount: 1
-    },
-    {
-        id: 5,
-        title: 'Question 5',
-        averageAnswerTime: 50,
-        correctAnswerCount: 0,
-        incorrectAnswerCount: 0
-    },
-]);
+// Game Timer
+const gameTimer = ref<GameTimer | null>(null);
 
 // Copy Status Tracking
 type CopyStatus = 'idle' | 'success' | 'error';
@@ -200,7 +238,7 @@ const copyButtonType = computed(() => {
 
 // Check if game can start (at least one player required)
 const canStartGame = computed(() => {
-    return players.value && players.value.length > 0;
+    return sortedPlayers.value && sortedPlayers.value.length > 0;
 });
 
 // Start button text based on game state
@@ -224,14 +262,14 @@ const startButtonDisabled = computed(() => {
     return !canStartGame.value || gameStarted.value;
 });
 
-// Cancel button text based on game state
+// Cancel button text based on analytics view state
 const cancelButtonText = computed(() => {
-    return gameStarted.value ? 'End Game' : 'Cancel';
+    return showAnalytics.value ? 'End Game' : 'Cancel';
 });
 
-// Exit modal message based on game state (used by all exit actions)
+// Exit modal message based on analytics view state (used by all exit actions)
 const exitModalMessage = computed(() => {
-    return gameStarted.value
+    return showAnalytics.value
         ? 'Are you sure you want to end the game? <br/> All players will be disconnected and you will not be able to reconnect.'
         : 'Are you sure you want to cancel the lobby? <br/> All players will be disconnected.';
 });
@@ -246,11 +284,46 @@ const copyButtonWidth = computed(() => {
     }
 });
 
+// In the script section, add computed for sorted players
+const sortedPlayers = computed(() => {
+    return [...playersData.value].sort((a, b) => a.getRank() - b.getRank());
+});
+
+// Watch for game start and set up timer
+watch(gameStarted, (isStarted) => {
+    if (isStarted && !gameTimer.value) {
+        showAnalytics.value = true;
+        setupGameTimer();
+    }
+});
+
+// Get rank color based on position
+const getRankColor = (rank: number) => {
+    switch (rank) {
+        case 1:
+            return 'var(--gold-color)';
+        case 2:
+            return 'var(--silver-color)';
+        case 3:
+            return 'var(--bronze-color)';
+        default:
+            return 'var(--text-color)';
+    }
+};
+
 // ===== METHODS =====
 
 // Handle Cancel/End Game button
 const handleCancel = () => {
     isExitModalOpen.value = true;
+};
+
+// Set up game timer when game starts
+const setupGameTimer = () => {
+    const start = new Date().getTime();
+    const fiveMinutes = 1000 * 60 * 5;
+    gameTimer.value = new GameTimer(start, start + fiveMinutes);
+    gameTimer.value.start();
 };
 
 // Game Management
@@ -269,6 +342,10 @@ const startGame = async () => {
 
 const endGame = async () => {
     isNavigatingAway.value = true;
+
+    // Reset analytics view when host manually ends the game
+    showAnalytics.value = true;
+    gameTimer.value = null;
 
     const apiManager = APIManager.getInstance();
     const session = await apiManager.getSession();
@@ -348,12 +425,14 @@ onBeforeRouteLeave((to: any, from: any, next: (value: boolean) => void) => {
 });
 
 // Total players for analytics
-//const totalPlayers = computed(() => players.value.length);
-const totalPlayers = 10;
+const totalPlayers = computed(() => playersData.value.length);
 
 </script>
 
+<!-- Styles -->
 <style scoped>
+
+/* Layout */
 .host-view {
     display: flex;
     justify-content: center;
@@ -386,7 +465,6 @@ const totalPlayers = 10;
 }
 
 
-
 .lobby-content {
     width: 100%;
     max-width: 30rem;
@@ -407,16 +485,16 @@ const totalPlayers = 10;
 
 .game-code-label {
     font-size: 3rem;
-    color: #ffffff;
+    color: var(--text-color);
 }
 
 @media (max-width: 1055px) {
-    .lobby-right {
-        max-height: 50%;
-    }
 
+    .lobby-right {
+        max-height:none
+    }
     .lobby-left {
-        max-height: 50%;
+        max-height: none;
     }
 
     .game-code-container {
@@ -425,9 +503,7 @@ const totalPlayers = 10;
 }
 
 
-
 /* Copy Button */
-
 .copy-button :deep(.btn-inner) {
     font-size: 5rem;
     padding: 1rem 2rem;
@@ -473,8 +549,8 @@ const totalPlayers = 10;
 
 .player-list-title {
     font-size: 50px;
-    color: #ffffff;
-    border-bottom: 3px solid white;
+    color: var(--text-color);
+    border-bottom: 3px solid var(--accent-color);
 }
 
 .player-list {
@@ -487,18 +563,80 @@ const totalPlayers = 10;
 
 .player-item {
     display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
     align-items: center;
     font-size: 3rem;
-    color: #ffffff;
-    gap: 1rem;
-    padding: 1rem;
-    border-bottom: 3px solid white;
+    color: var(--text-color);
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid var(--accent-color);
+}
+
+.player-info-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 0.5rem;
+}
+
+.player-info-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 2rem;
+}
+
+.player-info-left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .player-name {
     overflow: hidden;
     text-wrap: nowrap;
+    width: 250px;
+    text-align: left;
+}
+
+.player-rank {
+    font-weight: bold;
+    min-width: 2rem;
+}
+
+.player-score {
+    min-width: 3rem;
+    text-align: right;
+}
+
+.progress-indicators {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex: 1;
+    justify-content: space-between;
+}
+
+.indicator {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+}
+
+.correct {
+    background: var(--positive-color);
+}
+
+.incorrect {
+    background: var(--negative-color);
+}
+
+.unanswered {
+    background: var(--participation-color);
 }
 
 .kick-button :deep(.btn-inner) {
@@ -507,20 +645,22 @@ const totalPlayers = 10;
     min-width: 50px;
 }
 
-
+/* Host Timer */
+.host-timer {
+    margin-bottom: 2rem;
+    align-self: flex-end;
+}
 
 /* Question Analytics Styles */
-
 .analytics-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     height: 100%;
-    padding-bottom: 2rem;
     box-sizing: border-box;
 }
 
-.question-analytics{
+.question-analytics {
 
     display: flex;
     min-width: 500px;
@@ -531,7 +671,8 @@ const totalPlayers = 10;
     box-sizing: border-box;
     padding: 1rem;
     flex: 1;
-    min-height: 0; /* Allow flex item to shrink below content size */
+    min-height: 0;
+    /* Allow flex item to shrink below content size */
 }
 
 .question-header {
@@ -550,6 +691,7 @@ const totalPlayers = 10;
     font-size: 2rem;
 }
 
+/* Question Analytics Item Box */
 .question-analytics-item-box {
     display: flex;
     height: 30px;
@@ -583,5 +725,12 @@ const totalPlayers = 10;
 
 .question-analytics-item-box-unanswered {
     background: white;
+}
+
+.analytics-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
 </style>
