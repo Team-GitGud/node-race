@@ -17,8 +17,8 @@
                     </div>
                 </div>
             </div>
-            <div class="right border" v-if="players">
-                <LeaderboardComponent :players="players" />
+            <div class="right border" v-if="globalPlayers && lobbyPlayers">
+                <LeaderboardComponent :globalPlayers="globalPlayers" :localPlayers="lobbyPlayers" />
             </div>
         </div>
     </div>
@@ -27,12 +27,9 @@
 <script lang="ts" setup>
 import ScreenBackground from "@/components/ScreenBackground.vue";
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
-import CustomButton from "@/components/CustomButton.vue";
 import PlayerRank from "@/components/PlayerRank.vue";
 import { ref, onMounted } from "vue";
 import { PlayerSession } from "@/types/PlayerSession";
-import { HostSession } from "@/types/HostSession";
-import Logo from "@/components/LogoComponent.vue";
 import LeaderboardQuestionCard from "@/components/LeaderboardQuestionCard.vue";
 import LeaderboardComponent from "@/components/LeaderboardComponent.vue";
 import APIManager from "@/types/APIManager";
@@ -40,31 +37,36 @@ import { Session } from "@/types/Session";
 import { Question } from "@/types/Question";
 import { Player } from "@/types/Player";
 import { useRouter } from "vue-router";
+import { AlertService } from "@/types/AlertService";
 
 const router = useRouter();
-const session = ref<any>(null); // Kinda risky, but it works.
+const session = ref<Session | null>(null);
 const playerRank = ref<number>();
-const players = ref<Player[]>();
+const globalPlayers = ref<Player[]>();
+const lobbyPlayers = ref<Player[]>();
 const playerAnswers = ref<boolean[]>();
 const questions = ref<Question[]>();
 const isLoading = ref(true);
 
 onMounted(async () => {
-    const sessionData: Session | null = await APIManager.getInstance().getSession();
-    if (sessionData === null) {
-        alert("No session found");
+    session.value = await APIManager.getInstance().getSession();
+
+    if (session.value === null) {
+        AlertService.alert("No session found");
         router.push("/");
         return;
     }
-    console.log("Sending leaderboard")
-    await sessionData.fetchLeaderboard();
-    session.value = sessionData;
-    players.value = sessionData.getLeaderboard();
-    if (sessionData instanceof PlayerSession) {
-        playerAnswers.value = sessionData.getAnswers();
-        questions.value = sessionData.getQuestions();
+    await session.value.fetchLeaderboard();
+    if (session.value instanceof PlayerSession) {
+        await session.value.fetchScore();
+        playerRank.value = session.value.getPlayer().getLobbyRank();
+        playerAnswers.value = session.value.getAnswers();
+        questions.value = session.value.getQuestions();
+        globalPlayers.value = session.value.getGlobalLeaderboard();
+        lobbyPlayers.value = session.value.getLobbyLeaderboard();
     }
     isLoading.value = false;
+    console.log("Finished mounting");
 });
 </script>
 

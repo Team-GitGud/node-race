@@ -21,13 +21,9 @@ export class Player {
         this.ID = Lobby.generateKey();
     }
 
-    getScore(): number {
-        return this.score;
-    }
-
     /** Calculates score and adds it to previous score
      * then resets the time score penalty
-     * 
+     *
      * @param score 
      */
     calculateScore(timer: Timer, correct: boolean): void {
@@ -37,17 +33,26 @@ export class Player {
         this.prevQuestionTime = timer.getTime();
     }
 
-    getName(): string {
-        return this.name;
-    }
 
+    /**
+     * Starts a game by sending the startgame instruction to all players
+     */
     startGame(questions: string): void {
         this.ws.send(ApiResponseFactory.startGamePlayerResponse(questions));
     }
 
-    endGame(sessionLeaderboard: string, globalLeaderoard: string, time: string, rank: number, lobbyRank:number): void {
+    /**
+     * Ends game by sending all the required endgame information to the front end then close the websocket.
+     *
+     * @param sessionLeaderboard
+     * @param globalLeaderoard
+     * @param time 
+     * @param rank
+     * @param lobbyRank
+     */
+    endGame(sessionLeaderboard: string, globalLeaderoard: string, time: string, rank: number, lobbyRank: number): void {
         for (let i = 0; i < this.questionHistory.length; i++) {
-            if (this.questionHistory[i] == undefined){
+            if (this.questionHistory[i] == undefined) {
                 this.questionHistory[i] = false;
             }
         }
@@ -55,7 +60,18 @@ export class Player {
         this.ws.send(ApiResponseFactory.endGamePlayerResponse(time, numCorrect + '', JSON.stringify(this.questionHistory), sessionLeaderboard, globalLeaderoard, rank, lobbyRank));
         this.ws.close();
     }
-    //static endGamePlayerResponse(time: string, numCorrect: string, answer: string, sessLeaderboard: string, globalLeaderoard: string): string {
+
+    /**
+     * Rejoins the player to the game if they refresh the page.
+     *
+     * @param ws the new websocket for the player.
+     * @param questions the players questions.
+     */
+    rejoin(ws: WebSocket, questions: string | undefined): void {
+        this.ws.close();
+        this.ws = ws;
+        this.ws.send(ApiResponseFactory.playerRejoinResponse(this.name, this.score.toString(), questions));
+    }
 
     getPrevQuestionTime(): number {
         return this.prevQuestionTime;
@@ -65,10 +81,12 @@ export class Player {
         this.prevQuestionTime = time;
     }
 
-    rejoin(ws: WebSocket, questions: string | undefined): void {
-        this.ws.close();
-        this.ws = ws;
-        this.ws.send(ApiResponseFactory.playerRejoinResponse(this.name, this.score.toString(), questions));
+    getScore(): number {
+        return this.score;
+    }
+
+    getName(): string {
+        return this.name;
     }
 
     toJsonString(): string {

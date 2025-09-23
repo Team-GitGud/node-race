@@ -7,16 +7,19 @@ import { postorderBFS } from "../tree-management/postorderBFS";
 import { postorderDFS } from "../tree-management/postorderDFS";
 import { preorderBFS } from "../tree-management/preorderBFS";
 import { preorderDFS } from "../tree-management/preorderDFS";
+
 export class GameLogic {
     questions: Question[] = [];
     numberNormalQuestions = 4;
     numberDifficultQuestions = 1;
     difficultMaxDepth = 5;
-    generateQuestions(): void {
 
+    /**
+     * Generate a set of questions
+     */
+    generateQuestions(): void {
         // Generate questions randomly
         for (let i = 0; i < this.numberNormalQuestions; i++) {
-            
             this.questions.push(this.generateQuestion(false));
         }
 
@@ -24,18 +27,20 @@ export class GameLogic {
         for (let i = 0; i < this.numberDifficultQuestions; i++) {
             this.questions.push(this.generateQuestion(true));
         }
-
-
-
     }
 
-    generateQuestion(difficult:boolean): Question{
+    /**
+     * Generate a single question based on diffculty
+     */
+    generateQuestion(difficult: boolean): Question {
         let tree = new Tree();
         let solver: SolveTree;
         let questionType: string;
-        if (difficult){
+
+        if (difficult) {
             tree.maxDepth = this.difficultMaxDepth;
         }
+
         switch (Math.floor(Math.random() * 4)) {
             case 0:
                 solver = new inorderDFS();
@@ -53,8 +58,8 @@ export class GameLogic {
                 solver = new preorderDFS();
                 questionType = "Pre order Depth first search";
                 break;
-            default:
 
+            default:
                 console.log("I did my math wrong");
                 solver = new postorderDFS();
                 questionType = "Post order Depth first search";

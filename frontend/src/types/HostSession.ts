@@ -51,7 +51,7 @@ export class HostSession extends Session {
     }
 
     public handleGameStarted(questions: BackendQuestion[]) {
-        if (questions !== undefined && questions.length > 0) {
+        if (questions !== undefined && questions.length > 0 && questions !== null) {
             // If there's no players, for some reason there's no questions generated.
             const adaptedQuestions = QuestionAdapter.fromBackendQuestions(questions);
         }
@@ -114,5 +114,13 @@ export class HostSession extends Session {
             }
         }));
         console.log("Kick player request sent for:", playerId);
+    }
+
+    public getHostId(): string {
+        return this.hostId;
+    }
+    // In some places we're calling it hostToken, so we'll keep it for now.
+    public getHostToken(): string {
+        return this.hostId;
     }
 }

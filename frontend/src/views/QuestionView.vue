@@ -5,22 +5,25 @@
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
         <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
             class="navigate-left-icon" />
-        <div class="tree-container">
+        <div class="tree-container" :style="{ transform: `scale(${treeScale})` }">
             <TreeNode v-if="currentQuestion" :node="currentQuestion.root" :selectedOrder="selectedOrder"
-                :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect"
+                :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect($event)"
                 style="margin-top: 0px;" />
         </div>
         <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight"
             alt="Navigate Right" class="navigate-right-icon" />
         <div class="bottom-right-buttons">
-            <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="false">
+            <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="hasAnswered">
                 <h3>Submit</h3>
             </CustomButton>
-            <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="false">
+            <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="hasAnswered">
                 <img :src="ResetIcon" alt="Reset" class="btn-img" />
             </CustomButton>
         </div>
         <div class="bottom-left-buttons">
+            <CustomButton v-if="answerDisabled" class="back-to-leaderboard-button" :action="() => $router.push('/leaderboard')" type="neutral">
+                <h3>Leaderboard</h3>
+            </CustomButton>
             <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')"
                 type="neutral" :disabled="false">
                 <h3>Questions</h3>
@@ -35,16 +38,14 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router';
-import { ref, computed, onMounted, watch, withDefaults, defineProps, onUnmounted } from 'vue';
-import { Question } from '@/types/Question';
+import { ref, computed, onMounted, watch, withDefaults, defineProps, onUnmounted, nextTick } from 'vue';
 import CustomButton from '@/components/CustomButton.vue';
 import TreeNode from '@/components/TreeNode.vue';
 import APIManager from '@/types/APIManager';
 import TimerComponent from '@/components/TimerComponent.vue';
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
-import { GameTimer } from '@/types/GameTimer';
+import { Session } from '@/types/Session';
 import { PlayerSession } from '@/types/PlayerSession';
-import { Node } from '@/types/tree/Node';
 import { usePlayerSession } from '@/types/usePlayerSession';
 import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
@@ -52,26 +53,101 @@ import NavigateRight from '@/assets/navigate-right.svg';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
 
 const router = useRouter();
-const gameTimer = ref<GameTimer | null>(null);
+const { questions, gameTimer } = usePlayerSession();
+const selectedOrder = ref<Map<number, number>>(new Map());
+const hasAnswered = ref(false);
+const answerDisabled = ref(false);
+const session = ref<Session | null>(null);
+const treeScale = ref(1);
+
+// In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
+const result = ref<boolean | null>(null);
 
 interface Props {
-    questionIndex?: number;
+    questionIndex: number;
 }
 const props = withDefaults(defineProps<Props>(), {
     questionIndex: 0
 });
-// Reactive data
-const { questions } = usePlayerSession();
-const selectedOrder = ref<Map<number, number>>(new Map());
-const startTime = ref(0);
 
-// We make this null to indicate the result hasn't been checked yet.
-// In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
-const result = ref<boolean | null>(null);
+const calculateTreeScale = () => {
+    nextTick(() => {
+        const treeContainer = document.querySelector('.tree-container');
+        if (!treeContainer) return;
+        
+        const containerRect = treeContainer.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        const viewportWidth = window.innerWidth;
+        
+        // Define safe zones for buttons (with some padding)
+        const bottomButtonHeight = 140; // Height reserved for bottom buttons + padding
+        const sideButtonWidth = 200; // Width reserved for side buttons + padding
+        
+        // Calculate available space
+        const availableHeight = viewportHeight - bottomButtonHeight - 100; // 100px for top margin
+        const availableWidth = viewportWidth - (sideButtonWidth * 2); // Both sides
+        
+        // Calculate scale factors
+        let scaleX = 1;
+        let scaleY = 1;
+        
+        if (containerRect.height > availableHeight) {
+            scaleY = availableHeight / containerRect.height;
+        }
+        
+        if (containerRect.width > availableWidth) {
+            scaleX = availableWidth / containerRect.width;
+        }
+        
+        // Use the smaller scale to ensure tree fits in both dimensions
+        const newScale = Math.min(scaleX, scaleY, 1); // Never scale up, only down
+        treeScale.value = Math.max(newScale, 0.3); // Minimum scale of 0.3
+    });
+};
+
+const initializeQuestion = async () => {
+    session.value = await APIManager.getInstance().getSession();
+    console.debug("Trying to find session...")
+    if (!session.value || !(session.value instanceof PlayerSession)) return;
+    console.debug("Found session", session.value);
+
+    questions.value = session.value.getQuestions();
+    gameTimer.value = session.value.getGameTimer();
+    selectedOrder.value = new Map();
+    answerDisabled.value = await answeredAllQuestions();
+    hasAnswered.value = await hasAnsweredQuestion(props.questionIndex);
+    if (hasAnswered.value) {
+        result.value = session.value.getAnswers()[props.questionIndex] ?? false;
+        if (await answeredAllQuestions()) {
+            gameTimer.value?.stop(); // Stop counting down when the question is answered. Allows us to go back.
+        }
+    } else {
+        gameTimer.value?.start();
+        result.value = null; // Otherwise the nodes will be red/green.
+    }
+    
+    // Calculate tree scale after DOM updates
+    calculateTreeScale();
+};
+
+onMounted(() => {
+    initializeQuestion();
+    // Add window resize listener for responsive scaling
+    window.addEventListener('resize', calculateTreeScale);
+});
+
+onUnmounted(() => {
+    // Clean up resize listener
+    window.removeEventListener('resize', calculateTreeScale);
+});
+
+// Immediate false just means it won't call on the first mount.
+watch(() => props.questionIndex, () => {
+    initializeQuestion();
+}, { immediate: false });
 
 const handleSelect = (newOrder: Map<number, number>) => {
     selectedOrder.value = newOrder;
-    console.log("New Order", selectedOrder.value);
 };
 
 const resetOrder = () => {
@@ -80,91 +156,57 @@ const resetOrder = () => {
 };
 
 const checkAnswer = async () => {
+    if (!session.value || !(session.value instanceof PlayerSession)) return;
     result.value = currentQuestion.value.isCorrect(selectedOrder.value);
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        session.addAnswer(props.questionIndex, result.value ?? false);
-        console.log("Order", selectedOrder.value);
-        session.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
-    }
+    session.value.addAnswer(props.questionIndex, result.value ?? false);
+    session.value.sendAnswer(props.questionIndex, QuestionAdapter.toBackendAnswer(selectedOrder.value));
+    session.value.setAnswerTimes(props.questionIndex, gameTimer.value?.getLastAnswerTimeAndLogNewTime() ?? 0);
+    hasAnswered.value = true;
 
-    // TODO: Send the result to the backend. Make the question not available for the player to answer again.
     setTimeout(async () => {
         resetOrder();
-        if (!session || !(session instanceof PlayerSession)) {
-            return;
-        }
-        console.log("Setting answer time", startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
-        session.setAnswerTime(props.questionIndex, startTime.value - (session.getGameTimer()?.getTimeLeft() ?? 0));
-        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
         if (await answeredAllQuestions()) {
             router.push("/leaderboard");
             return;
-        }
-        if (props.questionIndex + 1 >= questions.value.length) {
+        } else if (props.questionIndex + 1 >= questions.value.length) {
             router.push("/question-navigation");
             return;
-        }
-
-        // This will cycle through all questions until it finds one that hasn't been answered.
-        let i = 1
-        while (await hasAnsweredQuestion(props.questionIndex + i)) {
-            i++;
-            if (props.questionIndex + i >= questions.value.length) {
-                router.push("/question-navigation");
-                return;
+        } else {
+            // This will cycle through all questions until it finds one that hasn't been answered.
+            let i = 1
+            while (await hasAnsweredQuestion(props.questionIndex + i)) {
+                i++;
+                if (props.questionIndex + i >= questions.value.length) {
+                    router.push("/question-navigation");
+                    return;
+                }
             }
+            router.push(`/question/${props.questionIndex + i}`);
         }
-        router.push(`/question/${props.questionIndex + i}`);
     }, 2000);
 };
 
 const answeredAllQuestions = async () => {
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        const answers = session.getAnswers();
+    if (!session.value || !(session.value instanceof PlayerSession)) return false;
 
-        // Check if all previous questions (0 to currentIndex-1) have been answered
-        for (let i = 0; i < questions.value.length; i++) {
-            if (answers[i] === undefined) {
-                return false;
-            }
+    // Check if all previous questions (0 to currentIndex-1) have been answered
+    const answers = session.value.getAnswers();
+    for (let i = 0; i < questions.value.length; i++) {
+        if (answers[i] === undefined || answers[i] === null) {
+            return false;
         }
     }
     return true;
 }
 
 const hasAnsweredQuestion = async (questionIndex: number) => {
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        const answers = session.getAnswers();
-        return answers[questionIndex] !== undefined;
-    }
+    if (!session.value || !(session.value instanceof PlayerSession)) return false;
+    return session.value.getAnswers()[questionIndex] !== undefined && session.value.getAnswers()[questionIndex] !== null;
 }
 
 const currentQuestion = computed(() => {
     return questions.value[props.questionIndex];
 })
-
-onMounted(async () => {
-    const session = await APIManager.getInstance().getSession();
-    if (session && session instanceof PlayerSession) {
-        questions.value = session.getQuestions();
-        gameTimer.value = session.getGameTimer();
-        startTime.value = gameTimer.value?.getTimeLeft() ?? 0;
-    }
-    selectedOrder.value = new Map();
-    result.value = null;
-});
-
-watch(currentQuestion, () => {
-    selectedOrder.value = new Map();
-    result.value = null;
-});
-
-watch(selectedOrder, () => {
-    console.log("Selected Order", selectedOrder.value);
-});
 
 const nextQuestion = () => {
     router.push(`/question/${props.questionIndex + 1}`);
@@ -205,6 +247,8 @@ h2 {
 
 .tree-container {
     margin-top: 5vh;
+    transform-origin: center top;
+    transition: transform 0.3s ease;
 }
 
 .navigate-left-icon,
@@ -216,6 +260,7 @@ h2 {
     height: 88px;
     flex-shrink: 0;
     cursor: pointer;
+    z-index: 1000;
 }
 
 .navigate-left-icon {
@@ -228,7 +273,8 @@ h2 {
 
 .submit-button :deep(.btn-inner),
 .reset-button :deep(.btn-inner),
-.question-navigation-button :deep(.btn-inner) {
+.question-navigation-button :deep(.btn-inner),
+.back-to-leaderboard-button :deep(.btn-inner) {
     height: 40px;
 }
 
@@ -248,12 +294,15 @@ h2 {
     display: flex;
     align-items: center;
     gap: 5px;
+    z-index: 100;
 }
 
 .bottom-left-buttons {
     position: absolute;
     bottom: 50px;
     left: 60px;
+    display: flex;
+    z-index: 90;
 }
 
 .back-to-home-button {
@@ -269,6 +318,7 @@ h2 {
     display: flex;
     align-items: center;
     gap: 15px;
+    z-index: 100;
 }
 
 .question-number {
