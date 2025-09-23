@@ -97,21 +97,55 @@ export class Lobby {
     calculateScore(playerID: string, answer: { [k: string]: number; }, questionNumber: number): boolean {
         let p: Player | undefined = this.players.find((pl) => pl.ID == playerID);
         if (p == undefined) { return false; }
-        // Just does nothing if a question 
+        // Just does nothing if a question has been answered already
         if (p.questionHistory[questionNumber] != undefined) {
             return false;
         }
         let correct = this.gameLogic.questions[questionNumber].solution
         for (let key in correct) {
             if (correct[key] != answer[key]) {
-                p.questionHistory[questionNumber] = false;
-                p.calculateScore(this.timer, false);
+                p.calculateScore(this.timer, false, questionNumber);
                 return true;
             }
         }
-        p.questionHistory[questionNumber];
-        p.calculateScore(this.timer, true);
+        p.calculateScore(this.timer, true, questionNumber);
         return true;
+    }
+
+    getPlayerAnalytics(): Array<playerData>{
+        let playerAnalytics: Array<playerData> = [];
+        this.players.forEach((p)=>{
+            let data = new playerData();
+            data.name = p.getName();
+            data.score = p.getScore();
+            data.answers = p.questionHistory;
+        })
+
+        return playerAnalytics;
+    }
+
+    getLobbyAnalytics(): Array<questionData>{
+        let lobbyData: Array<questionData> = []
+        for (let i = 0; i < this.gameLogic.numberDifficultQuestions + this.gameLogic.numberNormalQuestions; i++){
+            let qd = new questionData();
+            qd.id = i;
+            qd.title = this.gameLogic.questions[i].questionType;
+            let totalAnswertime = 0;
+            this.players.forEach((p)=>{
+                if (p.questionHistory[i] == undefined){
+                    return;
+                }
+                if (p.questionHistory[i]){
+                    qd.correctAnswerCount++;
+                } else{
+                    qd.incorrectAnswerCount++;
+                }
+                totalAnswertime += p.questionTimes[i];
+            })
+            qd.averageAnswerTime = totalAnswertime/( qd.incorrectAnswerCount + qd.correctAnswerCount );
+            lobbyData.push(qd);
+        }
+        return lobbyData;
     }
 
     /**
@@ -233,4 +267,19 @@ export class Lobby {
         return -1;
 
     }
+}
+
+
+class playerData{
+    name: string = "";
+    score: number = 0;
+    answers: Array<Boolean> = [];
+}
+
+class questionData{
+    id:number = 0;
+    title:string = "";
+    averageAnswerTime = 0;
+    correctAnswerCount = 0;
+    incorrectAnswerCount= 0;
 }

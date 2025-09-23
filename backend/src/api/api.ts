@@ -182,6 +182,10 @@ export class api {
         }
     }
 
+    static analyticsUpdate(lobby: Lobby){
+        lobby.ws.send(ApiResponseFactory.getAnalyticsUpdate(JSON.stringify(lobby.getLobbyAnalytics()), JSON.stringify(lobby.getPlayerAnalytics())));
+    }
+
     static getScore(message: any, ws: WebSocket): void {
         const lobbyId = message.data.lobbyId;
         const lobby: Lobby | undefined = this.lobbies.getLobby(lobbyId);
@@ -211,6 +215,7 @@ export class api {
         if (!lobby.players.some(player => player.ID === playerId)) {
             console.log("Kicked player:", playerId);
         }
+        this.analyticsUpdate(lobby);
     }
 
     static endGame(message: any, ws: WebSocket) {
@@ -227,6 +232,7 @@ export class api {
             ws.send("Invalid host token");
             return;
         }
+        this.analyticsUpdate(lobby);
 
     }
 
@@ -271,6 +277,7 @@ export class api {
         if (!lobby.calculateScore(message.playerId, message.data.answer, message.data.questionNumber)) {
             ws.send("Error processing answer either player does not exist or question already submitted");
         }
+        this.analyticsUpdate(lobby);
 
     }
 
@@ -304,6 +311,7 @@ export class api {
         }
 
         lobby.startGame();
+        this.analyticsUpdate(lobby);
     }
 
     static kickPlayer(message: any, ws: WebSocket): void {
@@ -324,6 +332,7 @@ export class api {
         if (!lobby.players.some(player => player.ID === playerId)) {
             console.log("Kicked player:", playerId);
         }
+        this.analyticsUpdate(lobby);
     }
 }
 
