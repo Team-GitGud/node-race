@@ -38,6 +38,10 @@ export class Lobby {
     * Creates a Player object and add to the list of playars
     */
     join(playerName: string, ws: WebSocket): void {
+        if (this.gameStarted) {
+            this.ws.send("Cannot join when a game is running");
+            return;
+        }
         if (this.players.some(p => p.getName() == playerName)) {
             ws.send("Students cannot have the same name");
         }
@@ -112,9 +116,9 @@ export class Lobby {
         return true;
     }
 
-    getPlayerAnalytics(): Array<playerData>{
+    getPlayerAnalytics(): Array<playerData> {
         let playerAnalytics: Array<playerData> = [];
-        this.players.forEach((p)=>{
+        this.players.forEach((p) => {
             let data = new playerData();
             data.name = p.getName();
             data.score = p.getScore();
@@ -124,26 +128,26 @@ export class Lobby {
         return playerAnalytics;
     }
 
-    getLobbyAnalytics(): Array<questionData>{
+    getLobbyAnalytics(): Array<questionData> {
         let lobbyData: Array<questionData> = []
-        for (let i = 0; i < this.gameLogic.numberDifficultQuestions + this.gameLogic.numberNormalQuestions; i++){
+        for (let i = 0; i < this.gameLogic.numberDifficultQuestions + this.gameLogic.numberNormalQuestions; i++) {
             let qd = new questionData();
             qd.id = i;
             qd.title = this.gameLogic.questions[i].questionType;
             let totalAnswertime = 0;
-            this.players.forEach((p)=>{
-                if (p.questionHistory[i] == undefined){
+            this.players.forEach((p) => {
+                if (p.questionHistory[i] == undefined) {
                     return;
                 }
-                if (p.questionHistory[i]){
+                if (p.questionHistory[i]) {
                     qd.correctAnswerCount++;
-                } else{
+                } else {
                     qd.incorrectAnswerCount++;
                 }
                 totalAnswertime += p.questionTimes[i];
             })
-            if (qd.incorrectAnswerCount + qd.correctAnswerCount != 0){
-                qd.averageAnswerTime = totalAnswertime/( qd.incorrectAnswerCount + qd.correctAnswerCount );
+            if (qd.incorrectAnswerCount + qd.correctAnswerCount != 0) {
+                qd.averageAnswerTime = totalAnswertime / (qd.incorrectAnswerCount + qd.correctAnswerCount);
             }
             lobbyData.push(qd);
         }
@@ -257,7 +261,7 @@ export class Lobby {
             });
         }
         return JSON.stringify(playerObjectArray);
-        
+
     }
 
     getRank(playerId: string) {
@@ -272,16 +276,16 @@ export class Lobby {
 }
 
 
-class playerData{
+class playerData {
     name: string = "";
     score: number = 0;
     answers: Array<Boolean> = [];
 }
 
-class questionData{
-    id:number = 0;
-    title:string = "";
+class questionData {
+    id: number = 0;
+    title: string = "";
     averageAnswerTime = 0;
     correctAnswerCount = 0;
-    incorrectAnswerCount= 0;
+    incorrectAnswerCount = 0;
 }
