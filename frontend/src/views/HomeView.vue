@@ -2,7 +2,7 @@
 	<div class="home">
 		<ScreenBackground />
 		<div class="button-container">
-			<CustomButton :action="() => $router.push('/practice')">Practice</CustomButton>
+			<CustomButton :action="() => $router.push('/practice')">Solo</CustomButton>
 			<CustomButton :action="() => joinIsOpen = true">Join</CustomButton>
 			<ModalPopup title="Join a Game" v-if="joinIsOpen" @close="joinIsOpen = false">
 				<template #body>
@@ -41,7 +41,9 @@
 					<CustomButton :action="() => handleHostClick()" type="positive">Host</CustomButton>
 				</template>
 			</ModalPopup>
-
+		</div>
+		<div style="position: absolute; right: 20px; top: 20px; display: flex;">
+			<GlobalLeaderboardPopup />
 			<TutorialPopup />
 		</div>
 		<ConnectionStatus style="position: fixed; bottom: 0; right: 0; margin: 20px;" />
@@ -61,6 +63,7 @@ import { AlertService } from '@/types/AlertService';
 import router from '@/router';
 import { ref } from 'vue';
 import TutorialPopup from '@/components/TutorialPopup.vue';
+import GlobalLeaderboardPopup from '@/components/GlobalLeaderboardPopup.vue';
 
 async function handleHostClick() {
 	if (await APIManager.getInstance().createSession()) {
