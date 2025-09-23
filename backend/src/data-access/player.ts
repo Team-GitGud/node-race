@@ -2,6 +2,7 @@ import { WebSocket } from 'ws';
 import { Lobby } from './lobby';
 import { ApiResponseFactory } from '../api/apiResponseFactory';
 import { Timer } from "./timer";
+import { time } from 'node:console';
 
 export class Player {
     name: string;
@@ -31,7 +32,10 @@ export class Player {
         this.questionHistory[questionNumber] = correct;
         this.questionTimes[questionNumber]= timer.getTime() - this.prevQuestionTime;
         if (correct) {
-            this.score = this.score + 100 + (900 * ((timer.getTime() - this.prevQuestionTime) / 100));
+
+            let timeMultiplier = ((45 - (timer.getTime() - this.prevQuestionTime)) / 100);
+            if (timeMultiplier < 0) timeMultiplier = 0;
+            this.score = this.score + 300 + (700 * timeMultiplier);
         }
         this.prevQuestionTime = timer.getTime();
     }

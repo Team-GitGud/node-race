@@ -119,6 +119,7 @@ export class Lobby {
             data.name = p.getName();
             data.score = p.getScore();
             data.answers = p.questionHistory;
+            data.playerId = p.ID;
         })
 
         return playerAnalytics;
@@ -133,6 +134,7 @@ export class Lobby {
             let totalAnswertime = 0;
             this.players.forEach((p)=>{
                 if (p.questionHistory[i] == undefined){
+                    qd.unansweredCount++;
                     return;
                 }
                 if (p.questionHistory[i]){
@@ -142,7 +144,9 @@ export class Lobby {
                 }
                 totalAnswertime += p.questionTimes[i];
             })
-            qd.averageAnswerTime = totalAnswertime/( qd.incorrectAnswerCount + qd.correctAnswerCount );
+            if (qd.incorrectAnswerCount + qd.correctAnswerCount != 0){
+                qd.averageAnswerTime = totalAnswertime/( qd.incorrectAnswerCount + qd.correctAnswerCount );
+            }
             lobbyData.push(qd);
         }
         return lobbyData;
@@ -272,6 +276,7 @@ export class Lobby {
 
 class playerData{
     name: string = "";
+    playerId: string = "";
     score: number = 0;
     answers: Array<Boolean> = [];
 }
@@ -281,5 +286,6 @@ class questionData{
     title:string = "";
     averageAnswerTime = 0;
     correctAnswerCount = 0;
-    incorrectAnswerCount= 0;
+    incorrectAnswerCount = 0;
+    unansweredCount = 0;
 }
