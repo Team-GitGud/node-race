@@ -114,6 +114,14 @@ export class Lobby {
         return true;
     }
 
+    getPlayerAnalytics(): Object{
+        let playerAnalytics = new Object(){
+            playerdataArray: Array = [];
+        };
+        
+
+        return playerAnalytics;
+    }
     /**
      * Generates the token for the host, used to authenticate host actions like remove player
      */

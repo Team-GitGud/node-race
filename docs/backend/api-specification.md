@@ -397,11 +397,13 @@ nickname, score, questions
       "incorrectAnswerCount": 10
     }
   ],
-  "playerData": {
+  "playerData": [
+    {
     "name": "the throngler",
     "score": 50000,
     "answers": [true, ,false] // Note it is possible for an empty item as players can solve questions in any order
   }
+  ]
 }
 ```
 
