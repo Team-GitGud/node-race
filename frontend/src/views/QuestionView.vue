@@ -14,7 +14,7 @@
             alt="Navigate Right" class="navigate-right-icon" />
         <div class="bottom-right-buttons">
             <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="hasAnswered">
-                <h3>Submit</h3>
+                <h4>Submit</h4>
             </CustomButton>
             <CustomButton class="reset-button" :action="() => resetOrder()" type="negative" :disabled="hasAnswered">
                 <img :src="ResetIcon" alt="Reset" class="btn-img" />
@@ -22,16 +22,17 @@
         </div>
         <div class="bottom-left-buttons">
             <CustomButton v-if="answerDisabled" class="back-to-leaderboard-button" :action="() => $router.push('/leaderboard')" type="neutral">
-                <h3>Leaderboard</h3>
+                <h4>Leaderboard</h4>
             </CustomButton>
             <CustomButton class="question-navigation-button" :action="() => $router.push('/question-navigation')"
                 type="neutral" :disabled="false">
-                <h3>Questions</h3>
+                <h4>Questions</h4>
             </CustomButton>
         </div>
         <div class="top-right-buttons">
             <TimerComponent class="timer-component" :gameTimer="gameTimer" />
-            <h3 class="question-number border">{{ props.questionIndex + 1 }}/{{ questions.length }}</h3>
+            <h4 class="question-number border">{{ props.questionIndex + 1 }}/{{ questions.length }}</h4>
+            <TutorialPopup class="tutorial-popup" />
         </div>
     </div>
 </template>
@@ -51,6 +52,7 @@ import ResetIcon from '@/assets/reset.svg';
 import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
+import TutorialPopup from '@/components/TutorialPopup.vue';
 
 const router = useRouter();
 const { questions, gameTimer } = usePlayerSession();
@@ -233,8 +235,8 @@ const handleReturnHome = async () => {
 }
 
 h2 {
-    font-size: 64px;
-    margin-top: 40px;
+    font-size: 50px;
+    margin-top: 25px;
     padding: 0 20px 10px 20px;
     border-bottom: 2px solid var(--text-color);
     white-space: normal;
@@ -256,8 +258,7 @@ h2 {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    width: 50px;
-    height: 88px;
+    height: 60px;
     flex-shrink: 0;
     cursor: pointer;
     z-index: 1000;
@@ -275,7 +276,7 @@ h2 {
 .reset-button :deep(.btn-inner),
 .question-navigation-button :deep(.btn-inner),
 .back-to-leaderboard-button :deep(.btn-inner) {
-    height: 40px;
+    height: 35px;
 }
 
 .submit-button :deep(.btn-inner),
@@ -289,7 +290,7 @@ h2 {
 
 .bottom-right-buttons {
     position: absolute;
-    bottom: 50px;
+    bottom: 40px;
     right: 60px;
     display: flex;
     align-items: center;
@@ -299,7 +300,7 @@ h2 {
 
 .bottom-left-buttons {
     position: absolute;
-    bottom: 50px;
+    bottom: 40px;
     left: 60px;
     display: flex;
     z-index: 90;
@@ -313,8 +314,8 @@ h2 {
 
 .top-right-buttons {
     position: absolute;
-    top: 50px;
-    right: 60px;
+    top: 25px;
+    right: 20px;
     display: flex;
     align-items: center;
     gap: 15px;
@@ -328,5 +329,11 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+</style>
+
+<style>
+.tutorial-popup .btn.neutral {
+    margin: 10px 0 !important;
 }
 </style>
