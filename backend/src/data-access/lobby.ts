@@ -124,6 +124,7 @@ export class Lobby {
             data.score = p.getScore();
             data.answers = p.questionHistory;
             data.playerId = p.ID;
+            playerAnalytics.push(data);
         })
 
         return playerAnalytics;
@@ -278,17 +279,16 @@ export class Lobby {
     }
 }
 
-
-class playerData {
+export class playerData{
     name: string = "";
     playerId: string = "";
     score: number = 0;
     answers: Array<Boolean> = [];
 }
 
-class questionData {
-    id: number = 0;
-    title: string = "";
+export class questionData{
+    id:number = 0;
+    title:string = "";
     averageAnswerTime = 0;
     correctAnswerCount = 0;
     incorrectAnswerCount = 0;
