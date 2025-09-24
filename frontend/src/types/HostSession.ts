@@ -1,60 +1,70 @@
 import { Session } from './Session';
-import { Player } from './Player';
-import { Question } from './Question';
-import { QuestionAdapter, BackendQuestion } from './QuestionAdapter';
 import { Ref, ref } from 'vue';
+import { QuestionData } from './QuestionData';
+import { PlayerAnswers } from './PlayerAnswers';
 
 export class HostSession extends Session {
     hostId: string;
-    players: Ref<Player[]>;
+    AllQuestionsData: Ref<QuestionData[]>;
+    playerQuestions: Ref<PlayerAnswers[]>;
 
     constructor(ws: WebSocket, lobbyCode: string, hostId: string) {
         super(ws, lobbyCode);
         this.hostId = hostId;
-        this.players = ref([]);
-
-        // Set up event listeners for incoming messages
-        this.addEventListener("GAME_STARTED_HOST", (data) => {
-            this.handleGameStarted(data.questions);
-        });
+        this.AllQuestionsData = ref([]);
+        this.playerQuestions = ref([]);
         
         this.addEventListener("GAME_END", (data) => {
             this.handleSessionEnded(data.reason);
         });
 
         this.addEventListener("PLAYER_JOINED", (data) => {
-            const newPlayer = new Player(data.player.playerId, data.player.username);
-            this.players.value.push(newPlayer);
+            const newPlayer = new PlayerAnswers(data.player.playerId, data.player.username, 0, [], 0);
+            this.playerQuestions.value.push(newPlayer);
         });
         
         this.addEventListener("PLAYER_LEFT", (data) => {
-            this.players.value = this.players.value.filter(player => player.id !== data.playerId);
+            this.playerQuestions.value = this.playerQuestions.value.filter(player => player.id !== data.playerId);
         });
 
         this.addEventListener("ALL_PLAYERS", (data) => {
             if (data.players) {
                 const playerObjects = data.players.map((serverPlayer: any) => 
-                    new Player(serverPlayer.id, serverPlayer.name, parseInt(serverPlayer.score) || 0)
+                    new PlayerAnswers(serverPlayer.id, serverPlayer.name, parseInt(serverPlayer.score) || 0, [], 0)
                 );
-                this.players.value = playerObjects;
+                this.playerQuestions.value = playerObjects;
             }
         });
 
         this.addEventListener("PLAYER_LEAVE", (data) => {
-            this.players.value = this.players.value.filter(player => player.id !== data.playerId);
+            this.playerQuestions.value = this.playerQuestions.value.filter(player => player.id !== data.playerId);
         });
 
         // Listen for server error messages
         this.addEventListener("SERVER_ERROR", (data) => {
             console.error("Server error received:", data.message);
         });
-    }
 
-    public handleGameStarted(questions: BackendQuestion[]) {
-        if (questions !== undefined && questions.length > 0 && questions !== null) {
-            // If there's no players, for some reason there's no questions generated.
-            const adaptedQuestions = QuestionAdapter.fromBackendQuestions(questions);
-        }
+        this.addEventListener("ANALYTICS_UPDATED", (data) => {
+
+            console.log("Analytics updated:", data);
+
+            // Process question data
+            if (data.questionData) {
+                const questionsData = data.questionData.map((question: any) =>
+                    new QuestionData(question.id, question.title, question.averageAanswerTime, question.correctAnswerCount, question.incorrectAnswerCount, question.unansweredCount)
+                );
+                this.AllQuestionsData.value = questionsData;
+            }
+
+            // Process player data
+            if (data.playerData) {
+                const playersData = data.playerData.map((player: any) =>
+                    new PlayerAnswers(player.playerId, player.name, player.score, player.answers || [], player.rank)
+                );
+                this.playerQuestions.value = playersData;
+            }
+        });
     }
 
     public handleSessionEnded(reason: string) {
@@ -113,7 +123,6 @@ export class HostSession extends Session {
                 playerId: playerId
             }
         }));
-        console.log("Kick player request sent for:", playerId);
     }
 
     public getHostId(): string {

@@ -3,60 +3,93 @@ import { useRouter } from 'vue-router';
 import APIManager from './APIManager';
 import { HostSession } from './HostSession';
 import { AlertService } from './AlertService';
-import { Player } from './Player';
-import { HostQuestion } from './HostQuestion';
-import { HostPlayer } from './HostPlayer';
+import { QuestionData } from './QuestionData';
+import { PlayerAnswers } from './PlayerAnswers';
 
 export function useHostSession() {
     const lobbyCode = ref('');
     const router = useRouter();
-    const players = ref<Player[]>([]);
     const gameStarted = ref(false);
-    const questions = ref<HostQuestion[]>([]);
-    const playersData = ref<HostPlayer[]>([]);
-    const gameStartedTime = ref<number | null>(null);
+    const questions = ref<QuestionData[]>([]);
+    const playersData = ref<PlayerAnswers[]>([]);   
 
     // Persist game started state with timestamp
-    const saveGameStartedState = (started: boolean) => {
-        const data = {
-            started,
-            timestamp: Date.now()
+    // const saveGameStartedState = (started: boolean) => {
+    //     const data = {
+    //         started,
+    //         timestamp: Date.now()
+    //     };
+    //     localStorage.setItem('host-game-started', JSON.stringify(data));
+    // };
+
+    // const loadGameStartedState = (): boolean => {
+    //     const saved = localStorage.getItem('host-game-started');
+    //     if (!saved) return false;
+
+    //     try {
+    //         const data = JSON.parse(saved);
+    //         // Expire after 5 mins (5 * 60 * 1000 = 300000 ms)
+    //         const EXPIRE_TIME = 5 * 60 * 1000;
+    //         if (Date.now() - data.timestamp > EXPIRE_TIME) {
+    //             localStorage.removeItem('host-game-started');
+    //             return false;
+    //         }
+    //         return data.started === true;
+    //     } catch {
+    //         localStorage.removeItem('host-game-started');
+    //         return false;
+    //     }
+    // };
+
+    const saveData = () => {
+        const saved = {
+            players: playersData.value.map(player => ({
+                id: player.getId(),
+                nickname: player.getNickname(),
+                score: player.getScore(),
+                answers: player.getAnswers(),
+                rank: player.getRank()
+            })),
+            questions: questions.value.map(question => ({
+                id: question.getId(),
+                title: question.getTitle(),
+                averageAnswerTime: question.getAverageAnswerTime(),
+                correctAnswerCount: question.getCorrectAnswerCount(),
+                incorrectAnswerCount: question.getIncorrectAnswerCount(),
+                unansweredCount: question.getUnansweredCount()
+            })),
+            gameStarted: gameStarted.value,
         };
-        localStorage.setItem('host-game-started', JSON.stringify(data));
+        localStorage.setItem('host-session-data', JSON.stringify(saved));
     };
 
-    const loadGameStartedState = (): boolean => {
-        const saved = localStorage.getItem('host-game-started');
-        if (!saved) return false;
-
-        try {
-            const data = JSON.parse(saved);
-            // Expire after 5 mins (5 * 60 * 1000 = 300000 ms)
-            const EXPIRE_TIME = 5 * 60 * 1000;
-            if (Date.now() - data.timestamp > EXPIRE_TIME) {
-                localStorage.removeItem('host-game-started');
-                return false;
-            }
-            return data.started === true;
-        } catch {
-            localStorage.removeItem('host-game-started');
-            return false;
-        }
-    };
-
-    const setStartedTime = () => {
-        const data = {
-            started: true,
-            timestamp: Date.now()
-        };
-        localStorage.setItem('host-game-started', JSON.stringify(data));
-    };
-
-    const getStartedTime = () => {
-        const saved = localStorage.getItem('host-game-started');
-        if (!saved) return null;
+    const loadData = () => {
+        const saved = localStorage.getItem('host-session-data');
+        if (!saved) return;
         const data = JSON.parse(saved);
-        return data.timestamp;
+        
+        // Reconstruct PlayerAnswers objects from saved data
+        if (data.players) {
+            playersData.value = data.players.map((player: any) => 
+                new PlayerAnswers(player.id, player.nickname, player.score, player.answers || [], player.rank)
+            );
+        }
+        
+        // Reconstruct QuestionData objects from saved data
+        if (data.questions) {
+            questions.value = data.questions.map((question: any) => 
+                new QuestionData(
+                    question.id, 
+                    question.title, 
+                    question.averageAnswerTime, 
+                    question.correctAnswerCount, 
+                    question.incorrectAnswerCount, 
+                    question.unansweredCount
+                )
+            );
+        }
+        
+        gameStarted.value = data.gameStarted || false;
     };
 
     onMounted(async () => {
@@ -69,48 +102,66 @@ export function useHostSession() {
         }
         lobbyCode.value = session.lobbyCode;
 
-        // Load persisted game started state
-        gameStarted.value = loadGameStartedState();
+        // Load persisted data first
+        loadData();
 
-        session.getPlayers(); // Triggers a request - response will be handled by event listeners
-
-        players.value = [...session.players.value];
-
-        if (gameStarted.value) {
-            gameStartedTime.value = getStartedTime();
+        // Initialize from session data (this will be empty for new lobbies)
+        if (session.playerQuestions.value.length > 0) {
+            playersData.value = session.playerQuestions.value.map((player: any) => {
+                return new PlayerAnswers(
+                    player.id || player.getId?.() || '', 
+                    player.nickname || player.getNickname?.() || '', 
+                    player.score || player.getScore?.() || 0, 
+                    player.answers || player.getAnswers?.() || [], 
+                    player.rank || player.getRank?.()
+                );
+            });
+        } else if (playersData.value.length === 0) {
+            // For fresh lobbies, start with empty player list and request current players
+            playersData.value = [];
+            session.getPlayers();
         }
 
+        // Watch for question data updates
         watch(
-            session.players,
-            (newPlayers) => {
-                console.log('🔄 [useHostSession] Players updated:', newPlayers);
-                players.value = [...newPlayers];
+            session.AllQuestionsData,
+            (newQuestions) => {
+                questions.value = [...newQuestions];
+            },
+            { deep: true }
+        );
 
-                // Convert Player objects to HostPlayer objects with answers and rankings
-                const hostPlayers = newPlayers.map((player) => {
-                    // For now, initialize with empty answers array
-                    // TODO: Get actual answers data from server when available
-                    const answers: Array<boolean | null> = [];
-        
-                    return new HostPlayer(player.id, player.nickname, player.score, answers, 1); // Temporary rank, will be updated below
-                });
+        // Watch for player data updates from session
+        watch(
+            session.playerQuestions,
+            (newPlayerData) => {
+                // Create new PlayerAnswers objects from backend data
+                const updatedPlayers = newPlayerData.map((player: any) => {
+                    return new PlayerAnswers(
+                        player.id || player.getId?.() || '',
+                        player.nickname || player.getNickname?.() || '',
+                        player.score || player.getScore?.() || 0,
+                        player.answers || player.getAnswers?.() || [],
+                        player.rank || player.getRank?.()
+                    );
+                }).sort((a, b) => b.getScore() - a.getScore());
 
-                playersData.value = hostPlayers;
+                playersData.value = updatedPlayers;
+                saveData(); // Persist player updates
             },
             { deep: true }
         );
 
         session.addEventListener("GAME_STARTED_HOST", () => {
             gameStarted.value = true;
-            saveGameStartedState(true);
-            setStartedTime();
+            saveData();
         });
 
         session.addEventListener("GAME_END", () => {
             gameStarted.value = false;
-            saveGameStartedState(false);
+            saveData();
         });
     });
 
-    return { lobbyCode, playersData, questions, gameStarted, gameStartedTime };
+    return { lobbyCode, playersData, questions, gameStarted };
 }

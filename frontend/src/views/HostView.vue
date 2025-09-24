@@ -105,27 +105,27 @@
         <div class="lobby-right border">
             <div class="lobby-content player-content">
                 <div class=" player-list-title-container">
-                    <h2 class="player-list-title" title="Players List">Players ({{ sortedPlayers.length }})</h2>
+                    <h2 class="player-list-title" title="Players List">Players ({{ playersData.length }})</h2>
                 </div>
                 <div class="player-list">
                     <!-- if analytics should be shown, show players with answers -->
                     <div v-if="showAnalytics">
-                        <div v-for="hostPlayer in sortedPlayers" :key="hostPlayer.getId()" class="player-item">
+                        <div v-for="PlayerAnswers in playersData" :key="PlayerAnswers.getId()" class="player-item">
                             
                             <!-- Player Info first row -->
                             <div class="player-info-top">
                                 
                                 <!-- Player Info grouped on the Left -->
                                 <div class="player-info-left">
-                                    <span class="player-rank" title="Rank" :style="{ color: getRankColor(hostPlayer.getRank()) }">{{ hostPlayer.getRank() }}.</span>
-                                    <span class="player-name" title="Player Name">{{ hostPlayer.getNickname() }}</span>
+                                    <span class="player-rank" title="Rank" :style="{ color: getRankColor(PlayerAnswers.getRank()) }">{{ PlayerAnswers.getRank() }}.</span>
+                                    <span class="player-name" title="Player Name">{{ PlayerAnswers.getNickname() }}</span>
                                 </div>
                             
                                 <!-- Player Score -->
-                                <span class="player-score" title="Score">{{ hostPlayer.getScore() }}</span>
+                                <span class="player-score" title="Score">{{ PlayerAnswers.getScore() }}</span>
                                
                                 <!-- Kick Player Button -->
-                                <CustomButton :action="() => kickPlayer(hostPlayer.getId())" type="negative"
+                                <CustomButton :action="() => kickPlayer(PlayerAnswers.getId())" type="negative"
                                     class="kick-button" title="Kick player">
                                     X
                                 </CustomButton>
@@ -138,18 +138,18 @@
                                 <div class="progress-indicators">
                                    
                                     <!-- Answers Indicators -->
-                                    <template v-for="(answer, index) in hostPlayer.getAnswers()" :key="index">
+                                    <template v-for="(answer, index) in PlayerAnswers.getAnswers()" :key="index">
                                         
                                         <!-- Indicator -->
                                         <div class="indicator" :class="{
                                             'correct': answer === true,
                                             'incorrect': answer === false,
-                                            'unanswered': answer === null
+                                            'unanswered': answer !== true && answer !== false
                                         }" :title="index + 1 + '. ' + (answer === true ? 'Correct' : answer === false ? 'Incorrect' : 'Unanswered')">
                                         </div>
                                         
                                         <!-- Indicator Separator -->
-                                        <span v-if="index < hostPlayer.getAnswers().length - 1"
+                                        <span v-if="index < PlayerAnswers.getAnswers().length - 1"
                                             class="indicator-separator">-</span>
                                     </template>
                                 </div>
@@ -158,18 +158,18 @@
                     </div>
                     <!-- else show just players -->
                     <div v-if="!showAnalytics">
-                        <div v-for="hostPlayer in sortedPlayers" :key="hostPlayer.getId()" class="player-item">
-                            
+                        <div v-for="player in playersData" :key="player.getId()" class="player-item">
+
                             <!-- Player Info first row -->
                             <div class="player-info-top">
-                                
+
                                 <!-- Player Info grouped on the Left -->
                                 <div class="player-info-left">
-                                    <span class="player-name">{{ hostPlayer.getNickname() }}</span>
+                                    <span class="player-name">{{ player.getNickname() }}</span>
                                 </div>
-                                
+
                                 <!-- Kick Player Button -->
-                                <CustomButton :action="() => kickPlayer(hostPlayer.getId())" type="negative" class="kick-button">
+                                <CustomButton :action="() => kickPlayer(player.getId())" type="negative" class="kick-button">
                                     X
                                 </CustomButton>
                             </div>
@@ -204,7 +204,7 @@ import { GameTimer } from '@/types/GameTimer';
 // ===== DATA & STATE =====
 
 // Host Session Data
-const { lobbyCode, playersData, questions, gameStarted, gameStartedTime } = useHostSession();
+const { lobbyCode, playersData, questions, gameStarted } = useHostSession();
 
 // Analytics View State
 const showAnalytics = ref(false);
@@ -238,7 +238,7 @@ const copyButtonType = computed(() => {
 
 // Check if game can start (at least one player required)
 const canStartGame = computed(() => {
-    return sortedPlayers.value && sortedPlayers.value.length > 0;
+    return playersData.value && playersData.value.length > 0;
 });
 
 // Start button text based on game state
@@ -282,11 +282,6 @@ const copyButtonWidth = computed(() => {
     else {
         return 410;
     }
-});
-
-// In the script section, add computed for sorted players
-const sortedPlayers = computed(() => {
-    return [...playersData.value].sort((a, b) => a.getRank() - b.getRank());
 });
 
 // Watch for game start and set up timer
@@ -352,8 +347,6 @@ const endGame = async () => {
     if (session instanceof HostSession) {
         session.endGame();
     }
-    // Clear persisted game state when navigating home
-    localStorage.removeItem('host-game-started');
 
     // Allow any pending navigation (like back button) to proceed
     if (navigationCallback.value) {
@@ -609,8 +602,9 @@ const totalPlayers = computed(() => playersData.value.length);
 }
 
 .player-score {
-    min-width: 3rem;
+    width: 3rem;
     text-align: right;
+    overflow: hidden;
 }
 
 .progress-indicators {
