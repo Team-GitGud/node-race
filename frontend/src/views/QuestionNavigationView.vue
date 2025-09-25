@@ -2,6 +2,11 @@
     <ScreenBackground blur/>
     <ReturnHomeComponent
         :onConfirm="handleReturnHome"/>
+
+    <div class="tutorial">
+        <TutorialPopup />
+    </div>
+    
     <div class="question-navigation-view">
         <h2 class="page-title">Question Navigation</h2>
         <div class="questions-container">
@@ -20,6 +25,7 @@ import { usePlayerSession } from '@/types/usePlayerSession';
 import { PlayerSession } from '@/types/PlayerSession';
 import APIManager from '@/types/APIManager';
 import router from '@/router';
+import TutorialPopup from '@/components/TutorialPopup.vue';
 
 const { questions } = usePlayerSession();
 
@@ -51,6 +57,13 @@ const handleReturnHome = async () => {
     padding: 20px;
     border-bottom: 4px solid var(--accent-color);
     width: 650px;
+}
+
+.tutorial {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
 }
 
 .questions-container {
