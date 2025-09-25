@@ -76,8 +76,8 @@ onMounted(async () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
+    width: 100dvw;
+    gap: 50px
 }
 
 .leaderboard-info {
@@ -85,10 +85,16 @@ onMounted(async () => {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    margin-top: 5vh;
     width: 100%;
     height: 100%;
     gap: 50px;
+}
+
+@media screen and (max-width: 890px) {
+    .leaderboard-info {
+        flex-direction: column;
+        align-items: center;
+    }
 }
 
 .leaderboard-title {

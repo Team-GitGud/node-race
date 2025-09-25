@@ -81,10 +81,10 @@ const chooseColour = (index: number) => {
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    padding: 0% 15%;
+    justify-content: center;
     border-bottom: 1px solid var(--text-color);
 }
+
 
 .header span {
     padding: 5px 10px;

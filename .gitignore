@@ -1,2 +1,5 @@
 .DS_Store
 /cursor
+# I have some scripts for development I don't want to commit :)
+*.sh
+*.bat

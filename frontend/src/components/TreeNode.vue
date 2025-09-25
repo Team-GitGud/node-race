@@ -3,8 +3,7 @@
         <svg
             v-if="lines.length"
             class="lines-svg"
-            :width="containerSize.width"
-            :height="containerSize.height"
+            :viewBox="`0 0 ${containerSize.width} ${containerSize.height}`"
             style="position: absolute; top: 0; left: 0; pointer-events: none;"
         >
             <line
@@ -157,6 +156,9 @@ watch(() => [props.node.leftChild, props.node.rightChild], updateLines);
     top: 0;
     left: 0;
     z-index: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
 }
 .node-btn {
     width: 80px;

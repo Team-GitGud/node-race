@@ -264,11 +264,11 @@ h2 {
 }
 
 .navigate-left-icon {
-    left: 150px;
+    left: min(150px, 10vw);
 }
 
 .navigate-right-icon {
-    right: 150px;
+    right: min(150px, 10vw);
 }
 
 .submit-button :deep(.btn-inner),
@@ -321,6 +321,14 @@ h2 {
     z-index: 100;
 }
 
+@media (max-width: 890px) { /* I found this is a good number to make sure it doesn't overlap the title. */
+    .top-right-buttons {
+        flex-direction: column-reverse;
+        align-items: flex-end;
+        gap: 10px;
+    }
+}
+
 .question-number {
     padding-left: 10px;
     padding-right: 10px;
@@ -328,5 +336,6 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: content-box !important; /* This needs to match the timer component. So set it :) */
 }
 </style>

@@ -75,6 +75,7 @@ const toggleTime = () => {
     width: 150px; /* Fixed width when visible */
     transition: width 0.3s ease-in-out; /* Smooth width animation */
     overflow: hidden; /* Hide content during animation */
+    box-sizing: content-box !important; /* This looks super weird when not set and the timer is invisible. So set it :) */
 }
 
 .timer-container.timer-hidden {
