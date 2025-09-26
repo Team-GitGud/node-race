@@ -31,6 +31,7 @@ onMounted(async () => {
 });
 
 function navigateToQuestion() {
+    if (answerStatus.value !== null) return;
     router.push('/question/' + props.question.id);
 }
 </script>
