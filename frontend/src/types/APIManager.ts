@@ -108,11 +108,14 @@ class APIManager {
             console.error('WebSocket message:', event.data);
             this.stopLoading();
             resolve(false);
+            return undefined;
         }
     }
 
     /** Create new session, sending request to backend */
     public createSession(): Promise<boolean> {
+        // Clear any existing session-specific data when creating a new session
+        localStorage.removeItem('host-session-data');
         this.startLoading();
         return new Promise((resolve) => {
             const ws = this.createWs('lobby/create', resolve, "host");
@@ -137,8 +140,9 @@ class APIManager {
                 resolve, "player");
             ws.onmessage = (event) => {
                 this.stopLoading();
-                const { playerId } = this.parseWsMsg(event, resolve);
-                if (!playerId) { return resolve(false); }
+                const parsedData = this.parseWsMsg(event, resolve);
+                if (!parsedData || !parsedData.playerId) { return resolve(false); }
+                const { playerId } = parsedData;
 
                 this.session = new PlayerSession(ws, lobbyCode, playerId, playerName, []);
                 this.saveSessionInfo({ lobbyCode, playerId, playerName }, "player");

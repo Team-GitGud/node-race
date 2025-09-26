@@ -23,7 +23,8 @@ export class GameTimer {
       return;
     }
     this.isRunning = true;
-    this.elapsedTime = this.elapsedTime !== 0 ? this.elapsedTime : 0;
+    // Immediately update elapsedTime to current time before starting interval
+    this.elapsedTime = new Date().getTime() - this.startTime;
     this.timer = setInterval(() => {
       this.elapsedTime = new Date().getTime() - this.startTime;
       this.saveRunnable(); // We save the current time it takes to cache.

@@ -21,10 +21,13 @@ defineProps<{ blur?: boolean }>();
 
 <style scoped>
 .bg-container {
-	display: flex;
-	justify-content: center;
-	max-height: 100vh;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
 	overflow: hidden;
+	z-index: -2;
 }
 
 .bg-container .overlay {
@@ -36,10 +39,12 @@ defineProps<{ blur?: boolean }>();
 }
 
 .bg-container img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
 	height: 100vh;
-	width: auto;
-	position: fixed;
+	object-fit: cover;
 	z-index: -2;
-	overflow-y: hidden;
 }
 </style>

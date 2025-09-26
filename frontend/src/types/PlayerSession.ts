@@ -47,6 +47,10 @@ export class PlayerSession extends Session {
     this.addEventListener("RANK", (data) => {
       this.handleRank(data.data.rank, data.data.lobbyRank);
     });
+
+    this.addEventListener("GAME_END", (data) => {
+      this.handleSessionEnded(data.reason || "Game ended by host");
+    });
   }
 
   public getPlayer(): Player {
@@ -79,6 +83,21 @@ export class PlayerSession extends Session {
     this.leaveSession(reason);
   }
 
+  public handleSessionEnded(reason: string) {
+    console.log("Session ended with reason:", reason);
+
+    if (this.inactivityChecker) {
+      this.inactivityChecker.stop();
+      this.inactivityChecker = null;
+    }
+
+    // Stop the game timer if it's running
+    if (this.gameTimer) {
+      this.gameTimer.stop();
+    }
+
+    this.leaveSession(reason || "Session closed by host");
+  }
 
   public getQuestions(): Array<Question> {
     return this.questions;
