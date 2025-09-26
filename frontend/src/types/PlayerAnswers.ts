@@ -2,8 +2,10 @@ import { Player } from './Player';
 
 export class PlayerAnswers extends Player {
     private answers: Array<boolean | null>;
-    private rank: number;
-    constructor(id: string, nickname: string, score: number, answers: Array<boolean | null>, rank: number) {
+    constructor(id: string, nickname: string, score: number, answers: Array<boolean | null>) {
+        
+        score = Math.round(score);
+        
         super(id, nickname, score);
         
         // Start with 5 nulls, then overlay any provided answers
@@ -13,8 +15,6 @@ export class PlayerAnswers extends Player {
                 this.answers[index] = answer;
             }
         });
-        
-        this.rank = rank;
     }
 
     getId(): string {
@@ -31,9 +31,5 @@ export class PlayerAnswers extends Player {
     
     getAnswers(): Array<boolean | null> {
         return this.answers;
-    }
-
-    getRank(): number {
-        return this.rank;
     }
 }

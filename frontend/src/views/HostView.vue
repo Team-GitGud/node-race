@@ -60,7 +60,7 @@
                 <div class="buttons">
                     
                     <!-- Cancel/End Game button -->
-                    <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="110">
+                    <CustomButton :action="handleCancel" type="negative" class="cancel-button" :width="150">
                         {{ cancelButtonText }}
                     </CustomButton>
                 </div>
@@ -117,7 +117,7 @@
                                 
                                 <!-- Player Info grouped on the Left -->
                                 <div class="player-info-left">
-                                    <span class="player-rank" title="Rank" :style="{ color: getRankColor(PlayerAnswers.getRank()) }">{{ PlayerAnswers.getRank() }}.</span>
+                                    <span class="player-rank" title="Rank" :style="{ color: getRankColor(playersData.indexOf(PlayerAnswers) + 1) }">{{ playersData.indexOf(PlayerAnswers) + 1 }}.</span>
                                     <span class="player-name" title="Player Name">{{ PlayerAnswers.getNickname() }}</span>
                                 </div>
                             
@@ -125,10 +125,12 @@
                                 <span class="player-score" title="Score">{{ PlayerAnswers.getScore() }}</span>
                                
                                 <!-- Kick Player Button -->
-                                <CustomButton :action="() => kickPlayer(PlayerAnswers.getId())" type="negative"
-                                    class="kick-button" title="Kick player">
-                                    X
-                                </CustomButton>
+                                <div v-if="!gameEnded">
+                                    <CustomButton :action="() => kickPlayer(PlayerAnswers.getId())" type="negative"
+                                        class="kick-button" title="Kick player">
+                                        X
+                                    </CustomButton>
+                                </div>
                             </div>
 
                             <!-- Player Info second row -->
@@ -169,9 +171,11 @@
                                 </div>
 
                                 <!-- Kick Player Button -->
-                                <CustomButton :action="() => kickPlayer(player.getId())" type="negative" class="kick-button">
-                                    X
-                                </CustomButton>
+                                <div v-if="!gameEnded">
+                                    <CustomButton :action="() => kickPlayer(player.getId())" type="negative" class="kick-button">
+                                        X
+                                    </CustomButton>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -185,7 +189,7 @@
 
 // Vue & Core Imports
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
-import { onBeforeRouteLeave } from 'vue-router';
+import { onBeforeRouteLeave, useRouter } from 'vue-router';
 
 // Components
 import CustomButton from '@/components/CustomButton.vue';
@@ -204,13 +208,10 @@ import { GameTimer } from '@/types/GameTimer';
 // ===== DATA & STATE =====
 
 // Host Session Data
-const { lobbyCode, playersData, questions, gameStarted } = useHostSession();
+const { lobbyCode, playersData, questions, gameStarted, gameEnded, showAnalytics, gameTimer } = useHostSession();
 
-// Analytics View State
-const showAnalytics = ref(false);
-
-// Game Timer
-const gameTimer = ref<GameTimer | null>(null);
+// Router instance
+const router = useRouter();
 
 // Copy Status Tracking
 type CopyStatus = 'idle' | 'success' | 'error';
@@ -264,6 +265,9 @@ const startButtonDisabled = computed(() => {
 
 // Cancel button text based on analytics view state
 const cancelButtonText = computed(() => {
+    if (gameEnded.value) {
+        return 'Return Home';
+    }
     return showAnalytics.value ? 'End Game' : 'Cancel';
 });
 
@@ -284,14 +288,6 @@ const copyButtonWidth = computed(() => {
     }
 });
 
-// Watch for game start and set up timer
-watch(gameStarted, (isStarted) => {
-    if (isStarted && !gameTimer.value) {
-        showAnalytics.value = true;
-        setupGameTimer();
-    }
-});
-
 // Get rank color based on position
 const getRankColor = (rank: number) => {
     switch (rank) {
@@ -309,16 +305,18 @@ const getRankColor = (rank: number) => {
 // ===== METHODS =====
 
 // Handle Cancel/End Game button
-const handleCancel = () => {
+const handleCancel = async () => {
+    // If game has ended, return home directly without warning
+    if (gameEnded.value) {
+        const apiManager = APIManager.getInstance();
+        const session = await apiManager.getSession();
+        if (session instanceof HostSession) {
+            session.endGame();
+        }
+        router.push('/');
+        return;
+    }
     isExitModalOpen.value = true;
-};
-
-// Set up game timer when game starts
-const setupGameTimer = () => {
-    const start = new Date().getTime();
-    const fiveMinutes = 1000 * 60 * 5;
-    gameTimer.value = new GameTimer(start, start + fiveMinutes);
-    gameTimer.value.start();
 };
 
 // Game Management
@@ -337,10 +335,6 @@ const startGame = async () => {
 
 const endGame = async () => {
     isNavigatingAway.value = true;
-
-    // Reset analytics view when host manually ends the game
-    showAnalytics.value = true;
-    gameTimer.value = null;
 
     const apiManager = APIManager.getInstance();
     const session = await apiManager.getSession();
@@ -401,6 +395,12 @@ const navigationCallback = ref<((value: boolean) => void) | null>(null);
 
 // Route leave guard for back button navigation
 onBeforeRouteLeave((to: any, from: any, next: (value: boolean) => void) => {
+
+    if (gameEnded.value) {
+        next(true);
+        return;
+    }
+
     // If already navigating programmatically (e.g., after confirming modal), allow it
     if (isNavigatingAway.value) {
         next(true);
@@ -435,7 +435,6 @@ const totalPlayers = computed(() => playersData.value.length);
     max-height: 100vh;
     max-width: 100vw;
     min-height: 100vh;
-    min-width: 100vw;
     padding: 2rem;
     box-sizing: border-box;
 }
@@ -536,7 +535,6 @@ const totalPlayers = computed(() => playersData.value.length);
     align-items: center;
     gap: 1rem;
     flex-shrink: 0;
-    margin-top: auto;
 }
 
 
@@ -602,7 +600,7 @@ const totalPlayers = computed(() => playersData.value.length);
 }
 
 .player-score {
-    width: 3rem;
+    width: 5rem;
     text-align: right;
     overflow: hidden;
 }
@@ -652,18 +650,17 @@ const totalPlayers = computed(() => playersData.value.length);
     align-items: center;
     height: 100%;
     box-sizing: border-box;
+    gap: 2rem;
 }
 
 .question-analytics {
-
     display: flex;
     min-width: 500px;
     flex-direction: column;
-    gap: 1rem;
+    gap: 2.5rem;
     overflow-x: hidden;
     overflow-y: auto;
     box-sizing: border-box;
-    padding: 1rem;
     flex: 1;
     min-height: 0;
     /* Allow flex item to shrink below content size */
@@ -674,10 +671,10 @@ const totalPlayers = computed(() => playersData.value.length);
     justify-content: space-between;
     align-items: center;
     margin-bottom: 5px;
+    gap: 1rem;
 }
 
 .question-title {
-    font-weight: bold;
     font-size: 2.5rem;
 }
 
@@ -686,6 +683,12 @@ const totalPlayers = computed(() => playersData.value.length);
 }
 
 /* Question Analytics Item Box */
+.question-analytics-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 .question-analytics-item-box {
     display: flex;
     height: 30px;
