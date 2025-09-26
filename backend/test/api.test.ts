@@ -83,7 +83,7 @@ describe("Api Tests", () => {
         };
 
         lobby!.send(JSON.stringify(getAllPlayersMessage));
-        
+
         // Wait for all players response - this will be sent to all players in lobby
         const allPlayersMsg = await waitForMessage(lobby!);
         // The response could be ALL_PLAYERS or PLAYER_JOINED depending on timing
@@ -120,7 +120,7 @@ describe("Api Tests", () => {
         };
 
         lobby!.send(JSON.stringify(getLeaderboardMessage));
-        
+
         // Wait for leaderboard response - this might be sent to all players in lobby
         const leaderboardMsg = await waitForMessage(lobby!);
         // The response could be LEADERBOARD or PLAYER_JOINED depending on timing
@@ -154,7 +154,7 @@ describe("Api Tests", () => {
         };
 
         player!.send(JSON.stringify(invalidMessage));
-        
+
         // Should receive error message
         const errorMsg = await waitForMessage(player!);
         expect(errorMsg).toBe("Error: no action block found");
@@ -163,7 +163,7 @@ describe("Api Tests", () => {
     it("should handle malformed JSON gracefully", async () => {
         // Send invalid JSON
         player!.send("invalid json");
-        
+
         // Should receive error message
         const errorMsg = await waitForMessage(player!);
         expect(errorMsg).toBe("Error with json message");
@@ -179,7 +179,7 @@ describe("Api Tests", () => {
         };
 
         lobby!.send(JSON.stringify(invalidLobbyMessage));
-        
+
         // Should receive error message - this might be sent to all players in lobby
         const errorMsg = await waitForMessage(lobby!);
         // The response could be error message or PLAYER_JOINED depending on timing
@@ -198,8 +198,26 @@ describe("Api Tests", () => {
         };
 
         lobby!.send(JSON.stringify(unauthorizedMessage));
+    });
 
-        // Should not receive any response (host validation failed)
-        // This test verifies that the method returns early without sending a response
+    it("shouldn't allow players to join after game has started", async () => {
+        const startGameMessage = {
+            action: "START_GAME",
+            hostId: hostId,
+            data: {
+                lobbyId: lobbyCode
+            }
+        };
+
+        lobby!.send(JSON.stringify(startGameMessage));
+        // Wait for game started response
+        const gameStartedMsg = await waitForMessage(player!);
+
+        const player1 = new WebSocket(
+            `ws://localhost:3000/api/v1/lobby/join?name=joeJoin1&lobbyId=${lobbyCode}`
+        );
+
+        const lobbyMessage = await waitForMessage(lobby!);
+        expect(lobbyMessage).toBe("Cannot join when a game is running");
     });
 });
