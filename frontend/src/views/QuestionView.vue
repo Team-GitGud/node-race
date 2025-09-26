@@ -3,14 +3,14 @@
         :onConfirm="handleReturnHome"/>
     <div class="question-view">
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
-        <img v-if="props.questionIndex > 0" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
+        <img v-if="showPrevArrow" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
             class="navigate-left-icon" />
         <div class="tree-container" :style="{ transform: `scale(${treeScale})` }">
             <TreeNode v-if="currentQuestion" :node="currentQuestion.root" :selectedOrder="selectedOrder"
                 :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect($event)"
                 style="margin-top: 0px;" />
         </div>
-        <img v-if="props.questionIndex < questions.length - 1" @click="nextQuestion()" :src="NavigateRight"
+        <img v-if="showNextArrow" @click="nextQuestion()" :src="NavigateRight"
             alt="Navigate Right" class="navigate-right-icon" />
         <div class="bottom-right-buttons">
             <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="hasAnswered">
@@ -53,6 +53,9 @@ import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
 import TutorialPopup from '@/components/TutorialPopup.vue';
+
+const showPrevArrow = computed(() => findPreviousUnanswered(props.questionIndex) !== null);
+const showNextArrow = computed(() => findNextUnanswered(props.questionIndex) !== null);
 
 const router = useRouter();
 const { questions, gameTimer } = usePlayerSession();
@@ -114,10 +117,17 @@ const initializeQuestion = async () => {
     console.debug("Found session", session.value);
 
     questions.value = session.value.getQuestions();
+    console.log("Questions:", questions.value);
     gameTimer.value = session.value.getGameTimer();
+    hasAnswered.value = await hasAnsweredQuestion(props.questionIndex);
+
+    if (hasAnswered.value) {
+        goToNextRelevantQuestion(props.questionIndex);
+        return;
+    }
+
     selectedOrder.value = new Map();
     answerDisabled.value = await answeredAllQuestions();
-    hasAnswered.value = await hasAnsweredQuestion(props.questionIndex);
     if (hasAnswered.value) {
         result.value = session.value.getAnswers()[props.questionIndex] ?? false;
         if (await answeredAllQuestions()) {
@@ -167,26 +177,33 @@ const checkAnswer = async () => {
 
     setTimeout(async () => {
         resetOrder();
-        if (await answeredAllQuestions()) {
-            router.push("/leaderboard");
-            return;
-        } else if (props.questionIndex + 1 >= questions.value.length) {
-            router.push("/question-navigation");
-            return;
-        } else {
-            // This will cycle through all questions until it finds one that hasn't been answered.
-            let i = 1
-            while (await hasAnsweredQuestion(props.questionIndex + i)) {
-                i++;
-                if (props.questionIndex + i >= questions.value.length) {
-                    router.push("/question-navigation");
-                    return;
-                }
-            }
-            router.push(`/question/${props.questionIndex + i}`);
-        }
+        goToNextRelevantQuestion(props.questionIndex);
     }, 2000);
 };
+
+function goToNextRelevantQuestion(currentIndex: number) {
+    const next = findNextUnanswered(currentIndex);
+    if (next !== null) {
+        router.push(`/question/${next}`);
+        return;
+    }
+
+    // Use session answers as the source of truth
+    if (!session.value || !(session.value instanceof PlayerSession)) {
+        router.push('/leaderboard');
+        return;
+    }
+    const answers = session.value.getAnswers();
+    for (let i = 0; i < questions.value.length; i++) {
+        if (answers[i] === undefined || answers[i] === null) {
+            router.push(`/question/${i}`);
+            return;
+        }
+    }
+
+    // If all answered, go to leaderboard
+    router.push('/leaderboard');
+}
 
 const answeredAllQuestions = async () => {
     if (!session.value || !(session.value instanceof PlayerSession)) return false;
@@ -210,12 +227,32 @@ const currentQuestion = computed(() => {
     return questions.value[props.questionIndex];
 })
 
+const previousQuestion = () => {
+    const prev = findPreviousUnanswered(props.questionIndex);
+    if (prev !== null) router.push(`/question/${prev}`);
+};
+
 const nextQuestion = () => {
-    router.push(`/question/${props.questionIndex + 1}`);
+    const next = findNextUnanswered(props.questionIndex);
+    if (next !== null) router.push(`/question/${next}`);
+};
+
+function findPreviousUnanswered(currentIndex: number): number | null {
+    if (!session.value || !(session.value instanceof PlayerSession)) return null;
+    const answers = session.value.getAnswers();
+    for (let i = currentIndex - 1; i >= 0; i--) {
+        if (answers[i] === undefined || answers[i] === null) return i;
+    }
+    return null;
 }
 
-const previousQuestion = () => {
-    router.push(`/question/${props.questionIndex - 1}`);
+function findNextUnanswered(currentIndex: number): number | null {
+    if (!session.value || !(session.value instanceof PlayerSession)) return null;
+    const answers = session.value.getAnswers();
+    for (let i = currentIndex + 1; i < questions.value.length; i++) {
+        if (answers[i] === undefined || answers[i] === null) return i;
+    }
+    return null;
 }
 
 const handleReturnHome = async () => {
