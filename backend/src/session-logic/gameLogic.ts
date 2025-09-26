@@ -39,7 +39,7 @@ export class GameLogic {
 
         if (difficult) {
             tree.maxDepth = this.difficultMaxDepth;
-            tree.generateTree();
+            tree.root = tree.generateTree();
         }
 
         switch (Math.floor(Math.random() * 4)) {
