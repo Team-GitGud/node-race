@@ -35,7 +35,7 @@ export class Player {
 
             let timeMultiplier = ((45 - (timer.getTime() - this.prevQuestionTime)) / 100);
             if (timeMultiplier < 0) timeMultiplier = 0;
-            this.score = this.score + 300 + (700 * timeMultiplier);
+            this.score = Math.trunc( this.score + 300 + (700 * timeMultiplier));
         }
         this.prevQuestionTime = timer.getTime();
     }
