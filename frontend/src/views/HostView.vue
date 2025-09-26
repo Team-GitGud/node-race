@@ -319,7 +319,7 @@ const handleCancel = async () => {
     isExitModalOpen.value = true;
 };
 
-// Game Management
+// Start Game Management
 const startGame = async () => {
     if (!canStartGame.value) {
         console.log('Cannot start game: no players available');
@@ -333,6 +333,7 @@ const startGame = async () => {
     }
 };
 
+// End Game Management
 const endGame = async () => {
     isNavigatingAway.value = true;
 
@@ -381,10 +382,12 @@ const handleResize = () => {
     screenWidth.value = window.innerWidth;
 };
 
+// Window resize listener
 onMounted(() => {
     window.addEventListener('resize', handleResize);
 });
 
+// Window resize listener cleanup
 onUnmounted(() => {
     window.removeEventListener('resize', handleResize);
 });
@@ -396,6 +399,7 @@ const navigationCallback = ref<((value: boolean) => void) | null>(null);
 // Route leave guard for back button navigation
 onBeforeRouteLeave((to: any, from: any, next: (value: boolean) => void) => {
 
+    // If game has ended, allow navigation
     if (gameEnded.value) {
         next(true);
         return;
@@ -662,6 +666,7 @@ const totalPlayers = computed(() => playersData.value.length);
     overflow-y: auto;
     box-sizing: border-box;
     flex: 1;
+    padding-right: 1rem;
     min-height: 0;
     /* Allow flex item to shrink below content size */
 }
@@ -729,5 +734,6 @@ const totalPlayers = computed(() => playersData.value.length);
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    padding-right: 2.5rem;
 }
 </style>
