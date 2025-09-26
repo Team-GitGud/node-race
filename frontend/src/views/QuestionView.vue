@@ -4,14 +4,14 @@
     <div class="question-view">
         <h2 v-if="currentQuestion">{{ currentQuestion.title }}</h2>
         <img v-if="showPrevArrow" @click="previousQuestion()" :src="NavigateLeft" alt="Navigate Left"
-            class="navigate-left-icon" />
+            class="navigate-left-icon" :class="{ disabled: checkingAnswer }" />
         <div class="tree-container" :style="{ transform: `scale(${treeScale})` }">
             <TreeNode v-if="currentQuestion" :node="currentQuestion.root" :selectedOrder="selectedOrder"
                 :correctOrder="currentQuestion.correctOrder" :result="result" @select="handleSelect($event)"
                 style="margin-top: 0px;" />
         </div>
         <img v-if="showNextArrow" @click="nextQuestion()" :src="NavigateRight"
-            alt="Navigate Right" class="navigate-right-icon" />
+            alt="Navigate Right" class="navigate-right-icon" :class="{ disabled: checkingAnswer }" />
         <div class="bottom-right-buttons">
             <CustomButton class="submit-button" :action="() => checkAnswer()" type="positive" :disabled="hasAnswered">
                 <h4>Submit</h4>
@@ -64,6 +64,7 @@ const hasAnswered = ref(false);
 const answerDisabled = ref(false);
 const session = ref<Session | null>(null);
 const treeScale = ref(1);
+const checkingAnswer = ref(false);
 
 // In the TreeNode component, the nodes are red/green when this is a boolean, and blue when null.
 const result = ref<boolean | null>(null);
@@ -111,6 +112,7 @@ const calculateTreeScale = () => {
 };
 
 const initializeQuestion = async () => {
+    checkingAnswer.value = false;
     session.value = await APIManager.getInstance().getSession();
     console.debug("Trying to find session...")
     if (!session.value || !(session.value instanceof PlayerSession)) return;
@@ -175,10 +177,12 @@ const checkAnswer = async () => {
     session.value.setAnswerTimes(props.questionIndex, gameTimer.value?.getLastAnswerTimeAndLogNewTime() ?? 0);
     hasAnswered.value = true;
 
+    checkingAnswer.value = true;
     setTimeout(async () => {
         resetOrder();
         goToNextRelevantQuestion(props.questionIndex);
-    }, 2000);
+        checkingAnswer.value = false;
+    }, 1000);
 };
 
 function goToNextRelevantQuestion(currentIndex: number) {
@@ -228,11 +232,13 @@ const currentQuestion = computed(() => {
 })
 
 const previousQuestion = () => {
+    if (checkingAnswer.value) return;
     const prev = findPreviousUnanswered(props.questionIndex);
     if (prev !== null) router.push(`/question/${prev}`);
 };
 
 const nextQuestion = () => {
+    if (checkingAnswer.value) return;
     const next = findNextUnanswered(props.questionIndex);
     if (next !== null) router.push(`/question/${next}`);
 };
@@ -307,6 +313,12 @@ h2 {
 
 .navigate-right-icon {
     right: 150px;
+}
+
+.navigate-left-icon.disabled,
+.navigate-right-icon.disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
 }
 
 .submit-button :deep(.btn-inner),
