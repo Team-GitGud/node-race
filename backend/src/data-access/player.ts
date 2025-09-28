@@ -4,6 +4,8 @@ import { ApiResponseFactory } from '../api/apiResponseFactory';
 import { Timer } from "./timer";
 import { time } from 'node:console';
 
+const bonusTimePerQuestion = 30;
+
 export class Player {
     name: string;
     ID: string;
@@ -33,9 +35,9 @@ export class Player {
         this.questionTimes[questionNumber]= timer.getTime() - this.prevQuestionTime;
         if (correct) {
 
-            let timeMultiplier = ((45 - (timer.getTime() - this.prevQuestionTime)) / 100);
+            let timeMultiplier = ((bonusTimePerQuestion - (timer.getTime() - this.prevQuestionTime)) / 100);
             if (timeMultiplier < 0) timeMultiplier = 0;
-            this.score = this.score + 300 + (700 * timeMultiplier);
+            this.score = Math.trunc( this.score + 200 + (800 * timeMultiplier));
         }
         this.prevQuestionTime = timer.getTime();
     }
