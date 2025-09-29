@@ -223,7 +223,7 @@ class APIManager {
             }
 
             // Check if game is over - don't attempt reconnection
-            if (info.gameOver === true) {
+            if (info.gameOver) {
                 this.stopLoading();
                 console.log("Game is over, skipping reconnection");
                 return resolve(false);

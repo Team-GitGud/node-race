@@ -73,8 +73,12 @@ function handleClick() {
     const current = newOrder.get(props.node.id);
     
     if (current === undefined || current === null) {
-        // Node hasn't been selected yet, add it to the next position
-        const nextPosition = newOrder.size;
+        // Node hasn't been selected yet, find the first available index
+        const usedIndices = new Set(newOrder.values());
+        let nextPosition = 0;
+        while (usedIndices.has(nextPosition)) {
+            nextPosition++;
+        }
         newOrder.set(props.node.id, nextPosition);
     } else {
         // Node already selected, remove it

@@ -152,8 +152,6 @@ export class PlayerSession extends Session {
       rank: data.rank,
       lobbyRank: data.lobbyRank
     });
-
-    // Navigation will be handled by components listening to GAME_ENDED event
   }
 
   public handleLeaderboard(
