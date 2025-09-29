@@ -35,7 +35,7 @@ export class InactivityChecker {
 
     /** Increments the inactivity timer and checks for inactivity */
     private incrementTimer() {
-        this.currentTime += 0;
+        this.currentTime += 1000;
         if (this.currentTime >= this.inactivityThreshold) {
             this.handleInactivity();
         }
