@@ -8,67 +8,69 @@
     No props required.
  -->
 <template>
-    <!-- Button to open the tutorial -->
-    <CustomButton shrink :action="() => isOpen = true">?</CustomButton> 
+    <div>
+        <!-- Button to open the tutorial -->
+        <CustomButton shrink :action="() => isOpen = true">?</CustomButton> 
 
-    <!-- Initial tutorial selection popup -->
-    <ModalPopup title="Tutorial" v-if="isOpen && currentTutorial === null" @close="isOpen = false">
-        <template #body>
-            <p style="padding-bottom: 15px">What do you want to learn?</p>
-            <div class="tutorial-cards">
-                <CustomButton :shrink="true" :action="() => currentTutorial = 'DFS: Pre-order'">
-                    <TutorialCard title="DFS:" subtitle="Pre-order" :image="previewDFSPre" />
-                </CustomButton>
+        <!-- Initial tutorial selection popup -->
+        <ModalPopup title="Tutorial" v-if="isOpen && currentTutorial === null" @close="isOpen = false">
+            <template #body>
+                <p style="padding-bottom: 15px">What do you want to learn?</p>
+                <div class="tutorial-cards">
+                    <CustomButton :shrink="true" :action="() => currentTutorial = 'DFS: Pre-order'">
+                        <TutorialCard title="DFS:" subtitle="Pre-order" :image="previewDFSPre" />
+                    </CustomButton>
 
-                <CustomButton :shrink="true" :action="() => currentTutorial = 'DFS: In-order'">
-                    <TutorialCard title="DFS:" subtitle="In-order" :image="previewDFSIn"/>
-                </CustomButton>
+                    <CustomButton :shrink="true" :action="() => currentTutorial = 'DFS: In-order'">
+                        <TutorialCard title="DFS:" subtitle="In-order" :image="previewDFSIn"/>
+                    </CustomButton>
 
-                <CustomButton :shrink="true" :action="() => currentTutorial = 'DFS: Post-order'">
-                    <TutorialCard title="DFS:" subtitle="Post-order" :image="previewDFSPost"/>
-                </CustomButton>
+                    <CustomButton :shrink="true" :action="() => currentTutorial = 'DFS: Post-order'">
+                        <TutorialCard title="DFS:" subtitle="Post-order" :image="previewDFSPost"/>
+                    </CustomButton>
 
-                <CustomButton :shrink="true" :action="() => currentTutorial = 'BFS'">
-                    <TutorialCard title="BFS" :image="previewBFS"/>
-                </CustomButton>
-            </div>
-        </template>
-        <template #footer>
-            <CustomButton :action="() => isOpen = false" type="negative">Close</CustomButton>
-        </template>
-    </ModalPopup>
+                    <CustomButton :shrink="true" :action="() => currentTutorial = 'BFS'">
+                        <TutorialCard title="BFS" :image="previewBFS"/>
+                    </CustomButton>
+                </div>
+            </template>
+            <template #footer>
+                <CustomButton :action="() => isOpen = false" type="negative">Close</CustomButton>
+            </template>
+        </ModalPopup>
 
-    <!-- The tutorials that are opened through clicking the cards -->
-    <TutorialContent v-if="currentTutorial === 'DFS: Pre-order'" title="DFS: Pre-order" :static="staticDFSPre" @close="handleClose" @back="handleBack">
-        <p>
-            For Pre-order Depth First Search, you follow a simple pattern. <br/>
-            ‘Visit’ the initial root/center node, then visit the left child,<br/>
-            and finally the right child. Follow this pattern through the<br/>
-            entire tree.
-        </p>
-    </TutorialContent>
-    <TutorialContent v-if="currentTutorial === 'DFS: In-order'" title="DFS: In-order" :static="staticDFSIn" @close="handleClose" @back="handleBack">
-        <p>
-            In-order Depth-First-Search is a bit more complex of a pattern. <br/>
-            Within a branch, you visit the left child first, then return to <br/>
-            the root node, and finally visit the right child. You repeat this <br/> 
-            pattern for every branch in the tree.
-        </p>
-    </TutorialContent>
-    <TutorialContent v-if="currentTutorial === 'DFS: Post-order'" title="DFS: Post-order" :static="staticDFSPost" @close="handleClose" @back="handleBack">
-        <p>
-            Post-order Depth-First-Search follows the pattern of visiting the <br/>
-            left child first, then the right child, and finally the root node You <br/>
-            repeat this pattern for every branch in the tree.
-        </p>
-    </TutorialContent>
-    <TutorialContent v-if="currentTutorial === 'BFS'" title="BFS" :static="staticBFS" @close="handleClose" @back="handleBack">
-        <p>
-            For Breadth-First-Search, you traverse the tree in ‘rows’ you <br/>
-            start from the root, then visit it’s children (left to right), then<br/>
-            you visit all the root’s children’s children, and so on.
-        </p>
-    </TutorialContent>
+        <!-- The tutorials that are opened through clicking the cards -->
+        <TutorialContent v-if="currentTutorial === 'DFS: Pre-order'" title="DFS: Pre-order" :static="staticDFSPre" @close="handleClose" @back="handleBack">
+            <p>
+                For Pre-order Depth First Search, you follow a simple pattern. <br/>
+                ‘Visit’ the initial root/center node, then visit the left child,<br/>
+                and finally the right child. Follow this pattern through the<br/>
+                entire tree.
+            </p>
+        </TutorialContent>
+        <TutorialContent v-if="currentTutorial === 'DFS: In-order'" title="DFS: In-order" :static="staticDFSIn" @close="handleClose" @back="handleBack">
+            <p>
+                In-order Depth-First-Search is a bit more complex of a pattern. <br/>
+                Within a branch, you visit the left child first, then return to <br/>
+                the root node, and finally visit the right child. You repeat this <br/> 
+                pattern for every branch in the tree.
+            </p>
+        </TutorialContent>
+        <TutorialContent v-if="currentTutorial === 'DFS: Post-order'" title="DFS: Post-order" :static="staticDFSPost" @close="handleClose" @back="handleBack">
+            <p>
+                Post-order Depth-First-Search follows the pattern of visiting the <br/>
+                left child first, then the right child, and finally the root node You <br/>
+                repeat this pattern for every branch in the tree.
+            </p>
+        </TutorialContent>
+        <TutorialContent v-if="currentTutorial === 'BFS'" title="BFS" :static="staticBFS" @close="handleClose" @back="handleBack">
+            <p>
+                For Breadth-First-Search, you traverse the tree in ‘rows’ you <br/>
+                start from the root, then visit it’s children (left to right), then<br/>
+                you visit all the root’s children’s children, and so on.
+            </p>
+        </TutorialContent>
+    </div>
 </template>
 
 <script setup lang="ts">

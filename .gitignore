@@ -3,3 +3,4 @@
 # I have some scripts for development I don't want to commit :)
 *.sh
 *.bat
+backend/src/data-access/data.json

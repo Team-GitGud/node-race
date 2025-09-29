@@ -104,7 +104,7 @@ async function handleJoinGame() {
 	display: flex;
 	justify-content: center;
 	position: fixed;
-	top: calc(100vh - 45vh);
+	top: 56%;
 	width: 100%;
 }
 

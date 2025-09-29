@@ -3,6 +3,10 @@
     <div class="question-view">
         <h2 v-if="question">{{ question.title }}</h2>
 
+        <div class="top-right-buttons">
+            <TutorialPopup />
+        </div>
+
         <!-- Render the question's tree structure -->
         <div class="tree-container">
             <TreeNode 
@@ -35,7 +39,7 @@
                 :disabled="selectedOrder.size !== question?.correctOrder.size" 
                 v-if="result === null"
             >
-                <h3>Submit</h3>
+                <h4>Submit</h4>
             </CustomButton>
 
             <!-- Next Button -->
@@ -45,7 +49,7 @@
                 type="positive" 
                 v-else
             >
-                <h3>Next</h3>
+                <h4>Next</h4>
             </CustomButton>
 
             <!-- Reset Button-->
@@ -97,6 +101,7 @@ import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import CustomButton from '@/components/CustomButton.vue';
 import ModalPopup from '@/components/ModalPopup.vue';
 import TreeNode from '@/components/TreeNode.vue';
+import TutorialPopup from '@/components/TutorialPopup.vue';
 import { Question } from '@/types/Question';
 import { AlertService } from '@/types/AlertService';
 // --- Types and Adapters ---
@@ -201,8 +206,8 @@ fetchQuestion();
 }
 
 h2 {
-    font-size: 64px;
-    margin-top: 40px;
+    font-size: 50px;
+    margin-top: 25px;
     padding: 0 20px 10px 20px;
     border-bottom: 2px solid var(--text-color);
     white-space: normal;
@@ -219,11 +224,21 @@ h2 {
 
 .bottom-right-buttons {
     position: absolute;
-    bottom: 50px;
+    bottom: 40px;
     right: 60px;
     display: flex;
     align-items: center;
     gap: 5px;
+}
+
+.top-right-buttons {
+    position: absolute;
+    top: 25px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 100;
 }
 
 .submit-button :deep(.btn-inner),

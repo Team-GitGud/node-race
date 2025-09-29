@@ -41,16 +41,22 @@ export function usePlayerSession() {
       router.push("/question-navigation");
     }
 
-    session.addEventListener("GAME_STARTED", () => {
-      console.log("Game started");
-      const start = new Date().getTime();
-      const fiveMinutes = 1000 * 60 * 5;
-      const gameTimer = new GameTimer(start, start + fiveMinutes);
-      session.setGameTimer(gameTimer);
-      gameTimer.start();
-      router.push("/question-navigation");
+        session.addEventListener("GAME_STARTED", () => {
+            console.log("Game started");
+            const start = new Date().getTime();
+            const fiveMinutes = 1000 * 60 * 5;
+            const gameTimer = new GameTimer(start, start + fiveMinutes);
+            session.setGameTimer(gameTimer);
+            gameTimer.start();
+            router.push('/question/0');
+        });
+
+        session.addEventListener("GAME_END", (data) => {
+            const reason = data?.reason || "Game ended by host";
+            AlertService.alert(`The game has ended: ${reason}`);
+            router.push('/');
+        });
     });
-  });
 
   return { lobbyCode, playerName, questions, gameTimer };
 }
