@@ -53,6 +53,15 @@ h3 {
     font-size: 38px;
 }
 
+.question-name {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    font-size: 32px;
+}
+
 .question-card {
     padding: 12px 30px;
     display: flex;

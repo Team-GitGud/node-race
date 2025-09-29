@@ -87,13 +87,6 @@ export class Session {
   }
 
   public async fetchLeaderboard(): Promise<void> {
-    if (this.ws.readyState !== WebSocket.OPEN) {
-      AlertService.alert("Server has closed the connection because the session has reached 5 minutes.");
-      this.setGameOver(true);
-      const router = useRouter();
-      router.push("/");
-      return;
-    }
     return new Promise((resolve) => {
       const message = JSON.stringify({
         action: "GET_LEADERBOARD",

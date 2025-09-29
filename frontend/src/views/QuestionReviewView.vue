@@ -128,12 +128,6 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 100dvh;
-    width: 100dvw;
-    padding: 20px;
-    box-sizing: border-box;
-    position: relative;
 }
 
 h2 {
@@ -150,98 +144,36 @@ h2 {
 }
 
 .tree-container {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    max-width: 800px;
-    margin: 20px 0;
+    margin-top: 5vh;
+    transform-origin: center top;
+    transition: transform 0.3s ease;
 }
 
 .bottom-right-buttons {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
+    position: absolute;
+    bottom: 40px;
+    right: 60px;
     display: flex;
-    gap: 15px;
-    z-index: 1000;
+    align-items: center;
+    gap: 5px;
+    z-index: 100;
 }
 
 .top-right-buttons {
-    position: fixed;
-    top: 30px;
-    right: 30px;
-    z-index: 1000;
-}
-
-.info-item {
+    position: absolute;
+    top: 25px;
+    right: 20px;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
-    font-size: 18px;
+    gap: 15px;
+    z-index: 100;
 }
 
-.info-item:last-child {
-    margin-bottom: 0;
-}
-
-.label {
-    font-weight: bold;
-    color: var(--text-color);
-}
-
-.value {
-    color: var(--text-color);
-}
-
-.value.correct {
-    color: var(--positive-color);
-    font-weight: bold;
-}
-
-.value.incorrect {
-    color: var(--negative-color);
-    font-weight: bold;
-}
-
-.btn-img {
-    width: 20px;
-    height: 20px;
-}
-
-@media screen and (max-width: 890px) {
+@media (max-width: 890px) { /* I found this is a good number to make sure it doesn't overlap the title. */
     .top-right-buttons {
-        position: fixed;
-        top: 20px;
-        right: 20px;
         flex-direction: column-reverse;
         align-items: flex-end;
         gap: 10px;
-    }
-    
-    .bottom-right-buttons {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        flex-direction: column;
-        align-items: flex-end;
-        gap: 10px;
-    }
-    
-    .question-info {
-        position: relative;
-        top: auto;
-        left: auto;
-        margin-bottom: 20px;
-        width: 100%;
-        max-width: 400px;
-    }
-    
-    h2 {
-        font-size: 36px;
-        margin-bottom: 20px;
     }
 }
 </style>
