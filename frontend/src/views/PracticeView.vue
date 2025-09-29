@@ -1,4 +1,5 @@
 <template>
+    <ScreenBackground blur />
     <ReturnHomeComponent skipConfirm />
     <div class="question-view">
         <h2 v-if="question">{{ question.title }}</h2>
@@ -104,6 +105,7 @@ import TreeNode from '@/components/TreeNode.vue';
 import TutorialPopup from '@/components/TutorialPopup.vue';
 import { Question } from '@/types/Question';
 import { AlertService } from '@/types/AlertService';
+import ScreenBackground from '@/components/ScreenBackground.vue';
 // --- Types and Adapters ---
 import { QuestionAdapter, BackendQuestion } from '@/types/QuestionAdapter';
 import APIManager from '@/types/APIManager';
