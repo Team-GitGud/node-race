@@ -1,4 +1,5 @@
 <template>
+    <ScreenBackground blur />
     <ReturnHomeComponent 
         :onConfirm="handleReturnHome"/>
     <div class="question-view">
@@ -53,6 +54,7 @@ import NavigateLeft from '@/assets/navigate-left.svg';
 import NavigateRight from '@/assets/navigate-right.svg';
 import { QuestionAdapter } from '@/types/QuestionAdapter';
 import TutorialPopup from '@/components/TutorialPopup.vue';
+import ScreenBackground from '@/components/ScreenBackground.vue';
 
 const router = useRouter();
 const { questions, gameTimer } = usePlayerSession();

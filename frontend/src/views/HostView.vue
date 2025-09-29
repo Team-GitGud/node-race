@@ -632,7 +632,7 @@ const totalPlayers = computed(() => playersData.value.length);
 }
 
 .unanswered {
-    background: var(--participation-color);
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .kick-button :deep(.btn-inner) {
@@ -697,7 +697,6 @@ const totalPlayers = computed(() => playersData.value.length);
 .question-analytics-item-box {
     display: flex;
     height: 30px;
-    background: #f0f0f0;
     overflow: hidden;
     overflow-x: hidden;
     overflow-y: auto;
@@ -706,7 +705,7 @@ const totalPlayers = computed(() => playersData.value.length);
 }
 
 .question-analytics-item-box-correct {
-    background: #139705;
+    background: var(--positive-color);
     color: white;
     display: flex;
     align-items: center;
@@ -716,7 +715,7 @@ const totalPlayers = computed(() => playersData.value.length);
 }
 
 .question-analytics-item-box-incorrect {
-    background: #AA0707;
+    background: var(--negative-color);
     color: white;
     display: flex;
     align-items: center;
@@ -726,7 +725,7 @@ const totalPlayers = computed(() => playersData.value.length);
 }
 
 .question-analytics-item-box-unanswered {
-    background: white;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .analytics-header {
@@ -734,6 +733,9 @@ const totalPlayers = computed(() => playersData.value.length);
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding-right: 2.5rem;
+}
+
+.host-timer {
+    margin-right: 1.0rem;
 }
 </style>
