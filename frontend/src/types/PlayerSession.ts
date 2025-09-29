@@ -49,7 +49,7 @@ export class PlayerSession extends Session {
     });
 
     this.addEventListener("GAME_END", (data) => {
-      this.handleSessionEnded(data.reason || "Game ended by host");
+      this.handleGameEnd(data);
     });
   }
 
@@ -97,6 +97,63 @@ export class PlayerSession extends Session {
     }
 
     this.leaveSession(reason || "Session closed by host");
+  }
+
+  public handleGameEnd(data: any) {
+    console.log("Game ended with data:", data);
+
+    // Set game over state
+    this.setGameOver(true);
+
+    // Stop the game timer if it's running
+    if (this.gameTimer) {
+      this.gameTimer.stop();
+    }
+
+    // Stop inactivity checker
+    if (this.inactivityChecker) {
+      this.inactivityChecker.stop();
+      this.inactivityChecker = null;
+    }
+
+    // Update player's final rank and score
+    if (data.rank !== undefined) {
+      this.player.setGlobalRank(data.rank);
+    }
+    if (data.lobbyRank !== undefined) {
+      this.player.setLobbyRank(data.lobbyRank);
+    }
+
+    // Update answers if provided
+    if (data.answer && Array.isArray(data.answer)) {
+      this.answers = data.answer;
+    }
+
+    // Update leaderboards with final data
+    if (data.sessLeaderboard && Array.isArray(data.sessLeaderboard)) {
+      this.lobbyLeaderboard = data.sessLeaderboard.map((player: any) => 
+        createReactivePlayer(player.rank.toString(), player.name, parseFloat(player.score))
+      );
+    }
+
+    if (data.globalLeaderoard && Array.isArray(data.globalLeaderoard)) {
+      this.globalLeaderboard = data.globalLeaderoard.map((player: any) => 
+        createReactivePlayer(player.rank.toString(), player.name, parseFloat(player.score))
+      );
+    }
+
+    // Emit custom event for game end with all the data
+    this.emitEvent("GAME_ENDED", {
+      time: data.time,
+      numCorrect: data.numCorrect,
+      answers: data.answer,
+      sessionLeaderboard: data.sessLeaderboard,
+      globalLeaderboard: data.globalLeaderoard,
+      rank: data.rank,
+      lobbyRank: data.lobbyRank
+    });
+
+    // Navigation will be handled by components listening to GAME_ENDED event
   }
 
   public handleLeaderboard(

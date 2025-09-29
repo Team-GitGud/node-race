@@ -144,15 +144,33 @@ const initializeQuestion = async () => {
     calculateTreeScale();
 };
 
-onMounted(() => {
+// Handle game end event
+const handleGameEnded = (data: any) => {
+    console.log("Game ended, navigating to leaderboard", data);
+    router.push('/leaderboard');
+};
+
+onMounted(async () => {
     initializeQuestion();
     // Add window resize listener for responsive scaling
     window.addEventListener('resize', calculateTreeScale);
+    
+    // Listen for game end event
+    const session = await APIManager.getInstance().getSession();
+    if (session) {
+        session.addEventListener("GAME_ENDED", handleGameEnded);
+    }
 });
 
-onUnmounted(() => {
+onUnmounted(async () => {
     // Clean up resize listener
     window.removeEventListener('resize', calculateTreeScale);
+    
+    // Clean up game end event listener
+    const session = await APIManager.getInstance().getSession();
+    if (session) {
+        session.removeEventListener("GAME_ENDED", handleGameEnded);
+    }
 });
 
 // Immediate false just means it won't call on the first mount.

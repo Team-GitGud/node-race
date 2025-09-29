@@ -171,6 +171,15 @@ class APIManager {
         localStorage.setItem(key, JSON.stringify(info));
     }
 
+    /** Save game over state to localStorage */
+    public saveGameOverState(gameOver: boolean) {
+        const info = this.loadSessionInfo("player");
+        if (info) {
+            info.gameOver = gameOver;
+            this.saveSessionInfo(info, "player");
+        }
+    }
+
     /** Update player session data in localStorage (for gameTimer, answers, etc.) */
     public updatePlayerSessionData(sessionData: any) {
         this.saveSessionInfo(sessionData, "player");
@@ -211,6 +220,13 @@ class APIManager {
             if (!info) { 
                 this.stopLoading();
                 return resolve(false); 
+            }
+
+            // Check if game is over - don't attempt reconnection
+            if (info.gameOver === true) {
+                this.stopLoading();
+                console.log("Game is over, skipping reconnection");
+                return resolve(false);
             }
 
             const ws = this.createWs(role === "host" ? `lobby/rejoin?id=${encodeURIComponent(info.hostToken)}&lobbyId=${encodeURIComponent(info.lobbyCode)}` : 

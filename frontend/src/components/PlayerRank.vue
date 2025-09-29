@@ -62,9 +62,26 @@ const getRankColor = (rank: number) => {
     return '';
 };
 
+// Handle game end event to update player data
+const handleGameEnded = (data: any) => {
+    console.log("PlayerRank: Game ended, updating player data", data);
+    // The player data is already updated in PlayerSession.handleGameEnd
+    // This is just for any additional UI updates if needed
+};
+
 onMounted(async () => {
     if (props.session instanceof PlayerSession) {
         timeSpent.value = (60 * 5) - (props.session.getGameTimer()?.getTimeLeft() ?? 0);
+        
+        // Listen for game end event
+        props.session.addEventListener("GAME_ENDED", handleGameEnded);
+    }
+});
+
+onUnmounted(() => {
+    // Clean up event listener
+    if (props.session instanceof PlayerSession) {
+        props.session.removeEventListener("GAME_ENDED", handleGameEnded);
     }
 });
 </script>

@@ -2,16 +2,19 @@ import { Player } from "./Player";
 import { Question } from "./Question";
 import { AlertService } from "./AlertService";
 import { useRouter } from "vue-router";
+import APIManager from "./APIManager";
 
 export class Session {
   ws: WebSocket;
   lobbyCode: string;
+  gameOver: boolean;
   protected globalLeaderboard: Array<Player> = [];
   protected lobbyLeaderboard: Array<Player> = [];
 
   constructor(ws: WebSocket, lobbyCode: string) {
     this.ws = ws;
     this.lobbyCode = lobbyCode;
+    this.gameOver = false;
   }
 
   disconnect(): void {
@@ -86,6 +89,7 @@ export class Session {
   public async fetchLeaderboard(): Promise<void> {
     if (this.ws.readyState !== WebSocket.OPEN) {
       AlertService.alert("Server has closed the connection because the session has reached 5 minutes.");
+      this.setGameOver(true);
       const router = useRouter();
       router.push("/");
       return;
@@ -113,5 +117,18 @@ export class Session {
 
   public getLobbyCode(): string {
     return this.lobbyCode;
+  }
+
+  public getGameOver(): boolean {
+    return this.gameOver;
+  }
+
+  public setGameOver(gameOver: boolean) {
+    this.gameOver = gameOver;
+    // Save game over state to localStorage for reconnection logic
+    if (gameOver) {
+      const apiManager = APIManager.getInstance();
+      apiManager.saveGameOverState(true);
+    }
   }
 }
