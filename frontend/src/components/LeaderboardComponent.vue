@@ -45,7 +45,7 @@ onMounted(async () => {
     currentPlayers.value = props.localPlayers;
     localPlayers.value = [...props.localPlayers];
     globalPlayers.value = [...props.globalPlayers];
-    if (session instanceof PlayerSession) {
+    if (session instanceof PlayerSession && globalPlayers.value != undefined) {
         globalPlayers.value.push(session.getPlayer());
     }
 });

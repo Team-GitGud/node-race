@@ -234,11 +234,22 @@ class APIManager {
                 resolve, role);
             ws.onmessage = (event) => {
                 this.stopLoading();
-                const { questions } = this.parseWsMsg(event, resolve);
+                const parsedData = this.parseWsMsg(event, resolve);
+                
+                // Check if parsing was successful
+                if (!parsedData) {
+                    console.log('Failed to parse WebSocket message during rejoin');
+                    return resolve(false);
+                }
+                
+                const { questions } = parsedData;
+                
                 if (role === "host") { 
                     this.session = new HostSession(ws, info.lobbyCode, info.hostToken); 
                 } else { 
-                    const playerSession = new PlayerSession(ws, info.lobbyCode, info.playerId, info.playerName, questions);
+                    // Ensure questions is an array, default to empty array if not provided
+                    const questionsArray = Array.isArray(questions) ? questions : [];
+                    const playerSession = new PlayerSession(ws, info.lobbyCode, info.playerId, info.playerName, questionsArray);
                     this.session = playerSession;
 
                     // If there's a game timer, we can assume there's questions and answers. 
