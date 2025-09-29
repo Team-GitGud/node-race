@@ -43,24 +43,24 @@ onMounted(async () => {
     }
     gameSession.value = session as PlayerSession;
     currentPlayers.value = props.localPlayers;
-    localPlayers.value = props.localPlayers;
-    globalPlayers.value = props.globalPlayers;
+    localPlayers.value = [...props.localPlayers];
+    globalPlayers.value = [...props.globalPlayers];
     if (session instanceof PlayerSession) {
         globalPlayers.value.push(session.getPlayer());
     }
 });
 
 watch(() => props.localPlayers, (newLocalPlayers) => {
-    localPlayers.value = newLocalPlayers;
+    localPlayers.value = [...newLocalPlayers];
     if (viewLocal.value) {
-        currentPlayers.value = newLocalPlayers;
+        currentPlayers.value = [...newLocalPlayers];
     }
 });
 
 watch(() => props.globalPlayers, (newGlobalPlayers) => {
-    globalPlayers.value = newGlobalPlayers;
+    globalPlayers.value = [...newGlobalPlayers];
     if (!viewLocal.value) {
-        currentPlayers.value = newGlobalPlayers;
+        currentPlayers.value = [...newGlobalPlayers];
     }
 });
 
@@ -68,6 +68,7 @@ const setCurrentPlayers = (players: Player[]) => {
     currentPlayers.value = players;
     currentPlayers.value.sort((a, b) => b.score - a.score);
     viewLocal.value = !viewLocal.value;
+    gameSession.value?.emitEvent("LEADERBOARD_SWITCHED", viewLocal.value ? "lobby" : "global");
 }
 
 const chooseColour = (index: number) => {

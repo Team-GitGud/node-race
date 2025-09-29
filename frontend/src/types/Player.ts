@@ -1,3 +1,5 @@
+import { reactive } from "vue";
+
 export class Player {
     id: string;
     nickname: string;
@@ -44,4 +46,8 @@ export class Player {
     getLobbyRank(): number {
         return this.lobbyRank;
     }
+}
+
+export const createReactivePlayer = (id: string, nickname: string, score = 0) => {
+    return reactive(new Player(id, nickname, score));
 }

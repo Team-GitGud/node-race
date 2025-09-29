@@ -41,7 +41,7 @@ import { AlertService } from "@/types/AlertService";
 
 const router = useRouter();
 const session = ref<Session | null>(null);
-const playerRank = ref<number>();
+// playerRank removed - using reactive player directly
 const globalPlayers = ref<Player[]>();
 const lobbyPlayers = ref<Player[]>();
 const playerAnswers = ref<boolean[]>();
@@ -60,7 +60,6 @@ onMounted(async () => {
     await session.value.fetchLeaderboard();
     if (session.value instanceof PlayerSession) {
         await session.value.fetchScore();
-        playerRank.value = session.value.getPlayer().getLobbyRank();
         playerAnswers.value = session.value.getAnswers();
         questions.value = session.value.getQuestions();
         globalPlayers.value = session.value.getGlobalLeaderboard();
@@ -71,7 +70,6 @@ onMounted(async () => {
             await session.value.fetchLeaderboard();
             globalPlayers.value = session.value.getGlobalLeaderboard();
             lobbyPlayers.value = [...session.value.getLobbyLeaderboard()];
-            playerRank.value = session.value.getPlayer().getLobbyRank();
         }
     }, 1000);
 

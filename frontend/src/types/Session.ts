@@ -75,26 +75,6 @@ export class Session {
     }
   }
 
-  public handleLeaderboard(
-    leaderboard: Array<{
-      rank: number;
-      name: string;
-      score: number;
-    }>, 
-    lobbyLeaderboard?: Array<{
-      rank: number;
-      name: string;
-      score: number;
-    }>
-  ) {
-    this.globalLeaderboard = leaderboard?.map((player) => {
-      return new Player(player.rank.toString(), player.name, player.score);
-    }) ?? [];
-    this.lobbyLeaderboard = lobbyLeaderboard?.map((player) => {
-      return new Player(player.rank.toString(), player.name, player.score);
-    }) ?? [];
-  }
-
   public getGlobalLeaderboard(): Array<Player> {
     return this.globalLeaderboard.sort((a, b) => b.getScore() - a.getScore());
   }

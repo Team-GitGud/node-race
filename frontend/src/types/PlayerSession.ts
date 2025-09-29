@@ -1,5 +1,5 @@
 import { Session } from "./Session";
-import { Player } from "./Player";
+import { Player, createReactivePlayer } from "./Player";
 import { Question } from "./Question";
 import { QuestionAdapter, BackendQuestion } from "./QuestionAdapter";
 import { InactivityChecker } from "./InactivityChecker";
@@ -22,7 +22,7 @@ export class PlayerSession extends Session {
     questions: Array<BackendQuestion>
   ) {
     super(ws, lobbyCode);
-    this.player = new Player(playerId, nickname);
+    this.player = createReactivePlayer(playerId, nickname);
     this.questions = QuestionAdapter.fromBackendQuestions(questions);
     this.answers = new Array(questions.length).fill(undefined); // All questions are incorrect by default.
     this.answerTimes = new Array(questions.length).fill(0);
@@ -97,6 +97,37 @@ export class PlayerSession extends Session {
     }
 
     this.leaveSession(reason || "Session closed by host");
+  }
+
+  public handleLeaderboard(
+    leaderboard: Array<{
+      rank: number;
+      name: string;
+      score: number;
+    }>, 
+    lobbyLeaderboard?: Array<{
+      rank: number;
+      name: string;
+      score: number;
+    }>
+  ) {
+    this.globalLeaderboard = leaderboard?.map((player) => {
+      console.debug("Global leaderboard", player.name);
+      console.debug("Global leaderboard player", player.rank.toString());
+      if (player.name === this.player.getNickname()) {
+        this.player.setGlobalRank(player.rank);
+        this.emitEvent("GLOBAL_RANK_UPDATED", player.rank);
+      }
+
+      return createReactivePlayer(player.rank.toString(), player.name, player.score);
+    }) ?? [];
+    this.lobbyLeaderboard = lobbyLeaderboard?.map((player) => {
+      if (player.name === this.player.getNickname()) {
+        this.player.setLobbyRank(player.rank);
+        this.emitEvent("LOBBY_RANK_UPDATED", player.rank);
+      }
+      return createReactivePlayer(player.rank.toString(), player.name, player.score);
+    }) ?? [];
   }
 
   public getQuestions(): Array<Question> {
