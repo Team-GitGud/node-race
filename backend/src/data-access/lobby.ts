@@ -83,6 +83,22 @@ export class Lobby {
     }
 
     /**
+     * Checks if the game has ended. The condition its checking is whether all of the players has finished or not.
+     */
+    isEndGame(): void {
+        let allPlayerFinished: boolean = true;
+        this.players.forEach((p: Player) => {
+            if (!p.finished) {
+                allPlayerFinished = false;
+            }
+        });
+
+        if (allPlayerFinished) {
+            this.endGame();
+        }
+    }
+
+    /**
      * Generates the session leaderboard from the current lobby/game
      * This is not saved and its different from the global leaderboard
      */
@@ -138,8 +154,8 @@ export class Lobby {
             qd.title = this.gameLogic.questions[i].questionType;
             let totalAnswertime = 0;
 
-            this.players.forEach((p)=>{
-                if (p.questionHistory[i] == undefined){
+            this.players.forEach((p) => {
+                if (p.questionHistory[i] == undefined) {
                     qd.unansweredCount++;
                     return;
                 }
@@ -279,16 +295,16 @@ export class Lobby {
     }
 }
 
-export class playerData{
+export class playerData {
     name: string = "";
     playerId: string = "";
     score: number = 0;
     answers: Array<Boolean> = [];
 }
 
-export class questionData{
-    id:number = 0;
-    title:string = "";
+export class questionData {
+    id: number = 0;
+    title: string = "";
     averageAnswerTime = 0;
     correctAnswerCount = 0;
     incorrectAnswerCount = 0;

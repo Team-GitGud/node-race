@@ -15,6 +15,7 @@ export class Player {
     prevQuestionTime: number;
     questionHistory: Array<Boolean> = [];
     questionTimes: Array<number> = [];
+    finished: boolean = false;
 
     constructor(name: string, ws: WebSocket, lobby: Lobby) {
         this.name = name;
@@ -32,14 +33,16 @@ export class Player {
      */
     calculateScore(timer: Timer, correct: boolean, questionNumber: number): void {
         this.questionHistory[questionNumber] = correct;
-        this.questionTimes[questionNumber]= timer.getTime() - this.prevQuestionTime;
+        this.questionTimes[questionNumber] = timer.getTime() - this.prevQuestionTime;
         if (correct) {
-
             let timeMultiplier = ((bonusTimePerQuestion - (timer.getTime() - this.prevQuestionTime)) / 100);
             if (timeMultiplier < 0) timeMultiplier = 0;
-            this.score = Math.trunc( this.score + 200 + (800 * timeMultiplier));
+            this.score = Math.trunc(this.score + 200 + (800 * timeMultiplier));
         }
         this.prevQuestionTime = timer.getTime();
+        if (this.questionHistory.length == 5) {
+            this.finished = true;
+        }
     }
 
 

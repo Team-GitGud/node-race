@@ -182,7 +182,7 @@ export class api {
         }
     }
 
-    static analyticsUpdate(lobby: Lobby){
+    static analyticsUpdate(lobby: Lobby) {
         console.log("THing");
         console.log(ApiResponseFactory.getAnalyticsUpdate(lobby.getLobbyAnalytics(), lobby.getPlayerAnalytics()));
         lobby.ws.send(ApiResponseFactory.getAnalyticsUpdate(lobby.getLobbyAnalytics(), lobby.getPlayerAnalytics()));
@@ -280,7 +280,7 @@ export class api {
             ws.send("Error processing answer either player does not exist or question already submitted");
         }
         this.analyticsUpdate(lobby);
-
+        lobby.isEndGame();
     }
 
     static getAllPlayers(message: any, ws: WebSocket): void {
