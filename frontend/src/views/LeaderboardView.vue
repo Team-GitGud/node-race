@@ -57,9 +57,18 @@ onMounted(async () => {
         router.push("/");
         return;
     }
-    await session.value.fetchLeaderboard();
+
+    if (session.value.ws.readyState !== WebSocket.OPEN) {
+      router.push("/");
+      session.value.setGameOver(true);
+      AlertService.alert("Server has closed the connection because the session has reached 5 minutes.");
+      return;
+    } else {
+        await session.value.fetchLeaderboard();
+    }
     if (session.value instanceof PlayerSession) {
         await session.value.fetchScore();
+        session.value.getGameTimer()?.stop();
         playerAnswers.value = session.value.getAnswers();
         questions.value = session.value.getQuestions();
         globalPlayers.value = session.value.getGlobalLeaderboard();
@@ -67,7 +76,14 @@ onMounted(async () => {
     }
     updater.value = setInterval(async () => {
         if (session.value instanceof PlayerSession) {
-            await session.value.fetchLeaderboard();
+            if (session.value.ws.readyState !== WebSocket.OPEN) {
+            router.push("/");
+            session.value.setGameOver(true);
+            AlertService.alert("Server has closed the connection because the session has reached 5 minutes.");
+            return;
+            } else {
+                await session.value.fetchLeaderboard();
+            }
             globalPlayers.value = session.value.getGlobalLeaderboard();
             lobbyPlayers.value = [...session.value.getLobbyLeaderboard()];
         }
