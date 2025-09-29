@@ -122,14 +122,9 @@ const initializeQuestion = async () => {
     console.log("Questions:", questions.value);
     gameTimer.value = session.value.getGameTimer();
     hasAnswered.value = await hasAnsweredQuestion(props.questionIndex);
-
-    if (hasAnswered.value) {
-        goToNextRelevantQuestion(props.questionIndex);
-        return;
-    }
-
     selectedOrder.value = new Map();
     answerDisabled.value = await answeredAllQuestions();
+    
     if (hasAnswered.value) {
         result.value = session.value.getAnswers()[props.questionIndex] ?? false;
         if (await answeredAllQuestions()) {
@@ -151,12 +146,13 @@ const handleGameEnded = (data: any) => {
 };
 
 onMounted(async () => {
+    // Listen for game end event
+    const session = await APIManager.getInstance().getSession();
+
     initializeQuestion();
     // Add window resize listener for responsive scaling
     window.addEventListener('resize', calculateTreeScale);
     
-    // Listen for game end event
-    const session = await APIManager.getInstance().getSession();
     if (session) {
         session.addEventListener("GAME_ENDED", handleGameEnded);
     }
