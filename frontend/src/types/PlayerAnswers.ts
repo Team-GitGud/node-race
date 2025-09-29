@@ -3,17 +3,22 @@ import { Player } from './Player';
 export class PlayerAnswers extends Player {
     private answers: Array<boolean | null>;
     constructor(id: string, nickname: string, score: number, answers: Array<boolean | null>) {
-        
+
         score = Math.round(score);
-        
+
         super(id, nickname, score);
-        
-        // Start with 5 nulls, then overlay any provided answers
-        this.answers = [null, null, null, null, null];
-        answers.forEach((answer, index) => {
-            if (index < 5 && (answer === true || answer === false)) {
-                this.answers[index] = answer;
+
+        const normalizedAnswers = Array.isArray(answers) ? answers : [];
+        const length = Math.max(5, normalizedAnswers.length);
+
+        this.answers = Array.from({ length }, (_, index) => {
+            const value = normalizedAnswers[index];
+
+            if (value === true || value === false) {
+                return value;
             }
+
+            return null;
         });
     }
 

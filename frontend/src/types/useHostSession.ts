@@ -78,7 +78,7 @@ export function useHostSession() {
         // Reconstruct PlayerAnswers objects from saved data
         if (data.players) {
             playersData.value = data.players.map((player: any) =>
-                new PlayerAnswers(player.id, player.nickname, player.score, player.answers || [])
+                new PlayerAnswers(player.id, player.nickname, player.score, player.answers)
             );
         }
 
@@ -127,6 +127,21 @@ export function useHostSession() {
         // Set the lobby code from the active session
         lobbyCode.value = session.lobbyCode;
 
+        // If we restored players from storage, prime the session cache so future updates merge correctly
+        if (playersData.value.length) {
+            const restoredPlayers = playersData.value.map((player) =>
+                new PlayerAnswers(
+                    player.getId(),
+                    player.getNickname(),
+                    player.getScore(),
+                    [...player.getAnswers()]
+                )
+            );
+
+            session.playerQuestions.value = restoredPlayers;
+        }
+
+
         // Listen for analytics updates from the server and persist them
         session.addEventListener("ANALYTICS_UPDATED", (data) => {
             session.updateHostSessionData(data);
@@ -161,13 +176,30 @@ export function useHostSession() {
         watch(
             session.playerQuestions,
             (newPlayerData) => {
+                
+                const previousPlayersById = new Map(
+                    playersData.value.map((player) => [player.getId(), player])
+                );                
+                
                 // Create new PlayerAnswers objects from backend data
                 const updatedPlayers = newPlayerData.map((player: any) => {
+                    const playerId = player.id || player.getId?.() || '';
+                    const previousPlayer = previousPlayersById.get(playerId);
+
+                    const incomingAnswers = player.answers || player.getAnswers?.() || [];
+                    const hasIncomingAnswers = Array.isArray(incomingAnswers) && incomingAnswers.length > 0;
+
+                    const answersToUse = hasIncomingAnswers
+                        ? [...incomingAnswers]
+                        : previousPlayer
+                            ? [...previousPlayer.getAnswers()]
+                            : [];
+
                     return new PlayerAnswers(
-                        player.id || player.getId?.() || '',
+                        playerId,
                         player.nickname || player.getNickname?.() || '',
                         player.score || player.getScore?.() || 0,
-                        player.answers || player.getAnswers?.() || [],
+                        answersToUse,
                     );
                 }).sort((a, b) => b.getScore() - a.getScore()); // Sort by score descending
 

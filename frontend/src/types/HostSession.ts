@@ -42,17 +42,6 @@ export class HostSession extends Session {
             this.playerQuestions.value = this.playerQuestions.value.filter(player => player.id !== data.playerId);
         });
 
-        // Handle receiving all players data (typically on initial load or refresh)
-        this.addEventListener("ALL_PLAYERS", (data) => {
-            if (data.players) {
-                // Convert server player data to PlayerAnswers objects
-                const playerObjects = data.players.map((serverPlayer: any) =>
-                    new PlayerAnswers(serverPlayer.id, serverPlayer.name, parseInt(serverPlayer.score) || 0, [])
-                );
-                this.playerQuestions.value = playerObjects;
-            }
-        });
-
         // Listen for server error messages
         this.addEventListener("SERVER_ERROR", (data) => {
             console.error("Server error received:", data.message);
