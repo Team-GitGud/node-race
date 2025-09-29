@@ -239,9 +239,9 @@ export class PlayerSession extends Session {
 
   public handleScore(score: number, rank: number) {
     this.player.setScore(score);
-    this.player.setLobbyRank(rank + 1);
+    this.player.setLobbyRank(rank);
     // Emit a custom event for score updates
-    this.emitEvent("SCORE_UPDATED", { score, rank: rank + 1 });
+    this.emitEvent("SCORE_UPDATED", { score, rank });
   }
 
   public getGlobalLeaderboard(): Array<Player> {

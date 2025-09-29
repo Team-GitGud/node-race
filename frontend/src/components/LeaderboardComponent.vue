@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, defineProps } from 'vue';
+import { ref, onMounted, defineProps, watch } from 'vue';
 import APIManager from '@/types/APIManager';
 import { Player } from '@/types/Player';
 import { PlayerSession } from '@/types/PlayerSession';
@@ -32,16 +32,35 @@ const props = defineProps<{
 const currentPlayers = ref<Player[]>([]);
 const localPlayers = ref<Player[]>([]);
 const globalPlayers = ref<Player[]>([]);
+const gameSession = ref<PlayerSession | null>(null);
 const viewLocal = ref(true);
 
 onMounted(async () => {
     // Cheaty way to include the user into the global players because it hasn't updated yet.
     const session = await APIManager.getInstance().getSession();
+    if (session == null) {
+        return;
+    }
+    gameSession.value = session as PlayerSession;
     currentPlayers.value = props.localPlayers;
     localPlayers.value = props.localPlayers;
     globalPlayers.value = props.globalPlayers;
     if (session instanceof PlayerSession) {
         globalPlayers.value.push(session.getPlayer());
+    }
+});
+
+watch(() => props.localPlayers, (newLocalPlayers) => {
+    localPlayers.value = newLocalPlayers;
+    if (viewLocal.value) {
+        currentPlayers.value = newLocalPlayers;
+    }
+});
+
+watch(() => props.globalPlayers, (newGlobalPlayers) => {
+    globalPlayers.value = newGlobalPlayers;
+    if (!viewLocal.value) {
+        currentPlayers.value = newGlobalPlayers;
     }
 });
 

@@ -28,7 +28,7 @@
 import ScreenBackground from "@/components/ScreenBackground.vue";
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import PlayerRank from "@/components/PlayerRank.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { PlayerSession } from "@/types/PlayerSession";
 import LeaderboardQuestionCard from "@/components/LeaderboardQuestionCard.vue";
 import LeaderboardComponent from "@/components/LeaderboardComponent.vue";
@@ -47,6 +47,7 @@ const lobbyPlayers = ref<Player[]>();
 const playerAnswers = ref<boolean[]>();
 const questions = ref<Question[]>();
 const isLoading = ref(true);
+const updater = ref<number | null>(null);
 
 onMounted(async () => {
     session.value = await APIManager.getInstance().getSession();
@@ -65,8 +66,23 @@ onMounted(async () => {
         globalPlayers.value = session.value.getGlobalLeaderboard();
         lobbyPlayers.value = session.value.getLobbyLeaderboard();
     }
+    updater.value = setInterval(async () => {
+        if (session.value instanceof PlayerSession) {
+            await session.value.fetchLeaderboard();
+            globalPlayers.value = session.value.getGlobalLeaderboard();
+            lobbyPlayers.value = [...session.value.getLobbyLeaderboard()];
+            playerRank.value = session.value.getPlayer().getLobbyRank();
+        }
+    }, 1000);
+
+
     isLoading.value = false;
-    console.log("Finished mounting");
+});
+
+onUnmounted(() => {
+    if (updater.value) {
+        clearInterval(updater.value);
+    }
 });
 </script>
 
