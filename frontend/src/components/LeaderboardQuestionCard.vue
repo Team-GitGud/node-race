@@ -44,7 +44,7 @@ const formattedTime = computed(() => {
 });
 
 const handleClick = () => {
-    router.push(`/question/${props.question.id}`);
+    router.push(`/review/${props.question.id}`);
 }
 </script>
 
