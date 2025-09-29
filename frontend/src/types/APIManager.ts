@@ -171,6 +171,15 @@ class APIManager {
         localStorage.setItem(key, JSON.stringify(info));
     }
 
+    /** Save game over state to localStorage */
+    public saveGameOverState(gameOver: boolean) {
+        const info = this.loadSessionInfo("player");
+        if (info) {
+            info.gameOver = gameOver;
+            this.saveSessionInfo(info, "player");
+        }
+    }
+
     /** Update player session data in localStorage (for gameTimer, answers, etc.) */
     public updatePlayerSessionData(sessionData: any) {
         this.saveSessionInfo(sessionData, "player");
@@ -213,16 +222,34 @@ class APIManager {
                 return resolve(false); 
             }
 
+            // Check if game is over - don't attempt reconnection
+            if (info.gameOver) {
+                this.stopLoading();
+                console.log("Game is over, skipping reconnection");
+                return resolve(false);
+            }
+
             const ws = this.createWs(role === "host" ? `lobby/rejoin?id=${encodeURIComponent(info.hostToken)}&lobbyId=${encodeURIComponent(info.lobbyCode)}` : 
                 `lobby/rejoin?id=${encodeURIComponent(info.playerId)}&lobbyId=${encodeURIComponent(info.lobbyCode)}`,
                 resolve, role);
             ws.onmessage = (event) => {
                 this.stopLoading();
-                const { questions } = this.parseWsMsg(event, resolve);
+                const parsedData = this.parseWsMsg(event, resolve);
+                
+                // Check if parsing was successful
+                if (!parsedData) {
+                    console.log('Failed to parse WebSocket message during rejoin');
+                    return resolve(false);
+                }
+                
+                const { questions } = parsedData;
+                
                 if (role === "host") { 
                     this.session = new HostSession(ws, info.lobbyCode, info.hostToken); 
                 } else { 
-                    const playerSession = new PlayerSession(ws, info.lobbyCode, info.playerId, info.playerName, questions);
+                    // Ensure questions is an array, default to empty array if not provided
+                    const questionsArray = Array.isArray(questions) ? questions : [];
+                    const playerSession = new PlayerSession(ws, info.lobbyCode, info.playerId, info.playerName, questionsArray);
                     this.session = playerSession;
 
                     // If there's a game timer, we can assume there's questions and answers. 

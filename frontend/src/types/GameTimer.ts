@@ -28,6 +28,12 @@ export class GameTimer {
     this.timer = setInterval(() => {
       this.elapsedTime = new Date().getTime() - this.startTime;
       this.saveRunnable(); // We save the current time it takes to cache.
+
+      if (this.elapsedTime >= this.totalDuration) {
+        console.debug("5 minutes has passed, stopping timer, sending to leaderboard...");
+        // TODO: Send to leaderboard.
+        this.stop();
+      }
     }, 1000);
   }
 

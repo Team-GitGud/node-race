@@ -6,6 +6,7 @@ import QuestionNavigationView from '@/views/QuestionNavigationView.vue';
 import PlayerLobbyView from '@/views/PlayerLobbyView.vue';
 import LeaderboardView from '@/views/LeaderboardView.vue';
 import PracticeView from '@/views/PracticeView.vue';
+import QuestionReviewView from '@/views/QuestionReviewView.vue';
 
 const routes: Array<RouteRecordRaw> = [
 	{
@@ -50,6 +51,14 @@ const routes: Array<RouteRecordRaw> = [
 		path: '/practice',
 		name: 'practice',
 		component: PracticeView,
+	},
+	{
+		path: '/review/:questionId',
+		name: 'question-review',
+		component: QuestionReviewView,
+		props: (route) => ({
+			questionId: Number(route.params.questionId)
+		})
 	},
 	{
 		path: '/:pathMatch(.*)*',

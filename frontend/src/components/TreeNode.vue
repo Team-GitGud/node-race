@@ -3,8 +3,7 @@
         <svg
             v-if="lines.length"
             class="lines-svg"
-            :width="containerSize.width"
-            :height="containerSize.height"
+            :viewBox="`0 0 ${containerSize.width} ${containerSize.height}`"
             style="position: absolute; top: 0; left: 0; pointer-events: none;"
         >
             <line
@@ -74,8 +73,12 @@ function handleClick() {
     const current = newOrder.get(props.node.id);
     
     if (current === undefined || current === null) {
-        // Node hasn't been selected yet, add it to the next position
-        const nextPosition = newOrder.size;
+        // Node hasn't been selected yet, find the first available index
+        const usedIndices = new Set(newOrder.values());
+        let nextPosition = 0;
+        while (usedIndices.has(nextPosition)) {
+            nextPosition++;
+        }
         newOrder.set(props.node.id, nextPosition);
     } else {
         // Node already selected, remove it
@@ -157,6 +160,9 @@ watch(() => [props.node.leftChild, props.node.rightChild], updateLines);
     top: 0;
     left: 0;
     z-index: 0;
+    width: 100%;
+    height: 100%;
+    transform-origin: top left;
 }
 .node-btn {
     width: 80px;

@@ -2,8 +2,8 @@
     <div class="player-rank" v-if="session && session instanceof PlayerSession">
         <div class="row-one">
             <div class="rank">
-                <span class="rank-number" :class="getRankColor(playerRank)">{{playerRank}}.</span>
-                <span>{{ session.getPlayer().getNickname() }}</span>
+                <span class="rank-number" :class="getRankColor(playerLobbyRank)">{{playerLobbyRank}}.</span>
+                <span>{{ playerNickname }}</span>
             </div>
             <span>{{parseInt(playerScore.toString())}}</span>
         </div>
@@ -24,12 +24,30 @@ import { Session } from "@/types/Session";
 import { PlayerSession } from "@/types/PlayerSession";
 
 const timeSpent = ref();
-const playerRank = ref(-1);
-const playerScore = ref(-1);
 
 const props = defineProps<{
     session: Session | null;
 }>();
+
+// Create computed properties to make player data reactive
+const player = computed(() => {
+    if (props.session instanceof PlayerSession) {
+        return props.session.getPlayer();
+    }
+    return null;
+});
+
+const playerLobbyRank = computed(() => {
+    return player.value?.getLobbyRank() ?? -1;
+});
+
+const playerScore = computed(() => {
+    return player.value?.getScore() ?? 0;
+});
+
+const playerNickname = computed(() => {
+    return player.value?.getNickname() ?? '';
+});
 
 const formattedTime = computed(() => {
     const minutes = Math.floor(timeSpent.value / 60);
@@ -44,38 +62,26 @@ const getRankColor = (rank: number) => {
     return '';
 };
 
-// Event handler for rank updates
-const handleRankUpdate = (data: { rank: number; lobbyRank: number }) => {
-    console.debug("Rank updated", data);
-    playerRank.value = data.rank;
-};
-
-// Event handler for score updates
-const handleScoreUpdate = (data: { score: number; rank: number }) => {
-    console.debug("Score updated", data);
-    playerScore.value = data.score;
-    playerRank.value = data.rank; // This is the lobby rank
+// Handle game end event to update player data
+const handleGameEnded = (data: any) => {
+    console.log("PlayerRank: Game ended, updating player data", data);
+    // The player data is already updated in PlayerSession.handleGameEnd
+    // This is just for any additional UI updates if needed
 };
 
 onMounted(async () => {
     if (props.session instanceof PlayerSession) {
-        playerRank.value = props.session.getPlayer().getLobbyRank();
-        playerScore.value = props.session.getPlayer().getScore();
         timeSpent.value = (60 * 5) - (props.session.getGameTimer()?.getTimeLeft() ?? 0);
         
-        // Listen for rank updates
-        props.session.addEventListener("RANK_UPDATED", handleRankUpdate);
-        
-        // Listen for score updates
-        props.session.addEventListener("SCORE_UPDATED", handleScoreUpdate);
+        // Listen for game end event
+        props.session.addEventListener("GAME_ENDED", handleGameEnded);
     }
 });
 
 onUnmounted(() => {
-    // Clean up event listeners
+    // Clean up event listener
     if (props.session instanceof PlayerSession) {
-        props.session.removeEventListener("RANK_UPDATED", handleRankUpdate);
-        props.session.removeEventListener("SCORE_UPDATED", handleScoreUpdate);
+        props.session.removeEventListener("GAME_ENDED", handleGameEnded);
     }
 });
 </script>

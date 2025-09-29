@@ -144,15 +144,33 @@ const initializeQuestion = async () => {
     calculateTreeScale();
 };
 
-onMounted(() => {
+// Handle game end event
+const handleGameEnded = (data: any) => {
+    console.log("Game ended, navigating to leaderboard", data);
+    router.push('/leaderboard');
+};
+
+onMounted(async () => {
     initializeQuestion();
     // Add window resize listener for responsive scaling
     window.addEventListener('resize', calculateTreeScale);
+    
+    // Listen for game end event
+    const session = await APIManager.getInstance().getSession();
+    if (session) {
+        session.addEventListener("GAME_ENDED", handleGameEnded);
+    }
 });
 
-onUnmounted(() => {
+onUnmounted(async () => {
     // Clean up resize listener
     window.removeEventListener('resize', calculateTreeScale);
+    
+    // Clean up game end event listener
+    const session = await APIManager.getInstance().getSession();
+    if (session) {
+        session.removeEventListener("GAME_ENDED", handleGameEnded);
+    }
 });
 
 // Immediate false just means it won't call on the first mount.
@@ -308,11 +326,11 @@ h2 {
 }
 
 .navigate-left-icon {
-    left: 150px;
+    left: min(150px, 10vw);
 }
 
 .navigate-right-icon {
-    right: 150px;
+    right: min(150px, 10vw);
 }
 
 .navigate-left-icon.disabled,
@@ -371,6 +389,14 @@ h2 {
     z-index: 100;
 }
 
+@media (max-width: 890px) { /* I found this is a good number to make sure it doesn't overlap the title. */
+    .top-right-buttons {
+        flex-direction: column-reverse;
+        align-items: flex-end;
+        gap: 10px;
+    }
+}
+
 .question-number {
     padding-left: 10px;
     padding-right: 10px;
@@ -378,6 +404,7 @@ h2 {
     display: flex;
     align-items: center;
     justify-content: center;
+    box-sizing: content-box !important; /* This needs to match the timer component. So set it :) */
 }
 </style>
 

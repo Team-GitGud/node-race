@@ -1,5 +1,5 @@
 import { Session } from "./Session";
-import { Player } from "./Player";
+import { Player, createReactivePlayer } from "./Player";
 import { Question } from "./Question";
 import { QuestionAdapter, BackendQuestion } from "./QuestionAdapter";
 import { InactivityChecker } from "./InactivityChecker";
@@ -22,7 +22,7 @@ export class PlayerSession extends Session {
     questions: Array<BackendQuestion>
   ) {
     super(ws, lobbyCode);
-    this.player = new Player(playerId, nickname);
+    this.player = createReactivePlayer(playerId, nickname);
     this.questions = QuestionAdapter.fromBackendQuestions(questions);
     this.answers = new Array(questions.length).fill(undefined); // All questions are incorrect by default.
     this.answerTimes = new Array(questions.length).fill(0);
@@ -49,7 +49,7 @@ export class PlayerSession extends Session {
     });
 
     this.addEventListener("GAME_END", (data) => {
-      this.handleSessionEnded(data.reason || "Game ended by host");
+      this.handleGameEnd(data);
     });
   }
 
@@ -97,6 +97,92 @@ export class PlayerSession extends Session {
     }
 
     this.leaveSession(reason || "Session closed by host");
+  }
+
+  public handleGameEnd(data: any) {
+    console.log("Game ended with data:", data);
+
+    // Set game over state
+    this.setGameOver(true);
+
+    // Stop the game timer if it's running
+    if (this.gameTimer) {
+      this.gameTimer.stop();
+    }
+
+    // Stop inactivity checker
+    if (this.inactivityChecker) {
+      this.inactivityChecker.stop();
+      this.inactivityChecker = null;
+    }
+
+    // Update player's final rank and score
+    if (data.rank !== undefined) {
+      this.player.setGlobalRank(data.rank);
+    }
+    if (data.lobbyRank !== undefined) {
+      this.player.setLobbyRank(data.lobbyRank);
+    }
+
+    // Update answers if provided
+    if (data.answer && Array.isArray(data.answer)) {
+      this.answers = data.answer;
+    }
+
+    // Update leaderboards with final data
+    if (data.sessLeaderboard && Array.isArray(data.sessLeaderboard)) {
+      this.lobbyLeaderboard = data.sessLeaderboard.map((player: any) => 
+        createReactivePlayer(player.rank.toString(), player.name, parseFloat(player.score))
+      );
+    }
+
+    if (data.globalLeaderoard && Array.isArray(data.globalLeaderoard)) {
+      this.globalLeaderboard = data.globalLeaderoard.map((player: any) => 
+        createReactivePlayer(player.rank.toString(), player.name, parseFloat(player.score))
+      );
+    }
+
+    // Emit custom event for game end with all the data
+    this.emitEvent("GAME_ENDED", {
+      time: data.time,
+      numCorrect: data.numCorrect,
+      answers: data.answer,
+      sessionLeaderboard: data.sessLeaderboard,
+      globalLeaderboard: data.globalLeaderoard,
+      rank: data.rank,
+      lobbyRank: data.lobbyRank
+    });
+  }
+
+  public handleLeaderboard(
+    leaderboard: Array<{
+      rank: number;
+      name: string;
+      score: number;
+    }>, 
+    lobbyLeaderboard?: Array<{
+      rank: number;
+      name: string;
+      score: number;
+    }>
+  ) {
+    this.globalLeaderboard = leaderboard?.map((player) => {
+      console.debug("Global leaderboard", player.name);
+      console.debug("Global leaderboard player", player.rank.toString());
+      if (player.name === this.player.getNickname()) {
+        this.player.setGlobalRank(player.rank);
+        this.emitEvent("GLOBAL_RANK_UPDATED", player.rank);
+      }
+
+      return createReactivePlayer(player.rank.toString(), player.name, player.score);
+    }) ?? [];
+    this.lobbyLeaderboard = lobbyLeaderboard?.map((player) => {
+      if (player.name === this.player.getNickname()) {
+        this.player.setLobbyRank(player.rank);
+        this.emitEvent("LOBBY_RANK_UPDATED", player.rank);
+      }
+      return createReactivePlayer(player.rank.toString(), player.name, player.score);
+    }) ?? [];
   }
 
   public getQuestions(): Array<Question> {
@@ -258,9 +344,9 @@ export class PlayerSession extends Session {
 
   public handleScore(score: number, rank: number) {
     this.player.setScore(score);
-    this.player.setLobbyRank(rank + 1);
+    this.player.setLobbyRank(rank);
     // Emit a custom event for score updates
-    this.emitEvent("SCORE_UPDATED", { score, rank: rank + 1 });
+    this.emitEvent("SCORE_UPDATED", { score, rank });
   }
 
   public getGlobalLeaderboard(): Array<Player> {

@@ -28,7 +28,7 @@
 import ScreenBackground from "@/components/ScreenBackground.vue";
 import ReturnHomeComponent from '@/components/ReturnHomeComponent.vue';
 import PlayerRank from "@/components/PlayerRank.vue";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onUnmounted } from "vue";
 import { PlayerSession } from "@/types/PlayerSession";
 import LeaderboardQuestionCard from "@/components/LeaderboardQuestionCard.vue";
 import LeaderboardComponent from "@/components/LeaderboardComponent.vue";
@@ -41,12 +41,13 @@ import { AlertService } from "@/types/AlertService";
 
 const router = useRouter();
 const session = ref<Session | null>(null);
-const playerRank = ref<number>();
+// playerRank removed - using reactive player directly
 const globalPlayers = ref<Player[]>();
 const lobbyPlayers = ref<Player[]>();
 const playerAnswers = ref<boolean[]>();
 const questions = ref<Question[]>();
 const isLoading = ref(true);
+const updater = ref<number | null>(null);
 
 onMounted(async () => {
     session.value = await APIManager.getInstance().getSession();
@@ -59,14 +60,27 @@ onMounted(async () => {
     await session.value.fetchLeaderboard();
     if (session.value instanceof PlayerSession) {
         await session.value.fetchScore();
-        playerRank.value = session.value.getPlayer().getLobbyRank();
         playerAnswers.value = session.value.getAnswers();
         questions.value = session.value.getQuestions();
         globalPlayers.value = session.value.getGlobalLeaderboard();
         lobbyPlayers.value = session.value.getLobbyLeaderboard();
     }
+    updater.value = setInterval(async () => {
+        if (session.value instanceof PlayerSession) {
+            await session.value.fetchLeaderboard();
+            globalPlayers.value = session.value.getGlobalLeaderboard();
+            lobbyPlayers.value = [...session.value.getLobbyLeaderboard()];
+        }
+    }, 1000);
+
+
     isLoading.value = false;
-    console.log("Finished mounting");
+});
+
+onUnmounted(() => {
+    if (updater.value) {
+        clearInterval(updater.value);
+    }
 });
 </script>
 
@@ -76,8 +90,8 @@ onMounted(async () => {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
+    width: 100dvw;
+    gap: 50px
 }
 
 .leaderboard-info {
@@ -85,10 +99,16 @@ onMounted(async () => {
     flex-direction: row;
     justify-content: center;
     align-items: flex-start;
-    margin-top: 5vh;
     width: 100%;
     height: 100%;
     gap: 50px;
+}
+
+@media screen and (max-width: 890px) {
+    .leaderboard-info {
+        flex-direction: column;
+        align-items: center;
+    }
 }
 
 .leaderboard-title {
