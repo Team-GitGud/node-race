@@ -1,6 +1,6 @@
 <template>
 	<div class="home">
-		<ScreenBackground />
+		<ScreenBackground text />
 		<div class="button-container">
 			<CustomButton :action="() => $router.push('/practice')">Solo</CustomButton>
 			<CustomButton :action="() => joinIsOpen = true">Join</CustomButton>
