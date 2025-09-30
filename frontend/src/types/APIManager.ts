@@ -211,7 +211,7 @@ class APIManager {
 
     /**
      * Attempt to reconnect using saved session info.
-     * Returns true if reconnection is successful.
+     * Returns true if reconnection is successful (or if offline session created for ended game).
      */
     public reconnectSession(role: "host" | "player"): Promise<boolean> {
         this.startLoading();
@@ -222,7 +222,30 @@ class APIManager {
                 return resolve(false); 
             }
 
-            // Check if game is over - don't attempt reconnection
+            // For hosts, check if game has ended - create offline session instead of reconnecting
+            if (role === "host") {
+                const hostSessionData = localStorage.getItem('host-session-data');
+                if (hostSessionData) {
+                    try {
+                        const data = JSON.parse(hostSessionData);
+                        if (data.gameEnded === true) {
+                            // Game ended - create offline session (no WebSocket connection needed)
+                            const offlineWs = {
+                                send: () => { /* offline mode - no messages to send */ },
+                                close: () => { /* offline mode - no connection to close */ },
+                                readyState: WebSocket.CLOSED
+                            } as unknown as WebSocket;
+                            this.session = new HostSession(offlineWs, info.lobbyCode, info.hostToken);
+                            this.stopLoading();
+                            return resolve(true);
+                        }
+                    } catch (e) {
+                        // If parsing fails, continue with normal reconnection
+                    }
+                }
+            }
+
+            // For players, check if game is over - don't attempt reconnection
             if (info.gameOver) {
                 this.stopLoading();
                 console.log("Game is over, skipping reconnection");

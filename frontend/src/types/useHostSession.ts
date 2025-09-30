@@ -110,6 +110,10 @@ export function useHostSession() {
      * Sets up event listeners, watchers, and restores any persisted session state.
      */
     onMounted(async () => {
+
+        // Load persisted data first to restore previous state
+        loadData();
+
         // Get the current session from the API manager
         const apiManager = APIManager.getInstance();
         const session = await apiManager.getSession();
@@ -121,46 +125,79 @@ export function useHostSession() {
             return;
         }
 
-        // Load persisted data first to restore previous state
-        loadData();
-
         // Set the lobby code from the active session
         lobbyCode.value = session.lobbyCode;
 
-        // If we restored players from storage, prime the session cache so future updates merge correctly
-        if (playersData.value.length) {
-            const restoredPlayers = playersData.value.map((player) =>
-                new PlayerAnswers(
-                    player.getId(),
-                    player.getNickname(),
-                    player.getScore(),
-                    [...player.getAnswers()]
-                )
-            );
+        // If game has ended, we rely entirely on localStorage data and skip server requests
+        if (gameEnded.value) {
+            // Restore questions to the session object so components can access them
+            if (questions.value.length > 0) {
+                session.AllQuestionsData.value = questions.value.map((question) =>
+                    new QuestionData(
+                        question.getId(),
+                        question.getTitle(),
+                        question.getAverageAnswerTime(),
+                        question.getCorrectAnswerCount(),
+                        question.getIncorrectAnswerCount(),
+                        question.getUnansweredCount()
+                    )
+                );
+            }
+            
+            // Restore players to the session object
+            if (playersData.value.length > 0) {
+                session.playerQuestions.value = playersData.value.map((player) =>
+                    new PlayerAnswers(
+                        player.getId(),
+                        player.getNickname(),
+                        player.getScore(),
+                        [...player.getAnswers()]
+                    )
+                );
+            }
+            
+            // Still listen for any final updates, but don't request fresh data
+            session.addEventListener("ANALYTICS_UPDATED", (data) => {
+                session.updateHostSessionData(data);
+                saveData();
+            });
+        } else {
+            // Game is still active - set up normal synchronization with server
+            
+            // If we restored players from storage, prime the session cache so future updates merge correctly
+            if (playersData.value.length) {
+                const restoredPlayers = playersData.value.map((player) =>
+                    new PlayerAnswers(
+                        player.getId(),
+                        player.getNickname(),
+                        player.getScore(),
+                        [...player.getAnswers()]
+                    )
+                );
 
-            session.playerQuestions.value = restoredPlayers;
+                session.playerQuestions.value = restoredPlayers;
+            }
+
+            // Listen for analytics updates from the server and persist them
+            session.addEventListener("ANALYTICS_UPDATED", (data) => {
+                session.updateHostSessionData(data);
+                saveData();
+            });
+
+            // Initialize player data and request current player list
+            playersData.value = [];
+            session.getPlayers();
+
+            // Convert session player data to PlayerAnswers objects for local state
+            playersData.value = session.playerQuestions.value.map((player: any) => {
+                return new PlayerAnswers(
+                    player.id || player.getId?.() || '',
+                    player.nickname || player.getNickname?.() || '',
+                    player.score || player.getScore?.() || 0,
+                    player.answers || player.getAnswers?.() || []
+                );
+            });
         }
-
-
-        // Listen for analytics updates from the server and persist them
-        session.addEventListener("ANALYTICS_UPDATED", (data) => {
-            session.updateHostSessionData(data);
-            saveData();
-        });
-
-        // Initialize player data and request current player list
-        playersData.value = [];
-        session.getPlayers();
-
-        // Convert session player data to PlayerAnswers objects for local state
-        playersData.value = session.playerQuestions.value.map((player: any) => {
-            return new PlayerAnswers(
-                player.id || player.getId?.() || '',
-                player.nickname || player.getNickname?.() || '',
-                player.score || player.getScore?.() || 0,
-                player.answers || player.getAnswers?.() || []
-            );
-        });
 
         // Watch for question data updates from the session and sync local state
         watch(

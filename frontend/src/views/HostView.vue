@@ -484,7 +484,7 @@ const totalPlayers = computed(() => playersData.value.length);
     color: var(--text-color);
 }
 
-@media (max-width: 1055px) {
+@media (max-width: 1300px) {
 
     .lobby-right {
         max-height:none
@@ -594,7 +594,7 @@ const totalPlayers = computed(() => playersData.value.length);
 .player-name {
     overflow: hidden;
     text-wrap: nowrap;
-    width: 250px;
+    max-width: 250px;
     text-align: left;
 }
 
@@ -659,7 +659,7 @@ const totalPlayers = computed(() => playersData.value.length);
 
 .question-analytics {
     display: flex;
-    min-width: 500px;
+    width: 700px;
     flex-direction: column;
     gap: 2.5rem;
     overflow-x: hidden;
@@ -669,6 +669,12 @@ const totalPlayers = computed(() => playersData.value.length);
     padding-right: 1rem;
     min-height: 0;
     /* Allow flex item to shrink below content size */
+}
+
+@media (max-width: 900px) {
+    .question-analytics {
+        width: 100%;
+    }
 }
 
 .question-header {
