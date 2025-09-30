@@ -131,15 +131,33 @@ export class PlayerSession extends Session {
 
     // Update leaderboards with final data
     if (data.sessLeaderboard && Array.isArray(data.sessLeaderboard)) {
-      this.lobbyLeaderboard = data.sessLeaderboard.map((player: any) => 
-        createReactivePlayer(player.rank.toString(), player.name, parseFloat(player.score))
-      );
+      try {
+        this.lobbyLeaderboard = data.sessLeaderboard.map((player: any) => {
+          // Parse if it's a string
+          if (typeof player === 'string') {
+            player = JSON.parse(player);
+          }
+          return createReactivePlayer(player.rank?.toString() ?? '0', player.name ?? 'Unknown', parseFloat(player.score ?? 0));
+        });
+      } catch (error) {
+        console.error('Error parsing session leaderboard:', error);
+        this.lobbyLeaderboard = [];
+      }
     }
 
     if (data.globalLeaderoard && Array.isArray(data.globalLeaderoard)) {
-      this.globalLeaderboard = data.globalLeaderoard.map((player: any) => 
-        createReactivePlayer(player.rank.toString(), player.name, parseFloat(player.score))
-      );
+      try {
+        this.globalLeaderboard = data.globalLeaderoard.map((player: any) => {
+          // Parse if it's a string
+          if (typeof player === 'string') {
+            player = JSON.parse(player);
+          }
+          return createReactivePlayer(player.rank?.toString() ?? '0', player.name ?? 'Unknown', parseFloat(player.score ?? 0));
+        });
+      } catch (error) {
+        console.error('Error parsing global leaderboard:', error);
+        this.globalLeaderboard = [];
+      }
     }
 
     // Emit custom event for game end with all the data
