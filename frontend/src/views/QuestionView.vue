@@ -1,5 +1,5 @@
 <template>
-    <ScreenBackground blur />
+    <ScreenBackground noTree />
     <ReturnHomeComponent 
         :onConfirm="handleReturnHome"/>
     <div class="question-view">

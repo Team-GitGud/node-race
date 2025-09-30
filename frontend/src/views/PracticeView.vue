@@ -1,5 +1,5 @@
 <template>
-    <ScreenBackground blur />
+    <ScreenBackground noTree />
     <ReturnHomeComponent skipConfirm />
     <div class="question-view">
         <h2 v-if="question">{{ question.title }}</h2>
