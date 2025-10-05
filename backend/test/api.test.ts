@@ -220,4 +220,12 @@ describe("Api Tests", () => {
         const lobbyMessage = await waitForMessage(lobby!);
         expect(lobbyMessage).toBe("Cannot join when a game is running");
     });
+
+    it("should allow 30 players to join a lobby", async () => {
+        for (let i = 0; i <= 30; i++) {
+            new WebSocket(
+                `ws://localhost:3000/api/v1/lobby/join?name=joeJoin${i}&lobbyId=${lobbyCode}`
+            );
+        }
+    });
 });
