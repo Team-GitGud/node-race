@@ -221,7 +221,7 @@ describe("Api Tests", () => {
         expect(lobbyMessage).toBe("Cannot join when a game is running");
     });
 
-    it("shouldn't allow players to join after game has started", async () => {
+    it("should allow 30 players to join a lobby", async () => {
         for (let i = 0; i <= 30; i++) {
             new WebSocket(
                 `ws://localhost:3000/api/v1/lobby/join?name=joeJoin${i}&lobbyId=${lobbyCode}`
